@@ -1,0 +1,220 @@
+package main
+import "core:fmt"
+import "core:math"
+import "core:math/rand"
+
+// King related things, particularly physical state, animation, and foods eaten.
+King :: struct {
+	jump_state: JumpState,
+	position: Vec2,
+	velocity: Vec2,
+	gravity_scale: f32,
+
+	foods_eaten: f32,
+	jump_buffer: f32,
+	coyote_time: f32,
+	jump_gravity_countdown: f32,
+	facing_right: bool,
+	running_input: bool,
+
+	animator: Animator,
+}
+
+// Current state of the king's jump and float capabilities.
+JumpState :: enum {
+	GROUNDED,
+	JUMP,
+	FLOAT,
+	POST_FLOAT,
+}
+
+// Initialize the starting values of king data.
+init_king :: proc(king: ^King, data: ^LevelData, config: ^KingConfig) {
+	using king
+
+	king.position = data.king_position
+
+	gravity_scale = config.jump_gravity_scale
+	jump_state = JumpState.GROUNDED
+	facing_right = true
+	running_input = false
+	foods_eaten = 0
+	velocity = {0, 0}
+}
+
+// Draw a sprite to the platform representative of the king's current state.
+draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^Platform, dt: f32) {
+	using king
+
+	animator.sequence = &sequences.king_idle
+	if running_input do animator.sequence = &sequences.king_run
+
+	if jump_state == JumpState.JUMP do animator.sequence = &sequences.king_jump
+	else if jump_state == JumpState.FLOAT do animator.sequence = &sequences.king_float
+	else if jump_state == JumpState.POST_FLOAT do animator.sequence = &sequences.king_post_float
+
+	animator.flipped = !facing_right
+
+	king_position := ivec2_from_vec2(position)
+	king_position.y += y_offset
+	cycle_and_draw_animator(&animator, king_position, platform, dt)
+}
+
+// Accelerate in direction of input, or decelerate if input is zero.
+update_king_movement :: proc(king: ^King, input: ^Input, config: ^KingConfig, dt: f32) {
+	using king
+
+	running_input = false 
+	acceleration_direction: f32 = 0
+	if input.left.held {
+		acceleration_direction -= 1 
+		facing_right = false
+		running_input = true
+	} 
+	if input.right.held {
+		acceleration_direction += 1
+		facing_right = true
+		running_input = true
+	}
+
+	foods_eaten_mod := config.acceleration_scale_per_food
+	i_foods_eaten: int = int(foods_eaten)
+	for i: int = 0; i < i_foods_eaten; i += 1 {
+		if i < 8 {
+			foods_eaten_mod *= config.acceleration_scale_per_food
+			continue
+		}
+
+		modded_scale := lerp(config.acceleration_scale_per_food, 1, (f32(i) - 8) / 8)
+		if modded_scale > 1 {
+			modded_scale = 1
+		}
+		foods_eaten_mod *= modded_scale
+	}
+
+	//foods_eaten_mod := math.pow(config.acceleration_scale_per_food, foods_eaten)
+	acceleration_magnitude: f32 = config.initial_acceleration * foods_eaten_mod * dt
+
+	if jump_state == JumpState.GROUNDED && !running_input {
+		if abs(velocity.x) - acceleration_magnitude < 0 {
+			acceleration_direction = 0 // will cause a complete stop
+		}
+		else {
+			acceleration_direction = -math.sign(velocity.x) 
+		}
+	}
+
+	velocity.x += acceleration_direction * acceleration_magnitude
+	velocity.x = clamp(velocity.x, -config.max_speed, config.max_speed)
+}
+
+// Updates king jump state from input, performing state machine functionality related to jumping.
+update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^KingConfig, sound_system: ^SoundSystem, dt: f32) {
+	using king
+
+	if jump_state == JumpState.GROUNDED || coyote_time > 0 {
+		coyote_time -= dt
+		if input.jump.just_pressed || jump_buffer > 0 {
+			jump_buffer = -1
+			jump_state = JumpState.JUMP
+			jump_gravity_countdown = config.jump_gravity_length
+			velocity.y = -config.jump_velocity
+			gravity_scale = config.jump_gravity_scale
+			start_sound(&sound_system.channels[0], SoundType.JUMP)
+		}
+	}
+	else if jump_state == JumpState.JUMP {
+		gravity_scale = config.jump_gravity_scale_down
+
+		if input.jump.just_pressed {
+			jump_state = JumpState.FLOAT
+			velocity.y = -config.float_velocity
+			gravity_scale = config.float_initial_gravity_scale
+
+			float_switchback_velocity: f32 = config.max_speed / 2
+			if input.left.held && velocity.x > 0 {
+				king.velocity.x = -float_switchback_velocity
+			} 
+			else if input.right.held && velocity.x < 0 {
+				king.velocity.x = float_switchback_velocity
+			}
+
+			start_sound(&sound_system.channels[0], SoundType.FLOAT)
+		}
+	}
+	else if jump_state == JumpState.FLOAT {
+		gravity_scale = math.lerp(gravity_scale, config.float_target_gravity_scale, config.float_gravity_lerp_speed * dt)
+		sound_system.channels[0].sound.frequency += -velocity.y * 16 * dt
+
+		jump_buffer -= dt
+		if input.jump.just_pressed {
+			jump_buffer = 0.1
+		}
+	}
+
+	velocity.y += config.base_gravity * gravity_scale * dt
+}
+
+// Update the king's current position per his velocity and stop before a collision.
+apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, king_config: ^KingConfig, tile_config: ^TileConfig, dt: f32) -> int {
+	using king
+	effective_velocity: Vec2 = velocity
+
+	collider := Rect{{-5, -16}, {10, 16}}
+
+	x_off_col: Rect = collider
+	x_off_col.position.x += velocity.x * dt
+
+	y_off_col: Rect = collider
+	y_off_col.position.y += velocity.y * dt
+
+	ground_check_col: Rect = collider
+	ground_check_col.position.y += 0.75
+
+	is_grounded: bool = false
+
+	tile_col: Rect = {{-8, 0}, {16, 10}}
+
+	tile_to_crumble: int = -1
+	closest_tile_distance: f32 = 128
+	for tile, tile_index in tilemap {
+		if tile.health == 0 do continue
+
+		tile_pos: Vec2 = tile_position_from_index(tile_index)
+
+		if is_colliding(&x_off_col, &position, &tile_col, &tile_pos) {
+			effective_velocity.x = 0
+			velocity.x = 0
+		}
+
+		if is_colliding(&y_off_col, &position, &tile_col, &tile_pos) {
+			effective_velocity.y = 0
+			//if jump_state != JumpState.FLOAT {
+				velocity.y = 0
+			//}
+
+			gravity_scale = king_config.fall_gravity_scale
+		}
+	
+		if velocity.y >= 0 && is_colliding(&ground_check_col, &position, &tile_col, &tile_pos) {
+			// TODO Should this disregard tiles that are currently crumbling to 0?
+			distance := abs(position.x - tile_pos.x)
+			if distance < closest_tile_distance {
+				tile_to_crumble = tile_index
+				closest_tile_distance = distance
+			}
+
+			is_grounded = true
+			jump_state = JumpState.GROUNDED
+		}
+	}
+	
+	if !is_grounded && jump_state == JumpState.GROUNDED {
+		jump_state = JumpState.JUMP
+		coyote_time = 0.08
+	}
+
+	position += effective_velocity * dt
+
+	return tile_to_crumble
+}

@@ -1,0 +1,20 @@
+=============
+Cabinet Notes
+=============
+
+To build
+- Control panel (3 buttons + graphic)
+- New front graphic inlay
+- Screen support (to hold in place)
+- Wooden screen bevel
+- Something something coin slot
+
+Hardware
+- Arduino Micro (connects control panel -> computer via USB)
+- SN76489 for sound (stretch goal)
+
+Control panel
+- Two buttons on left for movement
+- One button on right for jump/float
+- Directions on graphic
+- Graphic prolly like King chased by bad guy with crumbling tiles

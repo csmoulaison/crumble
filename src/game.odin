@@ -34,9 +34,6 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 	deserialize_leaderboard(&leaderboard.data)
 	init_main_menu(&main_menu)
 
-    start_music(music_bach1041(), &sound_system)
-
-
 	state = GameState.PRE_MAIN_MENU
 }
 

@@ -95,7 +95,11 @@ audio_data_callback :: proc "c" (device: ^MA.device, output, input: rawptr, fram
 
             data.oscillators[i].t += t_add
             sin_index := data.oscillators[i].t
+
+            // for sin
 		    //mem.ptr_offset(output_f32, j * 2)^ += math.sin_f32(sin_index) * data.oscillators[i].amplitude
+
+            // for square
             if int(data.oscillators[i].t) % 2 == 0 do mem.ptr_offset(output_f32, j * 2)^ += data.oscillators[i].amplitude
             else do mem.ptr_offset(output_f32, j * 2)^ -= data.oscillators[i].amplitude
 
@@ -103,11 +107,12 @@ audio_data_callback :: proc "c" (device: ^MA.device, output, input: rawptr, fram
             else if mem.ptr_offset(output_f32, j * 2)^ > 0.999 do mem.ptr_offset(output_f32, j * 2)^ = 0.999
 		}
 
-        // for sines
+        // for sin
         //if data.oscillators[i].t > math.PI * 128 {
             //data.oscillators[i].t -= math.PI * 128
         //}
 
+        // for square
         if data.oscillators[i].t > 64 {
             data.oscillators[i].t -= 64
         }

@@ -55,14 +55,11 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 
 	buffer_text(platform, {pos_x, pos_y}, "Foods", assets.fonts.red)
 
-	rand.reset(u64(session.current_level))
 	for i: int = 0; i < int(session.king.foods_eaten); i += 1 {
-		food_off_x: int = rand.int_max(4) * 128
-
 		y_off: = int(i / 8) * 20
 		x_off: = -int(i / 8) * 8 * 14
 
-		buffer_sprite(platform, IRect{{592 + food_off_x, 0},{16,16}}, IVec2{pos_x - 4 + i * 14 + x_off, pos_y + 20 + y_off}, IVec2{0,0}, false)
+		buffer_sprite(platform, IRect{{592 + session.food.eaten_food_offsets[i], 0},{16,16}}, IVec2{pos_x - 4 + i * 14 + x_off, pos_y + 20 + y_off}, IVec2{0,0}, false)
 	}
 
 	pos_x += col_width

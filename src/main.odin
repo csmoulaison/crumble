@@ -4,13 +4,7 @@ import "core:fmt"
 // ADDS
 // * Fireworks ending
 // * Music (6 + 1)
-// * Intro splash polish
 // * Sound on window reset
-// * Acceleration asymptote (in progress)
-// * Food UI from eaten food
-// BUGS
-// * Collisions
-// * Startup crash
 
 main :: proc() {
 	platform: ^Platform = new(Platform)

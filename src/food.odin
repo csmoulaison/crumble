@@ -7,6 +7,7 @@ import "core:math/linalg"
 import "core:math"
 
 MAX_WINDOWS :: 8
+MAX_FOODS_EATEN :: 256
 MAX_CHOOSE_WINDOW_ITERATIONS :: 64
 SCOREPOP_OFFSET :: Vec2{20, -12}
 
@@ -35,6 +36,7 @@ Food :: struct {
 	active_windows_len: int,
 	current_window: int,
 	current_food_offset: int,
+    eaten_food_offsets: [MAX_FOODS_EATEN]int,
 	// TODO this can be extrapolated from foods_eaten, yeah?
 	level_complete: bool,
 	animator: Animator,
@@ -179,6 +181,8 @@ update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_sy
 	}
 
 	if linalg.distance(food.windows[food.current_window].position, king.position) < config.distance_to_eat {
+        food.eaten_food_offsets[int(king.foods_eaten)] = food.current_food_offset
+
 		king.foods_eaten += 1
 		if food.phase == FoodPhase.COOKED {
 			session.level_points += config.high_points
@@ -187,8 +191,6 @@ update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_sy
 			session.level_points += config.low_points
 			pop_score(&session.scorepop, king.position + SCOREPOP_OFFSET, ScorepopType.LITTLE)
 		}
-
-		start_sound(&sound_system.channels[0], SoundType.FOOD_EAT)
 
 		for &active_window, i in food.active_windows[:food.active_windows_len] {
 			if active_window == food.current_window {
@@ -200,6 +202,7 @@ update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_sy
 
 		if food.active_windows_len > 0 {
 			start_food_cycle(food, config)
+            start_sound(&sound_system.channels[0], SoundType.FOOD_EAT)
 			session.state = SessionState.HITCH
 			session.time_to_next_state = config.hitch_length
 		} else {

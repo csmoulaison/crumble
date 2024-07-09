@@ -99,7 +99,7 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 		if time_to_next_state < 0 do state = SessionState.LEVEL_ACTIVE
 
 	case SessionState.FOOD_RESET:
-		state = handle_food_reset(session, config, dt)
+		state = handle_food_reset(session, config, sound_system, dt)
 		
 	case SessionState.POST_WIN:
 		state = handle_post_win(session, config, dt)
@@ -234,11 +234,12 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 }
 
 @(private="file")
-handle_food_reset :: proc(session: ^Session, config: ^Config, dt: f32) -> SessionState {
+handle_food_reset :: proc(session: ^Session, config: ^Config, sound_system: ^SoundSystem, dt: f32) -> SessionState {
 	using session.food
 
 	time_to_blink_toggle -= dt
 	if time_to_blink_toggle < 0 {
+        start_sound(&sound_system.channels[0], SoundType.JUMP)
 		is_blinking = !is_blinking
 		time_to_blink_toggle = config.food.blink_length
 	}
@@ -252,6 +253,7 @@ handle_food_reset :: proc(session: ^Session, config: ^Config, dt: f32) -> Sessio
 		}
 		active_windows_len = windows_len
 		start_food_cycle(&session.food, &config.food)
+		start_sound(&sound_system.channels[0], SoundType.ENEMY_ALARMED)
 		return SessionState.LEVEL_ACTIVE
 	}
 

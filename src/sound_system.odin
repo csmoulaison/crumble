@@ -21,4 +21,6 @@ update_sound_system :: proc(sound_system: ^SoundSystem, audio: ^Audio, dt: f32) 
 	update_channel(&channels[0], &music_trackhead, audio, music_length, 0, tempo, dt)
 	// Music channel
 	update_channel(&channels[1], &music_trackhead, audio, music_length, 1, tempo, dt)
+
+
 }

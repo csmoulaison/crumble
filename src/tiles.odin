@@ -34,7 +34,7 @@ draw_tilemap :: proc(tilemap: ^Tilemap, sequences: ^Sequences, current_level: in
 	level_tile_position: IVec2 = {480, 32}
 	level_tile_position.y += current_level * 16
 
-	for tile, index in tilemap {
+	for &tile, index in tilemap {
 		if tile.health == 0 do continue
 
 		// Setup tile orientation
@@ -71,7 +71,7 @@ draw_tilemap :: proc(tilemap: ^Tilemap, sequences: ^Sequences, current_level: in
 }
 
 update_tile_crumble :: proc(tilemap: ^Tilemap, dt: f32) {
-	for tile in tilemap {
+	for &tile in tilemap {
 		using tile
 
 		if is_crumbling {

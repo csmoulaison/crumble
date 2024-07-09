@@ -163,14 +163,10 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, ki
 	collider := Rect{{-5, -16}, {10, 16}}
 
 	x_off_col: Rect = collider
-	x_off_col.position.x += velocity.x * dt * 1.01
+	x_off_col.position.x += velocity.x * dt
 
 	y_off_col: Rect = collider
-	y_off_col.position.y += velocity.y * dt * 1.01
-
-    all_off_col: Rect = collider
-    all_off_col.position.x += velocity.x * dt * 1.01
-    all_off_col.position.y += velocity.y * dt * 1.01
+	y_off_col.position.y += velocity.y * dt
 
 	ground_check_col: Rect = collider
 	ground_check_col.position.y += 0.75
@@ -187,34 +183,20 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, ki
 		tile_pos: Vec2 = tile_position_from_index(tile_index)
 
 		if is_colliding(&x_off_col, &position, &tile_col, &tile_pos) {
-            if effective_velocity.x > 0.00001 {
-                all_off_col.position.x -= velocity.x * dt * 1.01
-            }
-
 			effective_velocity.x = 0
 			velocity.x = 0
 		}
-	}
 
-    for tile, tile_index in tilemap {
-		if tile.health == 0 do continue
-
-		tile_pos: Vec2 = tile_position_from_index(tile_index)
-
-        if is_colliding(&y_off_col, &position, &tile_col, &tile_pos) {
+		if is_colliding(&y_off_col, &position, &tile_col, &tile_pos) {
 			effective_velocity.y = 0
-            velocity.y = 0
+			//if jump_state != JumpState.FLOAT {
+				velocity.y = 0
+			//}
 
 			gravity_scale = king_config.fall_gravity_scale
 		}
-    }
-
-    for tile, tile_index in tilemap {
-		if tile.health == 0 do continue
-
-		tile_pos: Vec2 = tile_position_from_index(tile_index)
-
-        if velocity.y >= 0 && is_colliding(&ground_check_col, &position, &tile_col, &tile_pos) {
+	
+		if velocity.y >= 0 && is_colliding(&ground_check_col, &position, &tile_col, &tile_pos) {
 			// TODO Should this disregard tiles that are currently crumbling to 0?
 			distance := abs(position.x - tile_pos.x)
 			if distance < closest_tile_distance {
@@ -225,7 +207,7 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, ki
 			is_grounded = true
 			jump_state = JumpState.GROUNDED
 		}
-    }
+	}
 	
 	if !is_grounded && jump_state == JumpState.GROUNDED {
 		jump_state = JumpState.JUMP

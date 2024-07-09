@@ -106,7 +106,7 @@ update_platform :: proc(platform: ^Platform) {
 
 	// Draw sprites
 	//pixel_scalar: int = int(screen_height / LOGICAL_HEIGHT)
-	pixel_scalar: int = 2
+	pixel_scalar: int = 3
 	//offset := IVec2{(int(screen_width) - LOGICAL_WIDTH * pixel_scalar) / 2, int((screen_height % LOGICAL_HEIGHT) / 2)}
 	offset := IVec2{(int(screen_width) - LOGICAL_WIDTH * pixel_scalar) / 2 - 32, 64}
 	for &sprite in sprites[:sprites_len] {

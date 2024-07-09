@@ -203,9 +203,9 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 	update_king_movement(&king, input, &config.king, dt)
 	update_king_jump_state(&king, input, &config.king, sound_system, dt)
 
-	physics_iterations: int = 5
+	physics_iterations: int = 1
 	for i: int = 0; i < physics_iterations - 1; i += 1 {
-		apply_king_velocity_and_crumble_tiles(&king, &tilemap, &config.king, &config.tile, dt / f32(physics_iterations))
+		//apply_king_velocity_and_crumble_tiles(&king, &tilemap, &config.king, &config.tile, dt / f32(physics_iterations))
 	}
 
 	tile_to_crumble: int = apply_king_velocity_and_crumble_tiles(&king, &tilemap, &config.king, &config.tile, dt / f32(physics_iterations))

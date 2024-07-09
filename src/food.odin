@@ -195,7 +195,6 @@ update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_sy
 				food.windows[food.current_window].is_active = false
 				active_window = food.active_windows[food.active_windows_len - 1]
 				food.active_windows_len -= 1
-				fmt.println("Window deactivate")
 			}
 		}
 
@@ -220,7 +219,7 @@ update_pot_bounce :: proc(food: ^Food, king: ^King, session: ^Session, sound_sys
 	pot_pos := windows[current_window].position + pot_pos_off
 	pot_col := Rect{{2, 0}, {12, 4}}
 	king_collider := Rect{{-5, -16}, {10, 16}}
-	if is_colliding(&king_collider, &king.position, &pot_col, &pot_pos) && king.position.y > pot_pos.y {
+	if is_colliding(&king_collider, &king.position, &pot_col, &pot_pos) && king.position.y > pot_pos.y - 6 && king.velocity.y > 0 {
 		stop_music(sound_system)
 		start_sound(&sound_system.channels[0], SoundType.POT_BOUNCE)
 		pop_score(&session.scorepop, pot_pos + Vec2{26, -16}, ScorepopType.POT)

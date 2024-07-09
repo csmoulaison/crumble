@@ -55,10 +55,9 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 
 	buffer_text(platform, {pos_x, pos_y}, "Foods", assets.fonts.red)
 
-	rng: rand.Rand
-	rand.init(&rng, u64(session.current_level))
+	rand.reset(u64(session.current_level))
 	for i: int = 0; i < int(session.king.foods_eaten); i += 1 {
-		food_off_x: int = rand.int_max(4, &rng) * 128
+		food_off_x: int = rand.int_max(4) * 128
 
 		y_off: = int(i / 8) * 20
 		x_off: = -int(i / 8) * 8 * 14

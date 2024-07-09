@@ -4,7 +4,6 @@ import "core:fmt"
 // ADDS
 // * Fireworks ending
 // * Music (6 + 1)
-// * Sound on window reset
 
 main :: proc() {
 	platform: ^Platform = new(Platform)

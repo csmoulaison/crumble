@@ -163,14 +163,14 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, ki
 	collider := Rect{{-5, -16}, {10, 16}}
 
 	x_off_col: Rect = collider
-	x_off_col.position.x += velocity.x * dt * 1.01
+	x_off_col.position.x += velocity.x * dt * 1.1
 
 	y_off_col: Rect = collider
-	y_off_col.position.y += velocity.y * dt * 1.01
+	y_off_col.position.y += velocity.y * dt * 1.1
 
     all_off_col: Rect = collider
-    all_off_col.position.x += velocity.x * dt * 1.01
-    all_off_col.position.y += velocity.y * dt * 1.01
+    all_off_col.position.x += velocity.x * dt * 1.1
+    all_off_col.position.y += velocity.y * dt * 1.1
 
 	ground_check_col: Rect = collider
 	ground_check_col.position.y += 0.75
@@ -187,8 +187,8 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, ki
 		tile_pos: Vec2 = tile_position_from_index(tile_index)
 
 		if is_colliding(&x_off_col, &position, &tile_col, &tile_pos) {
-            if effective_velocity.x > 0.00001 {
-                all_off_col.position.x -= velocity.x * dt * 1.01
+            if effective_velocity.x > 0.000001 {
+                all_off_col.position.x -= velocity.x * dt * 1.1
             }
 
 			effective_velocity.x = 0

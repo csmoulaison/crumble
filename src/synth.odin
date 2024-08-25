@@ -54,12 +54,6 @@ init_audio :: proc(audio: ^Audio) {
 
 	for &osc_backend, i in data.osc_backends {
 		waveform_type := MA.waveform_type.square
-		if i == 1 {
-			waveform_type = MA.waveform_type.sawtooth
-		}
-		if i == 2 {
-			waveform_type = MA.waveform_type.square
-		}
 
 		oscillator_configs[i] = MA.waveform_config_init(
 			device.playback.internalFormat, 
@@ -87,7 +81,7 @@ audio_data_callback :: proc "c" (device: ^MA.device, output, input: rawptr, fram
 
     MA.waveform_read_pcm_frames(&data.osc_backends[0], &output_buffer, u64(frame_count), nil)
 
-	for i := 0; i < OSCILLATORS_LEN - 1; i += 1 {
+	for i := 0; i < OSCILLATORS_LEN - 0; i += 1 {
         t_add := (1.0 / 48000.0) * f32(data.oscillators[i].frequency)
 		for j: u64 = 0; j < u64(frame_count); j += 1 {
             if data.oscillators[i].target_amplitude > data.oscillators[i].amplitude do data.oscillators[i].amplitude += 0.02
@@ -100,8 +94,12 @@ audio_data_callback :: proc "c" (device: ^MA.device, output, input: rawptr, fram
 		    //mem.ptr_offset(output_f32, j * 2)^ += math.sin_f32(sin_index) * data.oscillators[i].amplitude
 
             // for square
-            if int(data.oscillators[i].t) % 2 == 0 do mem.ptr_offset(output_f32, j * 2)^ += data.oscillators[i].amplitude
-            else do mem.ptr_offset(output_f32, j * 2)^ -= data.oscillators[i].amplitude
+            //if int(data.oscillators[i].t * 2) % 4 == 0 do mem.ptr_offset(output_f32, j * 2)^ += data.oscillators[i].amplitude
+            if (i == 0 && int(data.oscillators[i].t) % 2 == 0) || (i != 0 && int(data.oscillators[i].t * 2) % 4 == 0) {
+                mem.ptr_offset(output_f32, j * 2)^ += data.oscillators[i].amplitude
+            } else {
+                mem.ptr_offset(output_f32, j * 2)^ -= data.oscillators[i].amplitude
+            }
 
             if mem.ptr_offset(output_f32, j * 2)^ < -0.999 do mem.ptr_offset(output_f32, j * 2)^ = -0.999
             else if mem.ptr_offset(output_f32, j * 2)^ > 0.999 do mem.ptr_offset(output_f32, j * 2)^ = 0.999

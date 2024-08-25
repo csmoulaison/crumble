@@ -250,8 +250,8 @@ music_speed :: proc() -> MusicData {
 
 	data: MusicData
 	data.tempo = 13
+	data.tracks[0] = init_track()
 	data.tracks[1] = melody
-	data.tracks[0] = harmony
-	data.tracks[2] = init_track()
+	data.tracks[2] = harmony
 	return data
 }

@@ -66,10 +66,30 @@ track_game_over :: proc() -> NoteTrack {
 	settings.amplitude = 0.4
 	settings.curve = {-1, -1, 0.25, -1, 0.5}
 
-	push_note(&track, NoteLetter.A4, NoteLength.HALF, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.QUARTER, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.QUARTER, settings)
-	
+	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
+
+	push_note(&track, NoteLetter.C5, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.B4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.B4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.G_SHARP4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
+	push_note(&track, NoteLetter.SILENT, NoteLength.DOT_EIGHTH, settings)
+	push_note(&track, NoteLetter.A5, NoteLength.SIXTEENTH, settings)
+	push_note(&track, NoteLetter.A3, NoteLength.EIGHTH, settings)
+
 	return track
 }
 

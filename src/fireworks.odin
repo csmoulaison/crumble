@@ -4,7 +4,7 @@ import "core:math/rand"
 FIREWORK_PARTICLE_COUNT :: 32
 TOTAL_PARTICLE_COUNT :: FIREWORK_PARTICLE_COUNT * 8
 PARTICLE_COLOR_COUNT :: 4
-PARTICLE_MAX_VELOCITY :: 40
+PARTICLE_MAX_VELOCITY :: 20
 
 ParticleSystem :: struct {
 	particles: [TOTAL_PARTICLE_COUNT]Particle,
@@ -24,7 +24,7 @@ update_fireworks :: proc(particle_system: ^ParticleSystem, dt: f32) {
 	time_to_firework -= dt
 	if time_to_firework < 0 {
 		reset_firework_timer(&time_to_firework)
-		firework_position: Vec2 = {rand.float32() * LOGICAL_WIDTH, rand.float32() * LOGICAL_HEIGHT}
+		firework_position: Vec2 = {rand.float32() * LOGICAL_WIDTH, rand.float32() * (LOGICAL_HEIGHT / 2)}
 
 		for i := 0; i < FIREWORK_PARTICLE_COUNT; i += 1 {
 			next_particle += 1
@@ -40,7 +40,7 @@ update_fireworks :: proc(particle_system: ^ParticleSystem, dt: f32) {
 	}
 
 	for &particle in particles {
-		particle.velocity.y += dt * 90
+		particle.velocity.y += dt * 20
 		particle.position += particle.velocity * dt
 	}
 }
@@ -71,5 +71,5 @@ init_fireworks :: proc(particle_system: ^ParticleSystem) {
 }
 
 reset_firework_timer :: proc(time_to_firework: ^f32) {
-	time_to_firework^ = rand.float32() * 2 * 0.5
+	time_to_firework^ = rand.float32() * 4 * 0.5
 }

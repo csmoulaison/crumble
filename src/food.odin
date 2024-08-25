@@ -133,6 +133,7 @@ update_food_state :: proc(food: ^Food, config: ^FoodConfig, sound_system: ^Sound
 	case FoodPhase.INACTIVE:
 		if time_to_next_phase < 0 {
 			phase, time_to_next_phase = FoodPhase.COOKING, config.cook_length
+            // TODO IF this is fucked for debug should be 1
 			if active_windows_len <= 1 {
 				phase, time_to_next_phase = FoodPhase.POT, config.pot_expiration_length
 			}

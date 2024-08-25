@@ -2,8 +2,20 @@ package main
 import "core:fmt"
 
 // ADDS
-// * Fireworks ending
-// * Music (6 + 1)
+// * Music (5/7)
+//   - 1: Greensleeves [X]
+//   - 2: Dompe        [ ]
+//   - 3: Bach         [X]
+//   - 4: Speed        [X]
+//   - 5: Ballarde     [ ]
+//   - 6: Islands      [X]
+//   - 7: Victory      [X]
+// * Track prioritization last pass (food takes precedence?)
+// * Any last visual telegraphs?
+// * New Hannah art
+// * Fucking collisions?
+// * Opening screens improvement
+// * Level UI improvements?
 
 main :: proc() {
 	platform: ^Platform = new(Platform)

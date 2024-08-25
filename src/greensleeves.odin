@@ -247,8 +247,8 @@ music_greensleeves :: proc() -> MusicData {
 
 	data: MusicData
 	data.tempo = 12
+	data.tracks[0] = init_track()
 	data.tracks[1] = melody
-	data.tracks[0] = harmony
-	data.tracks[2] = init_track()
+	data.tracks[2] = harmony
 	return data
 }

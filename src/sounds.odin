@@ -249,8 +249,10 @@ update_track :: proc(sound: ^SoundState, global_trackhead: ^Trackhead, audio: ^A
 
 	note_t = note_elapsed / note_length
 
+    vibrato_mod := math.sin_f32(note_t * 2) * 2.5 - 1.25
+
 	set_amplitude(oscillator, adsr_amplitude(current_note, note_elapsed, note_t))
-	set_frequency(oscillator, current_note.frequency)
+	set_frequency(oscillator, current_note.frequency + vibrato_mod)
 
 	return 
 }

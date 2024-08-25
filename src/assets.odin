@@ -37,6 +37,8 @@ Sequences :: struct {
 	emote_confused: Sequence,
 
 	foods: [4]Sequence,
+
+    chef: Sequence,
 }
 
 load_assets :: proc(assets: ^Assets, platform: ^Platform) {

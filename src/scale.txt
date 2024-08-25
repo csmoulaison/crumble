@@ -35,6 +35,37 @@ BASS CLEF
  =E4=
 D4
 
+
+
+
+
+
+=======
+. B
+#
+. A
+#
+. G
+#
+. F
+. E
+#
+. D
+# 
+. C
+=======
+
+
+
+
+
+
+
+
+
+
+
+
 MELODY
 
 pre measures

@@ -13,7 +13,6 @@ GameState :: enum {
 
 Game :: struct {
 	state: GameState,
-	config: Config,
 	assets: Assets,
 
 	// State specific data
@@ -30,7 +29,6 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 	using game
 
 	load_assets(&assets, platform)
-	init_config(&config)
 	deserialize_leaderboard(&leaderboard.data)
 	init_main_menu(&main_menu)
 

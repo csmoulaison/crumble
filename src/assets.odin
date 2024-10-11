@@ -3,11 +3,23 @@ package main
 Assets :: struct {
 	sequences: Sequences,
 	fonts: UIFonts,
+    config: Config,
+    music: MusicTrack
 }
 
 UIFonts :: struct {
 	white: int,
 	red: int,
+}
+
+MusicTracks :: struct {
+    greensleeves: MusicData,
+    dompe: MusicData,
+    bach: MusicData,
+    speed: MusicData,
+    ballard: MusicData,
+    islands: MusicData,
+    victory: MusicData,
 }
 
 Sequences :: struct {
@@ -64,6 +76,23 @@ load_assets :: proc(assets: ^Assets, platform: ^Platform) {
 		guard_end = {{{192, 16}, {16, 21}}, 2, {8, 21}, 0.1}
 	}
 
-	fonts.white = new_font_handle(platform, "textures/font_white.bmp")
-	fonts.red = new_font_handle(platform, "textures/font_red.bmp")
+    {
+        using music
+
+        greensleeves = music_greensleeves()
+        dompe = music_greensleeves() // TODO replace with dompe
+        bach = music_bach()
+        speed = music_speed()
+        ballard = music_greensleeves() // TODO replace with ballard
+        victory = music_victory()
+    }
+
+    {
+        using fonts
+
+        white = new_font_handle(platform, "textures/font_white.bmp")
+        red = new_font_handle(platform, "textures/font_red.bmp")
+    }
+
+    init_config(&config)
 }

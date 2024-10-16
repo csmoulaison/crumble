@@ -248,25 +248,25 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 	interpret_surfaces(&tilemap, &surface_map, &enemy_list, king.position)
 
 	for &enemy in enemy_list.enemies[:enemy_list.len] {
-		update_enemy(&enemy, &king, &surface_map, &config.enemy, sound_system, dt)
+		update_enemy(&enemy, &king, &surface_map, config, sound_system, dt)
 	}
 
 	update_tile_crumble(&tilemap, dt)
 
-	update_king_movement(&king, input, &config.king, dt)
-	update_king_jump_state(&king, input, &config.king, sound_system, dt)
+	update_king_movement(&king, input, config, dt)
+	update_king_jump_state(&king, input, config, sound_system, dt)
 
 	physics_iterations: int = 1
 	for i: int = 0; i < physics_iterations - 1; i += 1 {
 		//apply_king_velocity_and_crumble_tiles(&king, &tilemap, &config.king, &config.tile, dt / f32(physics_iterations))
 	}
 
-	tile_to_crumble: int = apply_king_velocity_and_crumble_tiles(&king, &tilemap, &config.king, &config.tile, dt / f32(physics_iterations))
+	tile_to_crumble: int = apply_king_velocity_and_crumble_tiles(&king, &tilemap, config, dt / f32(physics_iterations))
 	// Crumble the closest tile if there is one
 	if tile_to_crumble != -1 && !tilemap[tile_to_crumble].is_crumbling {
 		tile := &tilemap[tile_to_crumble]
 		tile.is_crumbling = true
-		tile.time_till_crumble = config.tile.crumble_tile_length
+		tile.time_till_crumble = config.crumble_tile_length
 	}
 
 
@@ -300,7 +300,7 @@ handle_food_reset :: proc(session: ^Session, config: ^Config, sound_system: ^Sou
 	if time_to_blink_toggle < 0 {
         start_sound(&sound_system.channels[0], SoundType.JUMP)
 		is_blinking = !is_blinking
-		time_to_blink_toggle = config.food.blink_length
+		time_to_blink_toggle = config.food_blink_length
             king_src_x: int = 112
 	}
 
@@ -311,7 +311,7 @@ handle_food_reset :: proc(session: ^Session, config: ^Config, sound_system: ^Sou
 			active_window = i
 		}
 		active_windows_len = windows_len
-		start_food_cycle(&session.food, &config.food)
+		start_food_cycle(&session.food, config)
 		start_sound(&sound_system.channels[0], SoundType.ENEMY_ALARMED)
 		return SessionState.LEVEL_ACTIVE
 	}
@@ -323,7 +323,7 @@ handle_food_reset :: proc(session: ^Session, config: ^Config, sound_system: ^Sou
 handle_post_win :: proc(session: ^Session, config: ^Config, dt: f32) -> SessionState {
 	using session
 
-	king.position.y -= config.king.pot_bounce_speed * dt
+	king.position.y -= config.king_pot_bounce_speed * dt
 
 	time_to_next_state -= dt
 	if time_to_next_state < 0 {
@@ -333,11 +333,11 @@ handle_post_win :: proc(session: ^Session, config: ^Config, dt: f32) -> SessionS
             king.position = {LOGICAL_WIDTH / 2 - 24, LOGICAL_HEIGHT - 96};
             king.facing_right = true
             king.velocity = Vec2{0, 0}
-			time_to_next_state = config.level.pre_active_length
+			time_to_next_state = config.pre_active_length
             return SessionState.FINAL_SCREEN
         }
 
-		time_to_next_state = config.level.level_interstitial_length
+		time_to_next_state = config.level_interstitial_length
 		return SessionState.PRE_LEVEL_SCREEN
 	}
 

@@ -14,6 +14,7 @@ GameState :: enum {
 Game :: struct {
 	state: GameState,
 	assets: Assets,
+	config: Config,
 
 	// State specific data
 	main_menu: MainMenu,
@@ -31,8 +32,6 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 	load_assets(&assets, platform)
 	deserialize_leaderboard(&leaderboard.data)
 	init_main_menu(&main_menu)
-
-    //start_music(music_islands(), &sound_system)
 
 	state = GameState.PRE_MAIN_MENU
 }
@@ -57,7 +56,7 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	case GameState.HIGH_SCORES:
 		update_high_scores(&leaderboard, input)
 
-		// This beautiful if clause prevents the "select" button from changing the
+		// This impeccable if clause prevents the "select" button from changing the
 		// game state if we instead want to advance the currently edited initial
 		if (input.select.just_pressed && (leaderboard.current_score < 0 || leaderboard.current_score > 9 || leaderboard.current_initial > 2)) || input.quit.just_pressed {
 			state = GameState.PRE_MAIN_MENU
@@ -69,6 +68,7 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 
 	case GameState.PRE_MAIN_MENU:
 		draw_pre_menu(game, input, platform, dt)
+
 	case GameState.EDITOR:
 		update_editor(&editor, game, input, &assets.fonts, &sound_system, platform)
 

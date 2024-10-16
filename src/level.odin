@@ -14,9 +14,9 @@ init_level :: proc(session: ^Session, data: ^LevelData, config: ^Config) {
 	level_points = 0
 
 	init_tilemap(&tilemap, &level_data)
-	init_king(&king, &level_data, &config.king)
-	init_food(&food, &level_data, &config.food)
-	init_enemies(&enemy_list, &level_data, &config.enemy)
+	init_king(&king, &level_data, config)
+	init_food(&food, &level_data, config)
+	init_enemies(&enemy_list, &level_data, config)
 
 	king.foods_eaten = 0
 }

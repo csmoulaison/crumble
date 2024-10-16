@@ -1,12 +1,12 @@
 package main
 
 Config :: struct {
-	level: LevelConfig,
-	king: KingConfig,
-	food: FoodConfig,
-	enemy: EnemyConfig,
-	tile: TileConfig,
-	leaderboard: LeaderboardConfig,
+	//level: LevelConfig,
+	//king: KingConfig,
+	//food: FoodConfig,
+	//enemy: EnemyConfig,
+	//tile: TileConfig,
+	//leaderboard: LeaderboardConfig,
 
 	starting_lives: int,
 	pre_active_length: f32,

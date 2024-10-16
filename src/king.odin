@@ -29,12 +29,12 @@ JumpState :: enum {
 }
 
 // Initialize the starting values of king data.
-init_king :: proc(king: ^King, data: ^LevelData, config: ^KingConfig) {
+init_king :: proc(king: ^King, data: ^LevelData, config: ^Config) {
 	using king
 
 	king.position = data.king_position
 
-	gravity_scale = config.jump_gravity_scale
+	gravity_scale = config.king_jump_gravity_scale
 	jump_state = JumpState.GROUNDED
 	facing_right = true
 	running_input = false
@@ -61,7 +61,7 @@ draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^
 }
 
 // Accelerate in direction of input, or decelerate if input is zero.
-update_king_movement :: proc(king: ^King, input: ^Input, config: ^KingConfig, dt: f32) {
+update_king_movement :: proc(king: ^King, input: ^Input, config: ^Config, dt: f32) {
 	using king
 
 	running_input = false 
@@ -77,15 +77,15 @@ update_king_movement :: proc(king: ^King, input: ^Input, config: ^KingConfig, dt
 		running_input = true
 	}
 
-	foods_eaten_mod := config.acceleration_scale_per_food
+	foods_eaten_mod := config.king_acceleration_scale_per_food
 	i_foods_eaten: int = int(foods_eaten)
 	for i: int = 0; i < i_foods_eaten; i += 1 {
 		if i < 8 {
-			foods_eaten_mod *= config.acceleration_scale_per_food
+			foods_eaten_mod *= config.king_acceleration_scale_per_food
 			continue
 		}
 
-		modded_scale := lerp(config.acceleration_scale_per_food, 1, (f32(i) - 8) / 8)
+		modded_scale := lerp(config.king_acceleration_scale_per_food, 1, (f32(i) - 8) / 8)
 		if modded_scale > 1 {
 			modded_scale = 1
 		}
@@ -93,7 +93,7 @@ update_king_movement :: proc(king: ^King, input: ^Input, config: ^KingConfig, dt
 	}
 
 	//foods_eaten_mod := math.pow(config.acceleration_scale_per_food, foods_eaten)
-	acceleration_magnitude: f32 = config.initial_acceleration * foods_eaten_mod * dt
+	acceleration_magnitude: f32 = config.king_initial_acceleration * foods_eaten_mod * dt
 
 	if jump_state == JumpState.GROUNDED && !running_input {
 		if abs(velocity.x) - acceleration_magnitude < 0 {
@@ -105,11 +105,11 @@ update_king_movement :: proc(king: ^King, input: ^Input, config: ^KingConfig, dt
 	}
 
 	velocity.x += acceleration_direction * acceleration_magnitude
-	velocity.x = clamp(velocity.x, -config.max_speed, config.max_speed)
+	velocity.x = clamp(velocity.x, -config.king_max_speed, config.king_max_speed)
 }
 
 // Updates king jump state from input, performing state machine functionality related to jumping.
-update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^KingConfig, sound_system: ^SoundSystem, dt: f32) {
+update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using king
 
 	if jump_state == JumpState.GROUNDED || coyote_time > 0 {
@@ -124,14 +124,14 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^KingConfig, 
 		}
 	}
 	else if jump_state == JumpState.JUMP {
-		gravity_scale = config.jump_gravity_scale_down
+		gravity_scale = config.king_jump_gravity_scale_down
 
 		if input.jump.just_pressed {
 			jump_state = JumpState.FLOAT
-			velocity.y = -config.float_velocity
-			gravity_scale = config.float_initial_gravity_scale
+			velocity.y = -config.king_float_velocity
+			gravity_scale = config.king_float_initial_gravity_scale
 
-			float_switchback_velocity: f32 = config.max_speed / 2
+			float_switchback_velocity: f32 = config.king_max_speed / 2
 			if input.left.held && velocity.x > 0 {
 				king.velocity.x = -float_switchback_velocity
 			} 
@@ -143,7 +143,7 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^KingConfig, 
 		}
 	}
 	else if jump_state == JumpState.FLOAT {
-		gravity_scale = math.lerp(gravity_scale, config.float_target_gravity_scale, config.float_gravity_lerp_speed * dt)
+		gravity_scale = math.lerp(gravity_scale, config.king_float_target_gravity_scale, config.king_float_gravity_lerp_speed * dt)
 		sound_system.channels[0].sound.frequency += -velocity.y * 16 * dt
 
 		jump_buffer -= dt
@@ -152,11 +152,11 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^KingConfig, 
 		}
 	}
 
-	velocity.y += config.base_gravity * gravity_scale * dt
+	velocity.y += config.king_base_gravity * gravity_scale * dt
 }
 
 // Update the king's current position per his velocity and stop before a collision.
-apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, king_config: ^KingConfig, tile_config: ^TileConfig, dt: f32) -> int {
+apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, config: ^Config, dt: f32) -> int {
 	using king
 	effective_velocity: Vec2 = velocity
 
@@ -205,7 +205,7 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, ki
 			effective_velocity.y = 0
             velocity.y = 0
 
-			gravity_scale = king_config.fall_gravity_scale
+			gravity_scale = config.king_fall_gravity_scale
 		}
     }
 

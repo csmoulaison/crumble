@@ -42,7 +42,7 @@ Food :: struct {
 	animator: Animator,
 }
 
-init_food :: proc(food: ^Food, data: ^LevelData, config: ^FoodConfig) {
+init_food :: proc(food: ^Food, data: ^LevelData, config: ^Config) {
 	using food
 
 	windows_len = 0
@@ -124,7 +124,7 @@ draw_window :: proc(is_active: bool, position: Vec2, platform: ^Platform) {
 		false)
 }
 
-update_food_state :: proc(food: ^Food, config: ^FoodConfig, sound_system: ^SoundSystem, dt: f32) {
+update_food_state :: proc(food: ^Food, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using food
 
 	time_to_next_phase -= dt
@@ -132,10 +132,10 @@ update_food_state :: proc(food: ^Food, config: ^FoodConfig, sound_system: ^Sound
 	#partial switch phase {
 	case FoodPhase.INACTIVE:
 		if time_to_next_phase < 0 {
-			phase, time_to_next_phase = FoodPhase.COOKING, config.cook_length
+			phase, time_to_next_phase = FoodPhase.COOKING, config.food_cook_length
             // TODO IF this is fucked for debug should be 1
 			if active_windows_len <= 1 {
-				phase, time_to_next_phase = FoodPhase.POT, config.pot_expiration_length
+				phase, time_to_next_phase = FoodPhase.POT, config.food_pot_expiration_length
 			}
 
 			start_sound(&sound_system.channels[0], SoundType.FOOD_COOKING)
@@ -144,7 +144,7 @@ update_food_state :: proc(food: ^Food, config: ^FoodConfig, sound_system: ^Sound
 		windows[current_window].is_active = int(time_to_next_phase * 4) % 2 == 0
 
 		if time_to_next_phase < 0 {
-			phase, time_to_next_phase = FoodPhase.COOKED, config.expiration_length
+			phase, time_to_next_phase = FoodPhase.COOKED, config.food_expiration_length
 			current_food_offset = 128 * rand.int_max(4)
 			start_sound(&sound_system.channels[0], SoundType.FOOD_APPEAR)
 		}
@@ -152,7 +152,7 @@ update_food_state :: proc(food: ^Food, config: ^FoodConfig, sound_system: ^Sound
 		// TODO: refactor this into function (also used in RESET phase)
 		// should return whether it has just blinked for sounds and stuff
 		// also won't have the / 2 part REMEMBER THE GLITCH!
-		if time_to_next_phase < config.expiration_length / 2 {
+		if time_to_next_phase < config.food_expiration_length / 2 {
 			phase = FoodPhase.COOLING
 		}
 	case FoodPhase.COOLING:
@@ -170,26 +170,26 @@ update_food_state :: proc(food: ^Food, config: ^FoodConfig, sound_system: ^Sound
 		}
 	case FoodPhase.POT:
 		if time_to_next_phase < 0 {
-			phase, time_to_next_phase = FoodPhase.COOKED, config.expiration_length
+			phase, time_to_next_phase = FoodPhase.COOKED, config.food_expiration_length
 			break
 		}
 	}
 }
 
-update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_system: ^SoundSystem, config: ^FoodConfig) {
+update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_system: ^SoundSystem, config: ^Config) {
 	if !(food.phase == FoodPhase.COOKED || food.phase == FoodPhase.COOLING) {
 		return 
 	}
 
-	if linalg.distance(food.windows[food.current_window].position, king.position) < config.distance_to_eat {
+	if linalg.distance(food.windows[food.current_window].position, king.position) < config.food_distance_to_eat {
         food.eaten_food_offsets[int(king.foods_eaten)] = food.current_food_offset
 
 		king.foods_eaten += 1
 		if food.phase == FoodPhase.COOKED {
-			session.level_points += config.high_points
+			session.level_points += config.food_high_points
 			pop_score(&session.scorepop, king.position + SCOREPOP_OFFSET, ScorepopType.BIG)
 		} else {
-			session.level_points += config.low_points
+			session.level_points += config.food_low_points
 			pop_score(&session.scorepop, king.position + SCOREPOP_OFFSET, ScorepopType.LITTLE)
 		}
 
@@ -205,17 +205,17 @@ update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_sy
 			start_food_cycle(food, config)
             start_sound(&sound_system.channels[0], SoundType.FOOD_EAT)
 			session.state = SessionState.HITCH
-			session.time_to_next_state = config.hitch_length
+			session.time_to_next_state = config.food_hitch_length
 		} else {
 			food.phase = FoodPhase.RESET
 			session.state = SessionState.FOOD_RESET
-			session.time_to_next_state = config.reset_length
+			session.time_to_next_state = config.food_reset_length
 			food.time_to_blink_toggle = 0
 		}
 	}
 }
 
-update_pot_bounce :: proc(food: ^Food, king: ^King, session: ^Session, sound_system: ^SoundSystem, config: ^LevelConfig) {
+update_pot_bounce :: proc(food: ^Food, king: ^King, session: ^Session, sound_system: ^SoundSystem, config: ^Config) {
 	using food
 	if food.phase != FoodPhase.POT do return
 
@@ -234,11 +234,11 @@ update_pot_bounce :: proc(food: ^Food, king: ^King, session: ^Session, sound_sys
 	}
 }
 
-start_food_cycle :: proc(food: ^Food, config: ^FoodConfig) {
+start_food_cycle :: proc(food: ^Food, config: ^Config) {
 	using food
 
 	phase = FoodPhase.INACTIVE
-	time_to_next_phase = config.inactive_length
+	time_to_next_phase = config.food_inactive_length
 	time_to_blink_toggle = 0
 	is_blinking = false
 	choose_next_window(food)

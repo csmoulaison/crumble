@@ -1,7 +1,19 @@
 package main
 import "core:fmt"
 
-// ADDS
+// MAJOR cleanup required.
+//     (Some might not be worth it at this stage in the project.
+//     Lesson learned.)
+// * Data formats for:
+//   - Textures
+//   - ALL config
+//   - Music
+//   - Input (will be porting to arcade machine soon)
+// * Make state machine structure consistent
+//   - What's inline with the switch? Just a function call would probably be best.
+// * Any new abstraction to facillitate tandy sound port?
+
+// To do
 // * Music (5/7)
 //   - 1: Greensleeves [X]
 //   - 2: Dompe        [ ]
@@ -13,7 +25,8 @@ import "core:fmt"
 // * Track prioritization last pass (food takes precedence?)
 // * Any last visual telegraphs?
 // * New Hannah art
-// * Fucking collisions?
+// * Collisions?
+//   - Yes: combine colliders while counting tiles
 // * Opening screens improvement
 // * Level UI improvements?
 

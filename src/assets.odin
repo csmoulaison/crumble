@@ -4,7 +4,7 @@ Assets :: struct {
 	sequences: Sequences,
 	fonts: UIFonts,
     config: Config,
-    music: MusicTrack
+    music: MusicTracks
 }
 
 UIFonts :: struct {

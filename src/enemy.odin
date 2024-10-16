@@ -150,14 +150,10 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 }
 
 @(private="file")
-handle_surface_edge :: proc(enemy: ^Enemy, surface: ^Surface, config: ^EnemyConfig) -> (hit_edge: bool) {
+handle_surface_edge :: proc(enemy: ^Enemy, surface: ^Surface, config: ^Config) -> (hit_edge: bool) {
 	using enemy
 
-	if !facing_right && position.x < surface.left ||
-	facing_right && position.x > surface.right {
-		state = EnemyState.PAUSE
-		facing_right = !facing_right
-		time_to_next_state = config.edge_wait_length
+	if !_wait_length {
 		return true
 	}
 	return false

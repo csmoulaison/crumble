@@ -1,5 +1,10 @@
 # Crumble King
 A simple arcade game written in the Odin language. Utilizes an imperative code style with minimal abstractions.
+
+> [![YouTube](http://i.ytimg.com/vi/_o3g5q6HveA/hqdefault.jpg)](https://www.youtube.com/watch?v=_o3g5q6HveA)
+>
+> Gameplay demo on YouTube. All but the first level have been omitted for brevity.
+
 ## Features
 - Simple arcade platformer gameplay featuring 6 levels.
 - Dedicated level editor within the same codebase.

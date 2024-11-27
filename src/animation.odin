@@ -14,17 +14,23 @@ Animator :: struct {
 	frame_length_mod: f32,
 	invisible: bool,
 	flipped: bool,
+	just_advanced_frame: bool,
 }
 
 cycle_and_draw_animator :: proc(animator: ^Animator, position: IVec2, platform: ^Platform, dt: f32) {
 	using animator
 
-	if frame_length_mod == 0 do frame_length_mod = 1
+	if frame_length_mod == 0 {
+		frame_length_mod = 1
+	}
+
+	just_advanced_frame = false
 
 	time_to_next_frame -= dt
 	if time_to_next_frame < 0 {
 		time_to_next_frame = sequence.frame_length * frame_length_mod
 		frame += 1
+		just_advanced_frame = true
 	}
 
 	if frame >= sequence.num_frames {

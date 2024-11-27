@@ -1,5 +1,6 @@
 package main
 import "core:math"
+import "core:fmt"
 
 Session :: struct {
 	state: SessionState,

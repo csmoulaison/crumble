@@ -103,7 +103,7 @@ track_food_cooking :: proc() -> NoteTrack {
 	push_note(&track, NoteLetter.A4, NoteLength.QUARTER, settings)
 	push_note(&track, NoteLetter.B4, NoteLength.EIGHTH, settings)
 	push_note(&track, NoteLetter.C5, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.G5, NoteLength.HALF, settings)
+	push_note(&track, NoteLetter.G5, NoteLength.QUARTER, settings)
 
 	return track
 }

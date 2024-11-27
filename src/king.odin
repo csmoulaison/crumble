@@ -18,6 +18,7 @@ King :: struct {
 	running_input: bool,
 
 	animator: Animator,
+	up_step: bool,
 }
 
 // Current state of the king's jump and float capabilities.
@@ -46,9 +47,11 @@ init_king :: proc(king: ^King, data: ^LevelData, config: ^Config) {
 draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^Platform, dt: f32) {
 	using king
 
+	animator.frame_length_mod = 1
 	animator.sequence = &sequences.king_idle
 	if running_input {
 		animator.sequence = &sequences.king_run
+		animator.frame_length_mod = 0.8
 	}
 
 	#partial switch(jump_state) {
@@ -145,9 +148,18 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 
 			start_sound(&sound_system.channels[0], SoundType.FLOAT)
 		}
-	} else if jump_state == JumpState.FLOAT {
+	} else if jump_state == JumpState.FLOAT || jump_state == JumpState.POST_FLOAT {
 		gravity_scale = math.lerp(gravity_scale, config.king_float_target_gravity_scale, config.king_float_gravity_lerp_speed * dt)
-		sound_system.channels[0].sound.frequency += -velocity.y * 16 * dt
+
+		if jump_state == JumpState.FLOAT {
+			sound_system.channels[0].sound.frequency += -velocity.y * 16 * dt
+			if velocity.y > 0 {
+				jump_state = JumpState.POST_FLOAT
+				//start_sound(&sound_system.channels[0], SoundType.POST_FLOAT)
+			}
+		} else {
+			sound_system.channels[0].sound.frequency -= -velocity.y * 2 * dt
+		}
 
 		jump_buffer -= dt
 		if input.jump.just_pressed {
@@ -159,7 +171,7 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 }
 
 // Update the king's current position per his velocity and stop before a collision.
-apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, config: ^Config, dt: f32) -> int {
+apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, sound_system: ^SoundSystem, config: ^Config, dt: f32) -> int {
 	using king
 	effective_velocity: Vec2 = velocity
 
@@ -231,8 +243,15 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, co
 				closest_tile_distance = distance
 			}
 
+			if jump_state != JumpState.GROUNDED {
+				//start_sound(&sound_system.channels[0], SoundType.LAND)
+				up_step = false
+				start_sound(&sound_system.channels[0], SoundType.DOWN_STEP)
+				jump_state = JumpState.GROUNDED
+			}
+
 			is_grounded = true
-			jump_state = JumpState.GROUNDED
+
 		}
     }
 	

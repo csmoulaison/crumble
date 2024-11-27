@@ -4,8 +4,8 @@ import "core:os"
 
 MAX_TOWER_LEVELS :: 32
 TOWER_COUNT :: 3
-MAIN_SEQUENCE_PATH :: "data/sequences/main"
-MAIN_SEQUENCE_FNAME :: "data/sequences/main/sequence.seq"
+MAIN_SEQUENCE_PATH :: "sequences/main"
+MAIN_SEQUENCE_FNAME :: "sequences/main/sequence.seq"
 
 Tower :: struct {
 	levels: [MAX_TOWER_LEVELS]int,

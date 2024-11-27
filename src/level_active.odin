@@ -19,7 +19,7 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 		//apply_king_velocity_and_crumble_tiles(&king, &tilemap, &config.king, &config.tile, dt / f32(physics_iterations))
 	}
 
-	tile_to_crumble: int = apply_king_velocity_and_crumble_tiles(&king, &tilemap, config, dt / f32(physics_iterations))
+	tile_to_crumble: int = apply_king_velocity_and_crumble_tiles(&king, &tilemap, sound_system, config, dt / f32(physics_iterations))
 	// Crumble the closest tile if there is one
 	if tile_to_crumble != -1 && !tilemap[tile_to_crumble].is_crumbling {
 		tile := &tilemap[tile_to_crumble]
@@ -27,6 +27,14 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 		tile.time_till_crumble = config.tile_crumble_length
 	}
 
+	if (input.left.held || input.right.held) && king.animator.just_advanced_frame && king.jump_state == JumpState.GROUNDED {
+		king.up_step = !king.up_step
+		if(king.up_step) {
+			start_sound(&sound_system.channels[0], SoundType.UP_STEP)
+		} else {
+			start_sound(&sound_system.channels[0], SoundType.DOWN_STEP)
+		}
+	}
 
 	update_food_eating(&food, &king, session, sound_system, config)
 	update_food_state(&food, config, sound_system, dt)

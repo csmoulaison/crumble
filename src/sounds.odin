@@ -1,5 +1,6 @@
 package main
 import "core:math"
+import "core:math/rand"
 
 ROOT_FREQ :: 440.00
 DEFAULT_AMPLITUDE :: 0.2 // absolute
@@ -26,6 +27,8 @@ SoundState :: struct {
 	speed: f32, // speed through t
 	t: f32, // normalized time 0 to 1
 	elapsed: f32, // absolute time passed in seconds
+
+	priority: i32,
 }
 
 SoundType :: enum {
@@ -36,8 +39,13 @@ SoundType :: enum {
 
 	JUMP,
 	FLOAT,
+	POST_FLOAT,
+	LAND,
 	FOOD_BLINK,
 	FOOD_COOKING,
+	UP_STEP,
+	DOWN_STEP,
+	STEP,
 
 	FOOD_APPEAR,
 	FOOD_DISAPPEAR,
@@ -144,28 +152,33 @@ start_track :: proc(channel: ^SoundChannel, new_track: NoteTrack, fg: bool) {
 }
 
 start_sound :: proc(channel: ^SoundChannel, new_type: SoundType) {
-	if channel.sound.type != SoundType.POT_BOUNCE && 
-	new_type != SoundType.POT_BOUNCE &&
-	channel.sound_playing &&
-	channel.sound.type == SoundType.TRACK &&
-	(new_type != SoundType.KING_DIE ||
-	new_type != SoundType.GAME_OVER ||
-	new_type != SoundType.FOOD_COOKING ||
-	new_type != SoundType.FOOD_APPEAR ||
-	new_type != SoundType.FOOD_DISAPPEAR ||
-	new_type != SoundType.FOOD_EAT) {
+	using channel.sound
+
+	new_priority: i32 = get_sound_priority(new_type)
+	if channel.sound_playing && priority > new_priority {
 		return
 	}
 
+	if new_type != SoundType.TRACK {
+		priority = new_priority
+	}
+
 	channel.sound_playing = true
-	using channel.sound
 
 	type = new_type
 	t = 0
 	elapsed = 0
 	amplitude = 0.4
 
-	switch type {
+	step_mod: f32 = 1
+	if type == SoundType.UP_STEP {
+		step_mod = 2
+		type = SoundType.STEP
+	} else if type == SoundType.DOWN_STEP {
+		type = SoundType.STEP
+	}
+
+	#partial switch type {
 	case SoundType.TRACK:
 	case SoundType.NAVIGATE:
 		speed = 24
@@ -182,6 +195,18 @@ start_sound :: proc(channel: ^SoundChannel, new_type: SoundType) {
 	case SoundType.FLOAT:
 		speed = 3
 		frequency = 600
+	case SoundType.POST_FLOAT:
+		speed = 2
+		frequency = 600
+		amplitude = 0
+	case SoundType.LAND:
+		speed = 12
+		frequency = ROOT_FREQ / 4
+		amplitude = 0
+	case SoundType.STEP:
+		speed = 28
+		frequency = ROOT_FREQ * step_mod + rand.float32() * 600
+		amplitude *= 1
 	case SoundType.FOOD_BLINK:
 		frequency = ROOT_FREQ * 2
 		speed = 16
@@ -195,9 +220,11 @@ start_sound :: proc(channel: ^SoundChannel, new_type: SoundType) {
 		start_track(channel, track_food_eat(), true)
 	case SoundType.ENEMY_ALARMED:
 		frequency = ROOT_FREQ
+		amplitude = 0.5
 		speed = 4
 	case SoundType.ENEMY_LOST:
 		frequency = ROOT_FREQ
+		amplitude = 0.5
 		speed = 4
 	case SoundType.KING_DIE:
 		start_track(channel, track_king_die(), true)
@@ -288,17 +315,35 @@ update_sound :: proc(sound: ^SoundState, audio: ^Audio, oscillator_index: int, d
 
 		set_frequency(oscillator, frequency)
 		set_amplitude(oscillator, amplitude)
+	case SoundType.POST_FLOAT:
+		amplitude = 0.4 - (0.2 * t) - 0.2 * f32(i32(t * 3) % 2)
+		amplitude = 0
+
+		//frequency = ROOT_FREQ * 3 - ROOT_FREQ * f32(i32(t * 4) % 2) - t * 200
+		frequency = ROOT_FREQ - (ROOT_FREQ / 2) * t
+		
+		set_frequency(oscillator, frequency)
+		set_amplitude(oscillator, amplitude)
+	case SoundType.LAND:
+		frequency = (ROOT_FREQ) - ROOT_FREQ * t
+		set_frequency(oscillator, frequency)
+		set_amplitude(oscillator, amplitude - amplitude * t)
+	case SoundType.STEP:
+		frequency -= 600 * speed * dt
+
+		set_frequency(oscillator, frequency)
+		set_amplitude(oscillator, amplitude)
 	case SoundType.FOOD_BLINK:
 		set_frequency(oscillator, frequency)
 		set_amplitude(oscillator, amplitude)
 	case SoundType.ENEMY_ALARMED:
 		lfo := math.sin_f32(t * 18)
 		set_frequency(oscillator, frequency + lfo * 400 + t * 400)
-		set_amplitude(oscillator, amplitude - 0.25 + lfo * 0.25)
+		set_amplitude(oscillator, -0.25 + amplitude + lfo * 0.25)
 	case SoundType.ENEMY_LOST:
 		lfo := math.sin_f32(t * 18)
 		set_frequency(oscillator, frequency + lfo * 400 - t * 400)
-		set_amplitude(oscillator, amplitude - 0.25 + lfo * 0.25)
+		set_amplitude(oscillator, -0.25 + amplitude + lfo * 0.25)
 	case SoundType.POT_BOUNCE:
 		attack: f32 = 0.06
 		if t < attack {
@@ -489,4 +534,52 @@ push_note :: proc(track: ^NoteTrack, letter: NoteLetter, length: NoteLength, set
 
 	track.notes[track.notes_len] = empty_note
 	track.notes_len += 1
+}
+
+get_sound_priority :: proc(type: SoundType) -> i32 {
+	switch type {
+	case SoundType.TRACK:
+		return 1000
+	case SoundType.NAVIGATE:
+		return 100
+	case SoundType.SELECT:
+		return 100
+	case SoundType.GO_BACK:
+		return 100
+	case SoundType.JUMP:
+		return 4
+	case SoundType.FLOAT:
+		return 6
+	case SoundType.POST_FLOAT:
+		return 6
+	case SoundType.LAND:
+		return 4
+	case SoundType.FOOD_BLINK:
+		return 7
+	case SoundType.FOOD_COOKING:
+		return 7
+	case SoundType.UP_STEP:
+		return 2
+	case SoundType.DOWN_STEP:
+		return 2
+	case SoundType.STEP:
+		return 2
+	case SoundType.FOOD_APPEAR:
+		return 7
+	case SoundType.FOOD_DISAPPEAR:
+		return 7
+	case SoundType.FOOD_EAT:
+		return 7
+	case SoundType.ENEMY_ALARMED:
+		return 5
+	case SoundType.ENEMY_LOST:
+		return 5
+	case SoundType.KING_DIE:
+		return 10
+	case SoundType.GAME_OVER:
+		return 10
+	case SoundType.POT_BOUNCE:
+		return 10
+	}
+	return 0
 }

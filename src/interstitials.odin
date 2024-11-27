@@ -57,7 +57,9 @@ draw_pre_session_screen :: proc(session: ^Session, assets: ^Assets, platform: ^P
 		false)
 	draw_str_y += line_height
 
-	if time_to_end > 7.5 do return
+	if time_to_end > 7.5 {
+		return
+	}
 
 	enemy_str := strings.builder_make()
 	strings.write_string(&enemy_str, "Avoid enemies")
@@ -70,7 +72,9 @@ draw_pre_session_screen :: proc(session: ^Session, assets: ^Assets, platform: ^P
 		false)
 	draw_str_y += line_height
 
-	if time_to_end > 6 do return
+	if time_to_end > 6 {
+		return
+	}
 
 	float_str := strings.builder_make()
 	strings.write_string(&float_str, "Double jump to float")
@@ -83,7 +87,9 @@ draw_pre_session_screen :: proc(session: ^Session, assets: ^Assets, platform: ^P
 		false)
 	draw_str_y += line_height
 
-	if time_to_end > 4.5 do return
+	if time_to_end > 4.5 {
+		return
+	}
 
 	pot_src_pos := IRect{{288, 0}, {16, 16}}
 	pot_str := strings.builder_make()
@@ -97,11 +103,15 @@ draw_pre_session_screen :: proc(session: ^Session, assets: ^Assets, platform: ^P
 		false)
 	draw_str_y += line_height
 	
-	if time_to_end > 3 do return
-	if int((time_to_end) * 4) % 2 == 0 do return
+	if time_to_end > 3 {
+		return
+	}
+
+	if int((time_to_end) * 4) % 2 == 0 {
+		return
+	}
 
 	cont_str := strings.builder_make()
 	strings.write_string(&cont_str, "Press select to continue")
 	buffer_text(platform, {draw_str_x, draw_str_y}, strings.to_string(cont_str), assets.fonts.white)
-
 }

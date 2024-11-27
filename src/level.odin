@@ -10,13 +10,13 @@ import "core:math/rand"
 init_level :: proc(session: ^Session, data: ^LevelData, config: ^Config) {
 	using session
 
-	time_to_next_state = config.level.pre_active_length
+	time_to_next_state = config.pre_active_length
 	level_points = 0
 
 	init_tilemap(&tilemap, &level_data)
 	init_king(&king, &level_data, config)
 	init_food(&food, &level_data, config)
-	init_enemies(&enemy_list, &level_data, config)
+	init_enemies(&enemy_list, &level_data)
 
 	king.foods_eaten = 0
 }

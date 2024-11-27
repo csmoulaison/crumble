@@ -1,13 +1,6 @@
 package main
 
 Config :: struct {
-	//level: LevelConfig,
-	//king: KingConfig,
-	//food: FoodConfig,
-	//enemy: EnemyConfig,
-	//tile: TileConfig,
-	//leaderboard: LeaderboardConfig,
-
 	starting_lives: int,
 	pre_active_length: f32,
 	post_loss_length: f32,
@@ -76,13 +69,6 @@ init_config :: proc(config: ^Config) {
 	king_float_target_gravity_scale = 0.1
 	king_float_gravity_lerp_speed = 2
 	king_pot_bounce_speed = 300
-
-	/* OVERWRITE FOR ALTERNATE KING
-	king.float_velocity = 100
-	king.float_initial_gravity_scale = -0.1
-	king.float_target_gravity_scale = 0.9
-	king.float_gravity_lerp_speed = 0.3
-	*/
 
 	enemy_patrol_speed = 50
 	enemy_chase_speed = 100

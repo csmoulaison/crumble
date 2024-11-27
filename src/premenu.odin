@@ -1,6 +1,6 @@
 package main
 
-draw_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
+update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
 
 	if input.jump.just_pressed {
@@ -17,7 +17,7 @@ draw_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) 
 		draw_pre_rules(game, input, platform, dt)
 	case 2:
 		game.leaderboard.current_score = -1
-		draw_high_scores(&leaderboard, &config.leaderboard, &assets.fonts, platform, dt)
+		draw_high_scores(&leaderboard, &config, &assets.fonts, platform, dt)
 	}
 
 	pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
@@ -118,5 +118,4 @@ draw_pre_rules :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32)
 	buffer_text(platform, IVec2{pos_x, pos_y}, "Enemies are stunned by", assets.fonts.white)
 	pos_y += header_height - 2
 	buffer_text(platform, IVec2{pos_x, pos_y}, "losing sight of you", assets.fonts.white)
-
 }

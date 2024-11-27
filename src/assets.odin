@@ -58,7 +58,6 @@ load_assets :: proc(assets: ^Assets, platform: ^Platform) {
 
 	{
 		using sequences
-
 		tile_island_src = {{0, 0}, {16, 16}}
 		tile_center_src = {{64, 0}, {16, 16}}
 		tile_left_src = {{128, 0}, {16, 16}}
@@ -78,10 +77,9 @@ load_assets :: proc(assets: ^Assets, platform: ^Platform) {
 
     {
         using music
-
         greensleeves = music_greensleeves()
         dompe = music_greensleeves() // TODO replace with dompe
-        bach = music_bach()
+        bach = music_bach1041()
         speed = music_speed()
         ballard = music_greensleeves() // TODO replace with ballard
         victory = music_victory()
@@ -89,7 +87,6 @@ load_assets :: proc(assets: ^Assets, platform: ^Platform) {
 
     {
         using fonts
-
         white = new_font_handle(platform, "textures/font_white.bmp")
         red = new_font_handle(platform, "textures/font_red.bmp")
     }

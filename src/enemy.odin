@@ -39,19 +39,15 @@ draw_enemies :: proc(enemy_list: ^EnemyList, sequences: ^Sequences, platform: ^P
 		switch state {
 		case EnemyState.PAUSE:
 			animator.sequence = &sequences.guard_idle
-
 		case EnemyState.PATROL:
 			animator.sequence = &sequences.guard_run
 			animator.flipped = !facing_right
-
 		case EnemyState.CHASE:
 			animator.sequence = &sequences.guard_run
 			animator.frame_length_mod = 2
 			animator.flipped = !facing_right
-
 		case EnemyState.SEEN_JUMP:
 			animator.sequence = &sequences.guard_jump
-
 		}
 
 		animator.sequence = &sequences.guard_idle
@@ -63,33 +59,34 @@ draw_enemies :: proc(enemy_list: ^EnemyList, sequences: ^Sequences, platform: ^P
 				animator.frame_length_mod = 0.66
 			}
 		}
-		if state == EnemyState.SEEN_JUMP do animator.sequence = &sequences.guard_jump
+		if state == EnemyState.SEEN_JUMP {
+			animator.sequence = &sequences.guard_jump
+		}
 
 		cycle_and_draw_animator(&animator, ivec2_from_vec2(position), platform, dt)
 	}
 }
 
-init_enemies :: proc(enemy_list: ^EnemyList, data: ^LevelData, config: ^EnemyConfig) {
+init_enemies :: proc(enemy_list: ^EnemyList, data: ^LevelData) {
 	enemy_list.len = 0
 	for enemy_position in data.enemy_positions[:data.enemy_positions_len] {
 		enemy_list.len += 1
 		enemy := &enemy_list.enemies[enemy_list.len - 1]
-		using enemy
-		
-		position = enemy_position
-		state = EnemyState.PATROL
-		cached_floor_height = position.y
+
+		enemy.position = enemy_position
+		enemy.state = EnemyState.PATROL
+		enemy.cached_floor_height = enemy.position.y
 
 		if rand.int_max(2) == 0 {
-			facing_right = true
+			enemy.facing_right = true
 		}
 		else {
-			facing_right = false
+			enemy.facing_right = false
 		}
 	}
 }
 
-update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, config: ^EnemyConfig, sound_system: ^SoundSystem, dt: f32) {
+update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using enemy
 
 	surface := &surface_map.surfaces[surface_index]
@@ -100,6 +97,7 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 		// The code we write is a description of the problem being solved, but it is
 		// also at its best a communication of the call flow with the maximum degree
 		// of clarity.
+		//
 		// Doing the most direct thing often leads to the clearest result, but doing
 		// the most direct thing isn't the goal in of itself. Especially when there
 		// is some ambiguity as to what the most direct thing is, clarity should be
@@ -112,10 +110,9 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 		if check_king_seen(enemy, king.position, surface_index, surface_map.king_surface) {
 			state = EnemyState.SEEN_JUMP
 			start_sound(&sound_system.channels[0], SoundType.ENEMY_ALARMED)
-			y_velocity = -config.seen_jump_velocity
-		}
-		else {
-			x_movement := config.patrol_speed
+			y_velocity = -config.enemy_seen_jump_velocity
+		} else {
+			x_movement := config.enemy_patrol_speed
 			if !facing_right do x_movement *= -1
 			position.x += x_movement * dt
 		}
@@ -125,7 +122,7 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 			state = EnemyState.PATROL
 		}
 	case EnemyState.SEEN_JUMP:
-		y_velocity += config.seen_jump_gravity * dt
+		y_velocity += config.enemy_seen_jump_gravity * dt
 		position.y += y_velocity * dt
 		if position.y > cached_floor_height {
 			position.y = cached_floor_height
@@ -139,10 +136,9 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 			// TODO maybe refactor into its own function from handle_surface_edge as well 
 			state = EnemyState.PAUSE
 			start_sound(&sound_system.channels[0], SoundType.ENEMY_LOST)
-			time_to_next_state = config.lost_pause_length
-		}
-		else {
-			x_movement := config.chase_speed
+			time_to_next_state = config.enemy_lost_pause_length
+		} else {
+			x_movement := config.enemy_chase_speed
 			if !facing_right do x_movement *= -1
 			position.x += x_movement * dt
 		}
@@ -153,7 +149,11 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 handle_surface_edge :: proc(enemy: ^Enemy, surface: ^Surface, config: ^Config) -> (hit_edge: bool) {
 	using enemy
 
-	if !_wait_length {
+	if !facing_right && position.x < surface.left ||
+	facing_right && position.x > surface.right {
+		state = EnemyState.PAUSE
+		facing_right = !facing_right
+		time_to_next_state = config.enemy_edge_wait_length
 		return true
 	}
 	return false

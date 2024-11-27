@@ -14,11 +14,6 @@ Animator :: struct {
 	frame_length_mod: f32,
 	invisible: bool,
 	flipped: bool,
-
-
-	// TODO use case?
-	//is_not_looping: bool,
-	//is_finished: bool,
 }
 
 cycle_and_draw_animator :: proc(animator: ^Animator, position: IVec2, platform: ^Platform, dt: f32) {

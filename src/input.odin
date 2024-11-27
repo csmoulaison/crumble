@@ -2,13 +2,6 @@ package main
 import "vendor:sdl2"
 import "core:fmt"
 
-// TODO: Think about whether we care that with multiple scancodes you can 
-// release a button without actually releasing all related scancodes.
-// > The fix would be to keep track of which associated scancodes are currently
-// held down and therefore relegate much of the current functionality to work
-// on scancodes rather than inputs, with the inputs themselves just querying
-// the stored states of their associated scancodes.
-
 MAX_SCANCODE_BUTTON_MAPPINGS :: 32
 MAX_BUTTONS :: 32
 

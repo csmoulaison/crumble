@@ -22,7 +22,7 @@ init_main_menu :: proc(main_menu: ^MainMenu) {
 	choices = {START_GAME_TEXT, LEVEL_EDITOR_TEXT, TOWER_EDITOR_TEXT, LEADERBOARD_TEXT, QUIT_TEXT}
 }
 
-handle_main_menu :: proc(game: ^Game, main_menu: ^MainMenu, input: ^Input, sound_system: ^SoundSystem) -> GameState {
+handle_main_menu :: proc(game: ^Game, main_menu: ^MainMenu, input: ^Input, sound_system: ^SoundSystem) {
 	using main_menu
 
 	if input.up.just_pressed {
@@ -38,7 +38,8 @@ handle_main_menu :: proc(game: ^Game, main_menu: ^MainMenu, input: ^Input, sound
 
 	// Check for application force quit
 	if input.quit.just_pressed {
-		return GameState.QUIT
+		game.state = GameState.QUIT
+		return
 	}
 
 	// Control menu selection
@@ -49,22 +50,21 @@ handle_main_menu :: proc(game: ^Game, main_menu: ^MainMenu, input: ^Input, sound
 		case START_GAME_TEXT:
 			init_session(&game.session, &game.config)
 			stop_music(sound_system)
-			return GameState.SESSION
+			game.state = GameState.SESSION
 		case LEADERBOARD_TEXT:
 			game.leaderboard.current_score = -1
-			return GameState.HIGH_SCORES
+			game.state = GameState.HIGH_SCORES
 		case LEVEL_EDITOR_TEXT:
-			init_editor(&game.editor)
-			return GameState.EDITOR
+			//init_editor(&game.editor)
+			//game.state = GameState.EDITOR
 		case TOWER_EDITOR_TEXT:
-			init_tower_editor(&game.tower_editor)
-			return GameState.TOWER_EDITOR
+			//init_tower_editor(&game.tower_editor)
+			//game.state = GameState.TOWER_EDITOR
 		case QUIT_TEXT:
-			return GameState.QUIT
+			game.state = GameState.QUIT
 		}
+		return
 	}
-
-	return GameState.MAIN_MENU
 }
 
 draw_main_menu :: proc(main_menu: ^MainMenu, assets: ^Assets, platform: ^Platform, dt: f32) {
@@ -94,8 +94,7 @@ draw_main_menu :: proc(main_menu: ^MainMenu, assets: ^Assets, platform: ^Platfor
 			}
 
 			font = assets.fonts.red
-		}
-		else {
+		} else {
 			choice_sin_amps[i] -= sin_amp_speed * 0.25 * dt
 			if choice_sin_amps[i] < 0 {
 				choice_sin_amps[i] = 0
@@ -110,5 +109,4 @@ draw_main_menu :: proc(main_menu: ^MainMenu, assets: ^Assets, platform: ^Platfor
 			choice_sin_amps[i],
 			sin_t)
 	}
-
 }

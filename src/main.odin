@@ -1,18 +1,6 @@
 package main
 import "core:fmt"
 
-// MAJOR cleanup required.
-//     (Some might not be worth it at this stage in the project.
-//     Lesson learned.)
-// * Data formats for:
-//   - Textures
-//   - ALL config
-//   - Music
-//   - Input (will be porting to arcade machine soon)
-// * Make state machine structure consistent
-//   - What's inline with the switch? Just a function call would probably be best.
-// * Any new abstraction to facillitate tandy sound port?
-
 // To do
 // * Music (5/7)
 //   - 1: Greensleeves [X]

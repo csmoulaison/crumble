@@ -219,36 +219,31 @@ update_channel :: proc(channel: ^SoundChannel, global_trackhead: ^Trackhead, aud
 	}
 }
 
-update_track :: proc(sound: ^SoundState, global_trackhead: ^Trackhead, audio: ^Audio, oscillator_index: int, dt: f32) -> (finished: bool) {
+update_track :: proc(sound: ^SoundState, global_trackhead: ^Trackhead, audio: ^Audio, oscillator_index: int, dt: f32) {
 	using sound
-	oscillator := &audio.data.oscillators[oscillator_index]
 
+	oscillator := &audio.data.oscillators[oscillator_index]
 	current_note := &track.notes[0]
-	current_i := 0
 	note_elapsed: f32 = 0
 	note_length: f32 = 0
-	note_t: f32 = 0
 
 	if global_trackhead.position < track.notes[1].timestamp {
 		current_note = &track.notes[0]
 		note_elapsed = global_trackhead.position
 		note_length = track.notes[1].timestamp
-	}
-	else {
+	} else {
 		for n, i in track.notes[:track.notes_len] {
 			if global_trackhead.position < track.notes[i].timestamp {
 				current_note = &track.notes[i - 1]
 				note_elapsed = global_trackhead.position - current_note.timestamp
 				note_length = track.notes[i].timestamp - current_note.timestamp
 
-				current_i = i
 				break
 			}
 		}
 	}
 
-	note_t = note_elapsed / note_length
-
+	note_t: f32 = note_elapsed / note_length
     vibrato_mod := math.sin_f32(note_t * 2) * 2.5 - 1.25
 
 	set_amplitude(oscillator, adsr_amplitude(current_note, note_elapsed, note_t))
@@ -330,35 +325,27 @@ update_sound :: proc(sound: ^SoundState, audio: ^Audio, oscillator_index: int, d
 		return true
 	}
 
-
 	return false
 }
 
 adsr_amplitude :: proc(note: ^Note, elapsed: f32, t: f32) -> f32 {
 	absolute_sustain: f32 = note.amplitude * note.curve.sustain
 
-	if t > note.curve.cutoff {
-		if t > note.curve.cutoff + note.curve.release {
-			return 0
-		}
-
-		return lerp(
-			note.curve.sustain,
-			0,
-			(t - note.curve.cutoff) / note.curve.release)
+	// Post release
+	if t > note.curve.cutoff + note.curve.release {
+		return 0
 	}
-	
+	// Releasing
+	if t > note.curve.cutoff {
+		return lerp(note.curve.sustain, 0, (t - note.curve.cutoff) / note.curve.release)
+	}
+	// Attacking
 	if elapsed < note.curve.attack {
-		return lerp(
-			0, 
-			note.amplitude, 
-			elapsed / note.curve.attack)
-	} 
-	else if elapsed - note.curve.attack < note.curve.decay {
-		return lerp(
-			note.amplitude, 
-			absolute_sustain,
-			(elapsed - note.curve.attack) / note.curve.decay)
+		return lerp(0, note.amplitude, elapsed / note.curve.attack)
+	}
+	// Decaying
+	if elapsed - note.curve.attack < note.curve.decay {
+		return lerp(note.amplitude, absolute_sustain, (elapsed - note.curve.attack) / note.curve.decay)
 	}
 
 	return absolute_sustain
@@ -372,43 +359,37 @@ push_note :: proc(track: ^NoteTrack, letter: NoteLetter, length: NoteLength, set
 
 	if amplitude == -1 {
 		note.amplitude = DEFAULT_AMPLITUDE
-	}
-	else {
+	} else {
 		note.amplitude = amplitude
 	}
 
 	if adsr.attack == -1 {
 		note.curve.attack = DEFAULT_ATTACK
-	}
-	else {
+	} else {
 		note.curve.attack = adsr.attack
 	}
 
 	if adsr.decay == -1 {
 		note.curve.decay = DEFAULT_DECAY
-	}
-	else {
+	} else {
 		note.curve.decay = adsr.decay
 	}
 
 	if adsr.sustain == -1 {
 		note.curve.sustain = DEFAULT_SUSTAIN
-	}
-	else {
+	} else {
 		note.curve.sustain = adsr.sustain
 	}
 
 	if adsr.release == -1 {
 		note.curve.release = DEFAULT_RELEASE
-	}
-	else {
+	} else {
 		note.curve.release = adsr.release
 	}
 
 	if adsr.cutoff == -1 {
 		note.curve.cutoff = DEFAULT_CUTOFF
-	}
-	else {
+	} else {
 		note.curve.cutoff = adsr.cutoff
 	}
 

@@ -47,11 +47,18 @@ draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^
 	using king
 
 	animator.sequence = &sequences.king_idle
-	if running_input do animator.sequence = &sequences.king_run
+	if running_input {
+		animator.sequence = &sequences.king_run
+	}
 
-	if jump_state == JumpState.JUMP do animator.sequence = &sequences.king_jump
-	else if jump_state == JumpState.FLOAT do animator.sequence = &sequences.king_float
-	else if jump_state == JumpState.POST_FLOAT do animator.sequence = &sequences.king_post_float
+	#partial switch(jump_state) {
+	case JumpState.JUMP:
+		animator.sequence = &sequences.king_jump
+	case JumpState.FLOAT:
+		animator.sequence = &sequences.king_float
+	case JumpState.POST_FLOAT:
+		animator.sequence = &sequences.king_post_float
+	}
 
 	animator.flipped = !facing_right
 
@@ -93,13 +100,12 @@ update_king_movement :: proc(king: ^King, input: ^Input, config: ^Config, dt: f3
 	}
 
 	//foods_eaten_mod := math.pow(config.acceleration_scale_per_food, foods_eaten)
-	acceleration_magnitude: f32 = config.king_initial_acceleration * foods_eaten_mod * dt
+	acceleration_magnitude: f32 = config.king_base_acceleration * foods_eaten_mod * dt
 
 	if jump_state == JumpState.GROUNDED && !running_input {
 		if abs(velocity.x) - acceleration_magnitude < 0 {
 			acceleration_direction = 0 // will cause a complete stop
-		}
-		else {
+		} else {
 			acceleration_direction = -math.sign(velocity.x) 
 		}
 	}
@@ -117,13 +123,12 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 		if input.jump.just_pressed || jump_buffer > 0 {
 			jump_buffer = -1
 			jump_state = JumpState.JUMP
-			jump_gravity_countdown = config.jump_gravity_length
-			velocity.y = -config.jump_velocity
-			gravity_scale = config.jump_gravity_scale
+			jump_gravity_countdown = config.king_jump_gravity_length
+			velocity.y = -config.king_jump_velocity
+			gravity_scale = config.king_jump_gravity_scale
 			start_sound(&sound_system.channels[0], SoundType.JUMP)
 		}
-	}
-	else if jump_state == JumpState.JUMP {
+	} else if jump_state == JumpState.JUMP {
 		gravity_scale = config.king_jump_gravity_scale_down
 
 		if input.jump.just_pressed {
@@ -134,15 +139,13 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 			float_switchback_velocity: f32 = config.king_max_speed / 2
 			if input.left.held && velocity.x > 0 {
 				king.velocity.x = -float_switchback_velocity
-			} 
-			else if input.right.held && velocity.x < 0 {
+			} else if input.right.held && velocity.x < 0 {
 				king.velocity.x = float_switchback_velocity
 			}
 
 			start_sound(&sound_system.channels[0], SoundType.FLOAT)
 		}
-	}
-	else if jump_state == JumpState.FLOAT {
+	} else if jump_state == JumpState.FLOAT {
 		gravity_scale = math.lerp(gravity_scale, config.king_float_target_gravity_scale, config.king_float_gravity_lerp_speed * dt)
 		sound_system.channels[0].sound.frequency += -velocity.y * 16 * dt
 
@@ -182,7 +185,9 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, co
 	tile_to_crumble: int = -1
 	closest_tile_distance: f32 = 128
 	for tile, tile_index in tilemap {
-		if tile.health == 0 do continue
+		if tile.health == 0 {
+			continue
+		}
 
 		tile_pos: Vec2 = tile_position_from_index(tile_index)
 
@@ -197,7 +202,9 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, co
 	}
 
     for tile, tile_index in tilemap {
-		if tile.health == 0 do continue
+		if tile.health == 0 {
+			continue
+		}
 
 		tile_pos: Vec2 = tile_position_from_index(tile_index)
 
@@ -210,7 +217,9 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, co
     }
 
     for tile, tile_index in tilemap {
-		if tile.health == 0 do continue
+		if tile.health == 0 {
+			continue
+		}
 
 		tile_pos: Vec2 = tile_position_from_index(tile_index)
 

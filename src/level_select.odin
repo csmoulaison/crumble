@@ -34,8 +34,7 @@ draw_level_select :: proc(level_select: ^LevelSelectMenu, assets: ^Assets, platf
 			}
 
 			font = assets.fonts.red
-		}
-		else {
+		} else {
 			choice_sin_amps[i] -= sin_amp_speed * 0.25 * dt
 			if choice_sin_amps[i] < 0 {
 				choice_sin_amps[i] = 0
@@ -78,29 +77,6 @@ handle_level_select :: proc(game: ^Game, level_select: ^LevelSelectMenu, input: 
 	// Control menu selection
 	if input.select.just_pressed {
 		start_sound(&sound_system.channels[0], SoundType.SELECT)
-
-			
-		/*
-		case START_GAME_TEXT:
-			init_session(&game.session, &game.config)
-			stop_music(sound_system)
-			return GameState.SESSION
-		case LEVEL_SELECT_TEXT:
-			return GameState.MAIN_MENU
-		case LEADERBOARD_TEXT:
-			game.leaderboard.current_score = -1
-			return GameState.HIGH_SCORES
-		case LEVEL_EDITOR_TEXT:
-			init_editor(&game.editor)
-			return GameState.EDITOR
-		case TOWER_EDITOR_TEXT:
-			init_tower_editor(&game.tower_editor)
-			return GameState.TOWER_EDITOR
-		case QUIT_TEXT:
-			return GameState.QUIT
-		}
-	*/
-
 	}
 
 	return GameState.MAIN_MENU	

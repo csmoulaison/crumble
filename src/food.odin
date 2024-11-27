@@ -1,5 +1,3 @@
-// TODO factor state machine logic out of here and into return statements
-
 package main
 import "core:fmt"
 import "core:math/rand"
@@ -57,6 +55,7 @@ init_food :: proc(food: ^Food, data: ^LevelData, config: ^Config) {
 		position = window_pos
 		is_active = true
 	}
+
 	if windows_len < 1 {
 		windows_len += 1
 		windows[windows_len - 1].position = {0, 0}
@@ -98,6 +97,7 @@ draw_food :: proc(food: ^Food, platform: ^Platform) {
 			}
 
 			food_draw_position := ivec2_from_vec2(window.position)
+
 			if cooked_food {
 				food_src_pos = cooked_src_pos
 				food_draw_position.y += int(math.sin_f32(time_to_next_phase * 6) * 3) - 2
@@ -165,7 +165,7 @@ update_food_state :: proc(food: ^Food, config: ^Config, sound_system: ^SoundSyst
 		time_to_blink_toggle -= dt
 		if time_to_blink_toggle < 0 {
 			is_blinking = !is_blinking
-			time_to_blink_toggle = config.blink_length
+			time_to_blink_toggle = config.food_blink_length
 			start_sound(&sound_system.channels[0], SoundType.FOOD_BLINK)
 		}
 	case FoodPhase.POT:

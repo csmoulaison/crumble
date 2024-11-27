@@ -32,7 +32,9 @@ Leaderboard :: struct {
 update_high_scores :: proc(leaderboard: ^Leaderboard, input: ^Input) {
 	using leaderboard
 
-	if current_score < 0 || current_score > 9 do return
+	if current_score < 0 || current_score > 9 {
+		return
+	}
 
 	if input.up.just_pressed {
 		blink = true
@@ -41,6 +43,7 @@ update_high_scores :: proc(leaderboard: ^Leaderboard, input: ^Input) {
 		if index >= SCORE_LETTER_COUNT do index = 0
 		data.scores[current_score].initials[current_initial] = letter_from_index(index)
 	}
+
 	if input.down.just_pressed {
 		blink = true
 		time_to_toggle_blink = 0
@@ -52,18 +55,19 @@ update_high_scores :: proc(leaderboard: ^Leaderboard, input: ^Input) {
 	if input.right.just_pressed || input.select.just_pressed {
 		current_initial += 1
 	}
+
 	if input.left.just_pressed {
 		current_initial -= 1
 		if current_initial < 0 do current_initial = 0
 	}
 }
 
-draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^LeaderboardConfig, fonts: ^UIFonts, platform: ^Platform, dt: f32) {
+draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^Config, fonts: ^UIFonts, platform: ^Platform, dt: f32) {
 	using leaderboard
 
 	time_to_toggle_blink -= dt
 	if time_to_toggle_blink < 0 {
-		time_to_toggle_blink = config.editing_blink_length
+		time_to_toggle_blink = config.scoreboard_editing_blink_length
 		blink = !blink
 	}
 
@@ -108,16 +112,13 @@ draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^LeaderboardConfig, 
 					if blink {
 						strings.write_rune(&initial_str, '.')
 						initial_off_x += 1
-					}
-					else {
+					} else {
 						strings.write_rune(&initial_str, c)
 					}
-				}
-				else {
+				} else {
 					strings.write_rune(&initial_str, c)
 				}
-			}
-			else {
+			} else {
 				strings.write_rune(&initial_str, c)
 			}
 			buffer_text(platform, {pos_x_3 + 8 * j + initial_off_x, pos_y}, strings.to_string(initial_str), font)
@@ -129,7 +130,9 @@ draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^LeaderboardConfig, 
 add_high_score :: proc(leaderboard: ^Leaderboard, new_score: Score) {
 	using leaderboard
 
-	if data.len > MAX_HIGH_SCORES do data.len = MAX_HIGH_SCORES
+	if data.len > MAX_HIGH_SCORES {
+		data.len = MAX_HIGH_SCORES
+	}
 
 	leaderboard.current_score = -1
 	#reverse for score, i in data.scores[:data.len] {
@@ -139,8 +142,7 @@ add_high_score :: proc(leaderboard: ^Leaderboard, new_score: Score) {
 			}
 			data.scores[i] = new_score
 			current_score = i
-		}
-		else {
+		} else {
 			break
 		}
 	}

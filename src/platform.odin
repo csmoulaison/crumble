@@ -146,15 +146,14 @@ update_platform :: proc(platform: ^Platform) {
 		0,
 		0,
 		8);
-	for i: int = 0; i * pixel_scalar < int(screen_height); i += 1 {
+
+	// Scanlines
+	//for i: int = 0; i * pixel_scalar < int(screen_height); i += 1 {
 		//scanline_y: i32 = i32(pixel_scalar - 1 + i * pixel_scalar)
 		//SDL.RenderDrawLine(renderer, 0, scanline_y, screen_width, scanline_y)
-	}
+	//}
 
 	SDL.RenderPresent(renderer)
-
-
-	// Play audio
 	
 	// Poll input events
 	keydowns_len = 0

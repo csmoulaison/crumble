@@ -6,6 +6,8 @@ import "core:strings"
 import "core:math"
 import "core:math/rand"
 
+LEVEL_FNAME_PREFIX :: "levels/level"
+
 // Initialize level data
 init_level :: proc(session: ^Session, data: ^LevelData, config: ^Config) {
 	using session

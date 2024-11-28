@@ -1,7 +1,5 @@
 package main
 
-LEVEL_FNAME_PREFIX :: "levels/level"
-
 // For serialization by level editor and loading from file to Level struct
 LevelData :: struct {
 	tiles: [NUM_TILES]u8,

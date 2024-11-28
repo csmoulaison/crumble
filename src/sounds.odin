@@ -294,8 +294,7 @@ update_sound :: proc(sound: ^SoundState, audio: ^Audio, oscillator_index: int, d
 	case SoundType.SELECT:
 		if t < 0.5 {
 			set_frequency(oscillator, frequency)
-		}
-		else {
+		} else {
 			set_frequency(oscillator, frequency * 0.5)
 		}
 

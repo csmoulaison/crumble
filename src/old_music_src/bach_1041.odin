@@ -1,5 +1,3 @@
-package main
-
 music_bach1041 :: proc() -> MusicData {
 	melody: NoteTrack = init_track()
 

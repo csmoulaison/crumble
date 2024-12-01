@@ -5,14 +5,6 @@ import "core:math"
 import "core:strings"
 import "core:strconv"
 
-// TODO:
-// - Convert old music src to styles in file format
-// - Convert mini music tracks and preload at start
-// - Deprecate push_note functionality and inline (?) direct values here
-// - Load full music tracks at level load
-// - Make music editor. Type styles manually, loaded and used at runtime
-
-MUSIC_FNAME_PREFIX :: "music/music"
 MAX_MUSIC_STYLES :: 16
 
 MusicLoadState :: enum {
@@ -30,7 +22,7 @@ MusicLoadContext :: struct {
 
 
 deserialize_music :: proc(result: ^MusicData, fname: string) {
-	fmt.println("Loading music...", fname)
+	//fmt.println("Loading music...", fname)
     data, read_ok := os.read_entire_file(fname)
     if !read_ok {
 	    fmt.println("Read not ok!")
@@ -86,10 +78,10 @@ deserialize_music :: proc(result: ^MusicData, fname: string) {
 		result.length = result.tracks[2].absolute_length
 	}
 
-	fmt.println("Music loaded:", fname)
-	fmt.println("  Length:", result.length)
-	fmt.println("  track1:", result.tracks[1].notes_len)
-	fmt.println("  track2:", result.tracks[2].notes_len)
+	// fmt.println("Music loaded:", fname)
+	// fmt.println("  Length:", result.length)
+	// fmt.println("  track1:", result.tracks[1].notes_len)
+	// fmt.println("  track2:", result.tracks[2].notes_len)
 }
 
 @(private="file")
@@ -224,13 +216,4 @@ read_float :: proc(str: string, start: int, digits: int) -> f32 {
 		os.exit(1)
 	}
 	return f32(strconv.atof(str)) / 100
-}
-
-@(private="file")
-get_music_fname :: proc(index: int) -> string {
-	fname := strings.builder_make()
-	strings.write_string(&fname, MUSIC_FNAME_PREFIX)
-	strings.write_int(&fname, index)
-	strings.write_string(&fname, ".mus")
-	return strings.to_string(fname)
 }

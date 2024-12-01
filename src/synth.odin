@@ -49,7 +49,7 @@ init_audio :: proc(audio: ^Audio) {
 		return
 	}
 	else {
-		fmt.println("Successfully opened playback device")
+		// fmt.println("Successfully opened playback device")
 	}
 
 	for &osc_backend, i in data.osc_backends {
@@ -70,7 +70,7 @@ init_audio :: proc(audio: ^Audio) {
 		MA.device_uninit(&device)
 	}
 	else {
-		fmt.println("Successfully started playback device")
+		// fmt.println("Successfully started playback device")
 	}
 }
 

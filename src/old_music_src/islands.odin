@@ -1,5 +1,3 @@
-package main
-
 music_islands :: proc() -> MusicData {
 	melody: NoteTrack = init_track()
 

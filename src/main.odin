@@ -10,9 +10,7 @@ import "core:fmt"
 //   - 5: Ballarde     [ ]
 //   - 6: Islands      [X]
 //   - 7: Victory      [X]
-// * Track prioritization last pass (food takes precedence?)
 // * Any last visual telegraphs?
-// * New Hannah art
 // * Collisions?
 //   - Yes: combine colliders while counting tiles
 // * Opening screens improvement

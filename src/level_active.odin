@@ -30,9 +30,9 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 	if (input.left.held || input.right.held) && king.animator.just_advanced_frame && king.jump_state == JumpState.GROUNDED {
 		king.up_step = !king.up_step
 		if(king.up_step) {
-			start_sound(&sound_system.channels[0], SoundType.UP_STEP)
+			start_sound(sound_system, SoundType.UP_STEP)
 		} else {
-			start_sound(&sound_system.channels[0], SoundType.DOWN_STEP)
+			start_sound(sound_system, SoundType.DOWN_STEP)
 		}
 	}
 
@@ -46,10 +46,10 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 		stop_music(sound_system)
 
         if lives == 0 {
-            start_sound(&sound_system.channels[0], SoundType.GAME_OVER)
+            start_sound(sound_system, SoundType.GAME_OVER)
             time_to_next_state = 9
         } else {
-            start_sound(&sound_system.channels[0], SoundType.KING_DIE)
+            start_sound(sound_system, SoundType.KING_DIE)
             time_to_next_state = config.post_loss_length
         }
 		return SessionState.POST_LOSS

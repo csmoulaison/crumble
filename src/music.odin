@@ -20,7 +20,18 @@ init_track :: proc() -> NoteTrack {
 	return track
 }
 
-start_music :: proc(music: MusicData, sound_system: ^SoundSystem) {
+start_music :: proc(level_index: int, sound_system: ^SoundSystem) {
+	musics: [7]^MusicData = {
+		&sound_system.music.speed,
+		&sound_system.music.speed,
+		&sound_system.music.bach_1041,
+		&sound_system.music.bach_1041,
+		&sound_system.music.greensleeves,
+		&sound_system.music.islands,
+		&sound_system.music.victory,
+	};
+	music: ^MusicData = musics[level_index]
+	
 	longest_track_length: f32 = 0
 	for i := 0; i < 3; i += 1 {
 		sound_system.channels[i].music.track = music.tracks[i]
@@ -43,111 +54,4 @@ stop_music :: proc(sound_system: ^SoundSystem) {
 
 	music_length = 0
 	music_trackhead.position = 0
-}
-
-track_king_die :: proc() -> NoteTrack {
-	track: NoteTrack = init_track()
-
-	settings: NoteSettings
-	settings.amplitude = 0.4
-	settings.curve = {-1, -1, 0.25, -1, 0.5}
-
-	push_note(&track, NoteLetter.A4, NoteLength.HALF, settings)
-	push_note(&track, NoteLetter.A5, NoteLength.QUARTER, settings)
-	push_note(&track, NoteLetter.A3, NoteLength.QUARTER, settings)
-
-	return track
-}
-
-track_game_over :: proc() -> NoteTrack {
-	track: NoteTrack = init_track()
-
-	settings: NoteSettings
-	settings.amplitude = 0.4
-	settings.curve = {-1, -1, 0.25, -1, 0.5}
-
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
-
-	push_note(&track, NoteLetter.C5, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.B4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.B4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.G_SHARP4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.SILENT, NoteLength.DOT_EIGHTH, settings)
-	push_note(&track, NoteLetter.A5, NoteLength.SIXTEENTH, settings)
-	push_note(&track, NoteLetter.A3, NoteLength.EIGHTH, settings)
-
-	return track
-}
-
-track_food_cooking :: proc() -> NoteTrack {
-	track: NoteTrack = init_track()
-
-	settings: NoteSettings
-	settings.amplitude = 0.4
-	settings.curve = {-1, -1, 0.25, -1, 0.5}
-
-	push_note(&track, NoteLetter.A4, NoteLength.QUARTER, settings)
-	push_note(&track, NoteLetter.B4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.C5, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.G5, NoteLength.QUARTER, settings)
-
-	return track
-}
-
-track_food_appear :: proc() -> NoteTrack {
-	track: NoteTrack = init_track()
-
-	settings: NoteSettings
-	settings.amplitude = 0.4
-	settings.curve = {-1, -1, 0.25, -1, 0.5}
-
-	push_note(&track, NoteLetter.A3, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.A5, NoteLength.EIGHTH, settings)
-
-	return track
-}
-
-track_food_disappear :: proc() -> NoteTrack {
-	track: NoteTrack = init_track()
-
-	settings: NoteSettings
-	settings.amplitude = 0.4
-	settings.curve = {-1, -1, 0.25, -1, 0.5}
-
-	push_note(&track, NoteLetter.A4, NoteLength.QUARTER, settings)
-	push_note(&track, NoteLetter.A3, NoteLength.QUARTER, settings)
-
-	return track
-}
-
-track_food_eat :: proc() -> NoteTrack {
-	track: NoteTrack = init_track()
-
-	settings: NoteSettings
-	settings.amplitude = 0.4
-	settings.curve = {-1, -1, 0.25, -1, 0.5}
-
-	push_note(&track, NoteLetter.A4, NoteLength.DOT_SIXTEENTH, settings)
-	push_note(&track, NoteLetter.B4, NoteLength.DOT_SIXTEENTH, settings)
-	push_note(&track, NoteLetter.C5, NoteLength.DOT_SIXTEENTH, settings)
-	push_note(&track, NoteLetter.G5, NoteLength.QUARTER, settings)
-	push_note(&track, NoteLetter.A4, NoteLength.EIGHTH, settings)
-	push_note(&track, NoteLetter.G5, NoteLength.QUARTER, settings)
-
-	return track
 }

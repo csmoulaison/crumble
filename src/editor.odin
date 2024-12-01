@@ -38,7 +38,7 @@ update_editor :: proc(editor: ^Editor, game: ^Game, input: ^Input, fonts: ^UIFon
 	// Check for force quit
 	if input.quit.just_pressed {
 		game.state = GameState.MAIN_MENU
-		start_sound(&sound_system.channels[0], SoundType.GO_BACK)
+		start_sound(sound_system, SoundType.GO_BACK)
 		return
 	}
 

@@ -138,7 +138,7 @@ update_food_state :: proc(food: ^Food, config: ^Config, sound_system: ^SoundSyst
 				phase, time_to_next_phase = FoodPhase.POT, config.food_pot_expiration_length
 			}
 
-			start_sound(&sound_system.channels[0], SoundType.FOOD_COOKING)
+			start_sound(sound_system, SoundType.FOOD_COOKING)
 		}
 	case FoodPhase.COOKING:
 		windows[current_window].is_active = int(time_to_next_phase * 4) % 2 == 0
@@ -146,7 +146,7 @@ update_food_state :: proc(food: ^Food, config: ^Config, sound_system: ^SoundSyst
 		if time_to_next_phase < 0 {
 			phase, time_to_next_phase = FoodPhase.COOKED, config.food_expiration_length
 			current_food_offset = 128 * rand.int_max(4)
-			start_sound(&sound_system.channels[0], SoundType.FOOD_APPEAR)
+			start_sound(sound_system, SoundType.FOOD_APPEAR)
 		}
 	case FoodPhase.COOKED:
 		// TODO: refactor this into function (also used in RESET phase)
@@ -158,7 +158,7 @@ update_food_state :: proc(food: ^Food, config: ^Config, sound_system: ^SoundSyst
 	case FoodPhase.COOLING:
 		if time_to_next_phase < 0 {
 			start_food_cycle(food, config)
-			start_sound(&sound_system.channels[0], SoundType.FOOD_DISAPPEAR)
+			start_sound(sound_system, SoundType.FOOD_DISAPPEAR)
 			break
 		}
 
@@ -166,7 +166,7 @@ update_food_state :: proc(food: ^Food, config: ^Config, sound_system: ^SoundSyst
 		if time_to_blink_toggle < 0 {
 			is_blinking = !is_blinking
 			time_to_blink_toggle = config.food_blink_length
-			start_sound(&sound_system.channels[0], SoundType.FOOD_BLINK)
+			start_sound(sound_system, SoundType.FOOD_BLINK)
 		}
 	case FoodPhase.POT:
 		if time_to_next_phase < 0 {
@@ -203,7 +203,7 @@ update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_sy
 
 		if food.active_windows_len > 0 {
 			start_food_cycle(food, config)
-            start_sound(&sound_system.channels[0], SoundType.FOOD_EAT)
+            start_sound(sound_system, SoundType.FOOD_EAT)
 			session.state = SessionState.HITCH
 			session.time_to_next_state = config.food_hitch_length
 		} else {
@@ -225,7 +225,7 @@ update_pot_bounce :: proc(food: ^Food, king: ^King, session: ^Session, sound_sys
 	king_collider := Rect{{-5, -16}, {10, 16}}
 	if is_colliding(&king_collider, &king.position, &pot_col, &pot_pos) && king.position.y > pot_pos.y - 6 && king.velocity.y > 0 {
 		stop_music(sound_system)
-		start_sound(&sound_system.channels[0], SoundType.POT_BOUNCE)
+		start_sound(sound_system, SoundType.POT_BOUNCE)
 		pop_score(&session.scorepop, pot_pos + Vec2{26, -16}, ScorepopType.POT)
 		session.level_points += 50
 

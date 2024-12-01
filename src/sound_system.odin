@@ -1,10 +1,55 @@
 package main
 
+MusicTracks :: struct {
+    greensleeves: MusicData,
+    dompe: MusicData,
+    bach_1041: MusicData,
+    speed: MusicData,
+    ballard: MusicData,
+    islands: MusicData,
+    victory: MusicData,
+
+    track_food_appear: NoteTrack,
+    track_food_cooking: NoteTrack,
+    track_food_disappear: NoteTrack,
+    track_food_eat: NoteTrack,
+    track_game_over: NoteTrack,
+    track_king_die: NoteTrack,
+}
+
 SoundSystem :: struct {
 	channels: [OSCILLATORS_LEN]SoundChannel,
 	music_trackhead: Trackhead,
 	music_length: f32,
 	music_tempo: f32,
+	music: MusicTracks,
+}
+
+init_sound_system :: proc(sound_system: ^SoundSystem) {
+	deserialize_music(&sound_system.music.speed, "music/music_speed.mus")
+	deserialize_music(&sound_system.music.bach_1041, "music/music_bach_1041.mus")
+	deserialize_music(&sound_system.music.islands, "music/music_islands.mus")
+	deserialize_music(&sound_system.music.greensleeves, "music/music_greensleeves.mus")
+
+	tmp: MusicData
+
+	deserialize_music(&tmp, "music/track_food_appear.mus")
+	sound_system.music.track_food_appear = tmp.tracks[1]
+
+	deserialize_music(&tmp, "music/track_food_cooking.mus")
+	sound_system.music.track_food_cooking = tmp.tracks[1]
+
+	deserialize_music(&tmp, "music/track_food_disappear.mus")
+	sound_system.music.track_food_disappear = tmp.tracks[1]
+
+	deserialize_music(&tmp, "music/track_food_eat.mus")
+	sound_system.music.track_food_eat = tmp.tracks[1]
+
+	deserialize_music(&tmp, "music/track_game_over.mus")
+	sound_system.music.track_game_over= tmp.tracks[1]
+
+	deserialize_music(&tmp, "music/track_king_die.mus")
+	sound_system.music.track_king_die = tmp.tracks[1]
 }
 
 update_sound_system :: proc(sound_system: ^SoundSystem, audio: ^Audio, dt: f32) {

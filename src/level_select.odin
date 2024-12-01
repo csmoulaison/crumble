@@ -61,12 +61,12 @@ handle_level_select :: proc(game: ^Game, level_select: ^LevelSelectMenu, input: 
 	if input.up.just_pressed {
 		highlighted_choice -= 1
 		if highlighted_choice < 0 do highlighted_choice = MAIN_MENU_CHOICE_LEN - 1
-		start_sound(&sound_system.channels[0], SoundType.NAVIGATE)
+		start_sound(sound_system, SoundType.NAVIGATE)
 	}
 	if input.down.just_pressed {
 		highlighted_choice += 1
 		if highlighted_choice > MAIN_MENU_CHOICE_LEN - 1 do highlighted_choice = 0
-		start_sound(&sound_system.channels[0], SoundType.NAVIGATE)
+		start_sound(sound_system, SoundType.NAVIGATE)
 	}
 
 	// Check for application force quit
@@ -76,7 +76,7 @@ handle_level_select :: proc(game: ^Game, level_select: ^LevelSelectMenu, input: 
 
 	// Control menu selection
 	if input.select.just_pressed {
-		start_sound(&sound_system.channels[0], SoundType.SELECT)
+		start_sound(sound_system, SoundType.SELECT)
 	}
 
 	return GameState.MAIN_MENU	

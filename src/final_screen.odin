@@ -33,7 +33,7 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
     chef_src_x: int = 369
     if king.jump_state == JumpState.GROUNDED && time_to_next_state < 0 {
         if time_to_next_state + dt >= 0 {
-            start_music(music_victory(), sound_system)
+            start_music(6, sound_system)
         }
 
         update_fireworks(&session.particle_system, dt)

@@ -5,7 +5,7 @@ handle_food_reset :: proc(session: ^Session, config: ^Config, sound_system: ^Sou
 
 	time_to_blink_toggle -= dt
 	if time_to_blink_toggle < 0 {
-        start_sound(&sound_system.channels[0], SoundType.JUMP)
+        start_sound(sound_system, SoundType.JUMP)
 		is_blinking = !is_blinking
 		time_to_blink_toggle = config.food_blink_length
             king_src_x: int = 112
@@ -19,7 +19,7 @@ handle_food_reset :: proc(session: ^Session, config: ^Config, sound_system: ^Sou
 		}
 		active_windows_len = windows_len
 		start_food_cycle(&session.food, config)
-		start_sound(&sound_system.channels[0], SoundType.ENEMY_ALARMED)
+		start_sound(sound_system, SoundType.ENEMY_ALARMED)
 		return SessionState.LEVEL_ACTIVE
 	}
 

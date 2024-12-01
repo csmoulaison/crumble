@@ -4,22 +4,11 @@ Assets :: struct {
 	sequences: Sequences,
 	fonts: UIFonts,
     config: Config,
-    music: MusicTracks
 }
 
 UIFonts :: struct {
 	white: int,
 	red: int,
-}
-
-MusicTracks :: struct {
-    greensleeves: MusicData,
-    dompe: MusicData,
-    bach: MusicData,
-    speed: MusicData,
-    ballard: MusicData,
-    islands: MusicData,
-    victory: MusicData,
 }
 
 Sequences :: struct {
@@ -74,16 +63,6 @@ load_assets :: proc(assets: ^Assets, platform: ^Platform) {
 		guard_jump = {{{270, 16}, {16, 21}}, 1, {8, 21}, 0.1}
 		guard_end = {{{192, 16}, {16, 21}}, 2, {8, 21}, 0.1}
 	}
-
-    {
-        using music
-        greensleeves = music_greensleeves()
-        dompe = music_greensleeves() // TODO replace with dompe
-        bach = music_bach1041()
-        speed = music_speed()
-        ballard = music_greensleeves() // TODO replace with ballard
-        victory = music_victory()
-    }
 
     {
         using fonts

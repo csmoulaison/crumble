@@ -129,7 +129,7 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 			jump_gravity_countdown = config.king_jump_gravity_length
 			velocity.y = -config.king_jump_velocity
 			gravity_scale = config.king_jump_gravity_scale
-			start_sound(&sound_system.channels[0], SoundType.JUMP)
+			start_sound(sound_system, SoundType.JUMP)
 		}
 	} else if jump_state == JumpState.JUMP {
 		gravity_scale = config.king_jump_gravity_scale_down
@@ -146,7 +146,7 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 				king.velocity.x = float_switchback_velocity
 			}
 
-			start_sound(&sound_system.channels[0], SoundType.FLOAT)
+			start_sound(sound_system, SoundType.FLOAT)
 		}
 	} else if jump_state == JumpState.FLOAT || jump_state == JumpState.POST_FLOAT {
 		gravity_scale = math.lerp(gravity_scale, config.king_float_target_gravity_scale, config.king_float_gravity_lerp_speed * dt)
@@ -155,7 +155,7 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 			sound_system.channels[0].sound.frequency += -velocity.y * 16 * dt
 			if velocity.y > 0 {
 				jump_state = JumpState.POST_FLOAT
-				//start_sound(&sound_system.channels[0], SoundType.POST_FLOAT)
+				//start_sound(sound_system, SoundType.POST_FLOAT)
 			}
 		} else {
 			sound_system.channels[0].sound.frequency -= -velocity.y * 2 * dt
@@ -244,9 +244,9 @@ apply_king_velocity_and_crumble_tiles :: proc(king: ^King, tilemap: ^Tilemap, so
 			}
 
 			if jump_state != JumpState.GROUNDED {
-				//start_sound(&sound_system.channels[0], SoundType.LAND)
+				//start_sound(sound_system, SoundType.LAND)
 				up_step = false
-				start_sound(&sound_system.channels[0], SoundType.DOWN_STEP)
+				start_sound(sound_system, SoundType.DOWN_STEP)
 				jump_state = JumpState.GROUNDED
 			}
 

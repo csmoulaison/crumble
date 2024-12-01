@@ -92,7 +92,7 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 		if input.jump.just_pressed {
 			time_to_next_state = config.level_interstitial_length
 			state = SessionState.PRE_LEVEL_SCREEN
-			start_sound(&sound_system.channels[0], SoundType.ENEMY_ALARMED)
+			start_sound(sound_system, SoundType.ENEMY_ALARMED)
 		}
 	case SessionState.FINAL_SCREEN:
 		handle_final_screen(session, input, dt)

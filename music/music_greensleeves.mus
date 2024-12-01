@@ -1,5 +1,10 @@
-greensleeves:10
-style
+settings
+10
+styles
+020 01 020 600 007 001 100
+040 01 020 600 007 001 100
+020 00 020 600 007 001 100
+030 00 020 600 007 001 100
 melody
 A4  Q  0
 C5  H  2
@@ -74,7 +79,7 @@ G4# Q  0
 A4  H. 3
 A4  H  2
 harmony
-A4  Q  0
+S   Q  0
 A4  Q  2
 C5  Q  0
 E5  Q  0

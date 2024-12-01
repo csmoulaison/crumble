@@ -1,4 +1,5 @@
 package main
+import "core:fmt"
 import "core:os"
 import "core:math"
 import "core:strings"
@@ -27,26 +28,13 @@ MusicLoadContext :: struct {
 	styles_len: int,
 };
 
-frequencies :: [12]f32 = {
-	261.63, // C4
-	277.18, // C#4
-	293.66, // D4
-	311.13, // D#4
-	329.63, // E4
-	349.23, // F4
-	369.99, // F#4
-	392.00, // G4
-	415.30, // G#4
-	440.00, // A4
-	466.16, // A#4
-	493.88, // B4
-	523.25, // C5 (in case the mythical B# is invoked)
-}
 
-deserialize_music :: proc(result: ^MusicData, index: int) -> (ok: bool) {
-    data, read_ok := os.read_entire_file(get_music_fname(index))
+deserialize_music :: proc(result: ^MusicData, fname: string) {
+	fmt.println("Loading music...", fname)
+    data, read_ok := os.read_entire_file(fname)
     if !read_ok {
-       return false
+	    fmt.println("Read not ok!")
+	    os.exit(1)
     }
 
     loader: MusicLoadContext
@@ -76,58 +64,72 @@ deserialize_music :: proc(result: ^MusicData, index: int) -> (ok: bool) {
 			result.tempo = f32(strconv.atoi(line))
 		case MusicLoadState.STYLES:
 			style: NoteSettings
-			style.amp = read_float(line, 0, 3)
-			style.octave = read_float(line, 5, 1)
+			style.amplitude = read_float(line, 0, 3)
+			style.octave_offset = read_float(line, 4, 2) * 100
 			style.curve.attack = read_float(line, 7, 3)
 			style.curve.decay = read_float(line, 11, 3)
 			style.curve.sustain = read_float(line, 15, 3)
 			style.curve.release = read_float(line, 19, 3)
 			style.curve.cutoff = read_float(line, 23, 3)
 
-			loader.styles[music.styles_len] = style
+			loader.styles[loader.styles_len] = style
 			loader.styles_len += 1
 		case MusicLoadState.MELODY:
-			note: Note = read_note(line)
-			push_note(&result.tracks[1], note)
+			push_note_from_line(line, &loader, &result.tracks[1])
 		case MusicLoadState.HARMONY:
-			note: Note = read_note(line)
-			push_note(&result.tracks[1], note)
+			push_note_from_line(line, &loader, &result.tracks[2])
 		}
 	}
 
-	result.length: f32 = melody.absolute_length
-	if harmony.absolute_length > result.length {
-		result.length = harmony.absolute_length
+	result.length = result.tracks[1].absolute_length
+	if result.tracks[2].absolute_length > result.length {
+		result.length = result.tracks[2].absolute_length
 	}
 
-    return true
+	fmt.println("Music loaded:", fname)
+	fmt.println("  Length:", result.length)
+	fmt.println("  track1:", result.tracks[1].notes_len)
+	fmt.println("  track2:", result.tracks[2].notes_len)
 }
 
 @(private="file")
-read_note :: proc(line: ^string, loader: ^MusicLoadContext) -> Note {
+push_note_from_line :: proc(line: string, loader: ^MusicLoadContext, track: ^NoteTrack) {
 	// Read line
-	note_letter: rune = line[0]
+	note_letter: u8 = line[0]
 	silent: bool = false
-	octave: int = 0
+	octave: f32 = 0
 	sharp_offset: int = 0
 
 	if note_letter == 'S' {
 		silent = true
 	} else {
 		// -4 so that octave represents an offset from octave 4 (C4 to B4)
-		octave = strconv.atoi(line[1]) - 4
+		octave_char, ok := strings.substring(line, 1, 2)
+		if !ok {
+			fmt.println("Could not get substring for octave_char. Music data corrupted.")
+			os.exit(1)
+		}
+		octave = f32(strconv.atof(octave_char) - 4)
+
 		if line[2] == '#' {
 			sharp_offset = 1
 		}
 	}
 
-	length_letter: rune = line[4]
+	length_letter: u8 = line[4]
 	dotted: bool = (line[5] == '.')
-	style_index: int = strconv.atoi(line[7])
+	style_index_char, ok := strings.substring(line, 7, 8)
+		if !ok {
+			fmt.println("Could not get substring for octave_char. Music data corrupted.")
+			os.exit(1)
+		}
+	style_index: int = strconv.atoi(style_index_char)
 
 	// Interpret data
 	if style_index >= loader.styles_len {
-		printf("Trying to access a style outside the bounds of those setup. Music data corrupted.")
+		fmt.println("Trying to access a style outside the bounds of those setup. Music data corrupted.")
+		fmt.println("  style_index:", style_index)
+		fmt.println("  styles_len:", loader.styles_len)
 		os.exit(1)
 	}
 	style: NoteSettings = loader.styles[style_index]
@@ -154,27 +156,74 @@ read_note :: proc(line: ^string, loader: ^MusicLoadContext) -> Note {
 	}
 	freq_index += sharp_offset // sharp_offset is 0 if note is not sharp
 
+	frequencies: [13]f32 = {
+		261.63, // C4
+		277.18, // C#4
+		293.66, // D4
+		311.13, // D#4
+		329.63, // E4
+		349.23, // F4
+		369.99, // F#4
+		392.00, // G4
+		415.30, // G#4
+		440.00, // A4
+		466.16, // A#4
+		493.88, // B4
+		523.25, // C5 (in case the mythical B# is invoked)
+	}
+
 	octave += style.octave_offset
 	note.frequency = frequencies[freq_index] * math.pow_f32(2, octave)
 
-	// TODO: Get note.timestamp. I think this is done in push_note at the moment.
-	// This will also involve using the length letter we got earlier. Probs another
-	// switch statement, but not with a separate table as with frequencies.
-	// 
-	// After that, everything in note is sorted.
-	// 
-	// Remember that it would be good to have as much done in here as possible, as
-	// this function is called twice. It is a function after all. Thanks.
+	length: f32 = 0
+	switch length_letter {
+	case 'S':
+		length = 1
+	case 'E':
+		length = 2
+	case 'Q':
+		length = 4
+	case 'H':
+		length = 8
+	case 'W':
+		length = 16
+	}
+
+	if dotted {
+		length *= 1.5
+	}
+
+	if silent {
+		note.amplitude = 0
+		note.frequency = 0
+		note.curve.attack = 0
+		note.curve.decay = 0
+		note.curve.sustain = 0
+		note.curve.release = 0
+		note.curve.cutoff = 0
+	}
+
+	note.timestamp = track.absolute_length 
+	track.absolute_length += length
+	track.notes[track.notes_len - 1] = note
+
+	// We need an empty note at the end of the track
+	empty_note: Note
+	empty_note.timestamp = track.absolute_length
+	empty_note.amplitude = 0
+
+	track.notes[track.notes_len] = empty_note
+	track.notes_len += 1
 }
 
 @(private="file")
-read_float :: proc(str: string, start: int, digits: int) -> float {
-	str, ok := substring(line, start, start + digits)
-	if(!ok) {
-		fmt.println("Error: Couldn't read float for music style. Music data is corrupt.")
+read_float :: proc(str: string, start: int, digits: int) -> f32 {
+	str, ok := strings.substring(str, start, start + digits)
+	if !ok {
+		fmt.println("Error reading float while loading track. Music data corrupted.")
 		os.exit(1)
 	}
-	return strconv.atof(str)
+	return f32(strconv.atof(str)) / 100
 }
 
 @(private="file")

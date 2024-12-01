@@ -135,7 +135,8 @@ Trackhead :: struct {
 	position: f32,
 }
 
-start_track :: proc(channel: ^SoundChannel, new_track: NoteTrack, fg: bool) {
+start_track :: proc(sound_system: ^SoundSystem, new_track: NoteTrack, fg: bool) {
+	channel: ^SoundChannel = &sound_system.channels[0]
 	using channel.sound
 
 	if new_track.notes_len <= 0 {
@@ -145,13 +146,14 @@ start_track :: proc(channel: ^SoundChannel, new_track: NoteTrack, fg: bool) {
 	track = new_track
 	trackhead.position = 0
 
-	start_sound(channel, SoundType.TRACK)
+	start_sound(sound_system, SoundType.TRACK)
 
 	// VOLATILE this is set because start_sound sets sound_playing to true
 	channel.sound_playing = fg
 }
 
-start_sound :: proc(channel: ^SoundChannel, new_type: SoundType) {
+start_sound :: proc(sound_system: ^SoundSystem, new_type: SoundType) {
+	channel: ^SoundChannel = &sound_system.channels[0]
 	using channel.sound
 
 	new_priority: i32 = get_sound_priority(new_type)
@@ -211,13 +213,13 @@ start_sound :: proc(channel: ^SoundChannel, new_type: SoundType) {
 		frequency = ROOT_FREQ * 2
 		speed = 16
 	case SoundType.FOOD_COOKING:
-		start_track(channel, track_food_cooking(), true)
+		start_track(sound_system, sound_system.music.track_food_cooking, true)
 	case SoundType.FOOD_APPEAR:
-		start_track(channel, track_food_appear(), true)
+		start_track(sound_system, sound_system.music.track_food_appear, true)
 	case SoundType.FOOD_DISAPPEAR:
-		start_track(channel, track_food_disappear(), true)
+		start_track(sound_system, sound_system.music.track_food_disappear, true)
 	case SoundType.FOOD_EAT:
-		start_track(channel, track_food_eat(), true)
+		start_track(sound_system, sound_system.music.track_food_eat, true)
 	case SoundType.ENEMY_ALARMED:
 		frequency = ROOT_FREQ
 		amplitude = 0.5
@@ -227,9 +229,9 @@ start_sound :: proc(channel: ^SoundChannel, new_type: SoundType) {
 		amplitude = 0.5
 		speed = 4
 	case SoundType.KING_DIE:
-		start_track(channel, track_king_die(), true)
+		start_track(sound_system, sound_system.music.track_king_die, true)
 	case SoundType.GAME_OVER:
-		start_track(channel, track_game_over(), true)
+		start_track(sound_system, sound_system.music.track_game_over, true)
 	case SoundType.POT_BOUNCE:
 		frequency = ROOT_FREQ
 		speed = 0.5

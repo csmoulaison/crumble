@@ -109,7 +109,7 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 
 		if check_king_seen(enemy, king.position, surface_index, surface_map.king_surface) {
 			state = EnemyState.SEEN_JUMP
-			start_sound(&sound_system.channels[0], SoundType.ENEMY_ALARMED)
+			start_sound(sound_system, SoundType.ENEMY_ALARMED)
 			y_velocity = -config.enemy_seen_jump_velocity
 		} else {
 			x_movement := config.enemy_patrol_speed
@@ -135,7 +135,7 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 		if !check_king_seen(enemy, king.position, surface_map.king_surface, surface_index) {
 			// TODO maybe refactor into its own function from handle_surface_edge as well 
 			state = EnemyState.PAUSE
-			start_sound(&sound_system.channels[0], SoundType.ENEMY_LOST)
+			start_sound(sound_system, SoundType.ENEMY_LOST)
 			time_to_next_state = config.enemy_lost_pause_length
 		} else {
 			x_movement := config.enemy_chase_speed

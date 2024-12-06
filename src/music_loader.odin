@@ -81,10 +81,10 @@ deserialize_music :: proc(result: ^MusicData, fname: string) {
 		result.length = result.tracks[2].absolute_length
 	}
 
-	 fmt.println("Music loaded:", fname)
-	 fmt.println("  Length:", result.length)
-	 fmt.println("  track1:", result.tracks[1].notes_len)
-	 fmt.println("  track2:", result.tracks[2].notes_len)
+	//fmt.println("Music loaded:", fname)
+	//fmt.println("  Length:", result.length)
+	//fmt.println("  track1:", result.tracks[1].notes_len)
+	//fmt.println("  track2:", result.tracks[2].notes_len)
 }
 
 @(private="file")

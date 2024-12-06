@@ -19,6 +19,10 @@ handle_final_screen :: proc(session: ^Session, input: ^Input, dt: f32) {
 draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, sound_system: ^SoundSystem, platform: ^Platform, dt:f32) {
 	using session
 
+	platform.logical_offset.x = 88
+	platform.logical_offset.y = -120
+	platform.logical_offset_active = true
+
     src: IRect = {{592,112},{16,16}}
 
     for i: int = 0; i < TILE_ROW_WIDTH; i += 1 {
@@ -29,6 +33,7 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
         buffer_sprite(platform, src, IVec2{10 * 16 + i * 16, LOGICAL_HEIGHT - 96}, IVec2{8,0}, false)
     }
 
+	platform.logical_offset.x = 8
     king_src_x: int = 112
     chef_src_x: int = 369
     if king.jump_state == JumpState.GROUNDED && time_to_next_state < 0 {
@@ -53,6 +58,7 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
             if i > 1 do flipped = true
             buffer_sprite(platform, IRect{{enemy_src_x, 16},{16, 21}}, IVec2{LOGICAL_WIDTH / 2 + i * 96 - 152, LOGICAL_HEIGHT - 32}, IVec2{8,21}, flipped)
         }
+
 
         draw_fireworks(&session.particle_system, platform)
 

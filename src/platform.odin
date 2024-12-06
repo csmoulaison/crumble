@@ -6,9 +6,9 @@ import "core:strings"
 import "core:math"
 
 // Imaginary pixel art width
-LOGICAL_WIDTH :: 480 
+LOGICAL_WIDTH :: 640
 // Imaginary pixel resolution height
-LOGICAL_HEIGHT :: 360 
+LOGICAL_HEIGHT :: 480
 // Maximum keyboard inputs stored each frame
 MAX_SCANCODE_INPUTS :: 128 
 // Maximum sprites allowed to be onscreen at once
@@ -41,6 +41,8 @@ Platform :: struct {
 	sprites_len: int,
 	texts: [MAX_TEXTS]Text,
 	texts_len: int,
+	logical_offset: IVec2,
+	logical_offset_active: bool,
 	// Assets
 	sprite_atlas_handle: int,
 	textures: [MAX_TEXTURES]^SDL.Texture, //
@@ -106,9 +108,36 @@ update_platform :: proc(platform: ^Platform) {
 
 	// Draw sprites
 	//pixel_scalar: int = int(screen_height / LOGICAL_HEIGHT)
-	pixel_scalar: int = 3
+	//pixel_scalar: int = 3
 	//offset := IVec2{(int(screen_width) - LOGICAL_WIDTH * pixel_scalar) / 2, int((screen_height % LOGICAL_HEIGHT) / 2)}
-	offset := IVec2{(int(screen_width) - LOGICAL_WIDTH * pixel_scalar) / 2 - 32, 64}
+	//offset := IVec2{(int(screen_width) - LOGICAL_WIDTH * pixel_scalar) / 2 - 32, 64}
+
+	pixel_scalar: int = int(screen_height / LOGICAL_HEIGHT)
+	//SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
+	//SDL.RenderDrawLine(renderer, 0, screen_height / 2, screen_width, screen_height / 2)
+
+	screen_scalar: f32 = f32(LOGICAL_HEIGHT) / f32(screen_height)
+	scaled_screen_width: f32 = f32(screen_width) * screen_scalar
+	pillarbox: int = (int(scaled_screen_width) - LOGICAL_WIDTH) / 2
+
+	//SDL.SetRenderDrawColor(renderer, 0, 0, 255, 255)
+	//SDL.RenderDrawLine(renderer, i32(pillarbox), 0, i32(pillarbox), screen_height)
+
+	logical_pillarbox: int = pillarbox * pixel_scalar
+	offset := IVec2{logical_pillarbox, 0}
+
+	//SDL.SetRenderDrawColor(renderer, 255, 0, 0, 255)
+	//SDL.RenderDrawLine(renderer, i32(logical_pillarbox), 0, i32(logical_pillarbox), screen_height)
+
+	// Screen space center line
+	//SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
+	//SDL.RenderDrawLine(renderer, screen_width / 2, 0, screen_width / 2, screen_height)
+
+	// Logical space center line
+	//SDL.SetRenderDrawColor(renderer, 0, 255, 0, 255)
+	//x: i32 = i32((LOGICAL_WIDTH / 2) + offset.x) * i32(pixel_scalar)
+	//SDL.RenderDrawLine(renderer, x, 0, x, screen_height)
+
 	for &sprite in sprites[:sprites_len] {
 		using sprite
 

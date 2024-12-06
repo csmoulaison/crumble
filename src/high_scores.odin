@@ -65,6 +65,8 @@ update_high_scores :: proc(leaderboard: ^Leaderboard, input: ^Input) {
 draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^Config, fonts: ^UIFonts, platform: ^Platform, dt: f32) {
 	using leaderboard
 
+	platform.logical_offset_active = false
+
 	time_to_toggle_blink -= dt
 	if time_to_toggle_blink < 0 {
 		time_to_toggle_blink = config.scoreboard_editing_blink_length

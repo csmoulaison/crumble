@@ -6,6 +6,10 @@ draw_level_interstitial :: proc(session: ^Session, time_to_end: f32, assets: ^As
 		return
 	}
 
+	platform.logical_offset_active = true
+	platform.logical_offset.x = 3
+	platform.logical_offset.y = 0
+
 	center := IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 14}
 	tower_height: int = 128
 	level_y_height := center.y + tower_height / 2 + 20

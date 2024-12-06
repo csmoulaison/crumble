@@ -37,6 +37,11 @@ buffer_sprite_chosen_atlas :: proc(platform: ^Platform, texture_src: IRect, posi
 
 @(private="file")
 buffer_sprite_raw :: proc(platform: ^Platform, sprite: Sprite) {
-	platform.sprites[platform.sprites_len] = sprite
+	spr: Sprite = sprite
+	if platform.logical_offset_active {
+		spr.position.x += platform.logical_offset.x
+		spr.position.y += platform.logical_offset.y
+	}
+	platform.sprites[platform.sprites_len] = spr
 	platform.sprites_len += 1
 }

@@ -3,6 +3,8 @@ package main
 update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
 
+	platform.logical_offset_active = false
+
 	secret_code: [7]^Button = {
 		&input.left,
 		&input.left,
@@ -43,7 +45,7 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 	}
 
 	pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
-	pos_y: int = LOGICAL_HEIGHT - 16
+	pos_y: int = LOGICAL_HEIGHT - 64
 	font := assets.fonts.red
 	if int(intro_elapsed_time) % 2 != 0 {
 		font = assets.fonts.white
@@ -55,6 +57,8 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 
 draw_pre_credits :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
+
+	platform.logical_offset_active = false
 
 	total_time: f32 = 15
 

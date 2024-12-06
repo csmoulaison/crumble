@@ -25,6 +25,10 @@ Session :: struct {
 	surface_map: SurfaceMap,
 	scorepop: Scorepop,
 	particle_system: ParticleSystem,
+
+	// UI state
+	visual_points: int,
+	visual_points_countdown: f32,
 }
 
 SessionState :: enum {

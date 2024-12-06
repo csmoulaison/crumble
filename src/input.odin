@@ -19,6 +19,7 @@ ScancodeButtonMapping :: struct {
 }
 
 Input :: struct {
+	any_just_pressed: bool,
 	scancode_button_map: [MAX_SCANCODE_BUTTON_MAPPINGS]ScancodeButtonMapping,
 	scancode_button_map_len: int,
 	mapped_buttons: [MAX_BUTTONS]^Button,
@@ -134,6 +135,7 @@ update_input :: proc(input: ^Input, platform: ^Platform) {
 			if keydown == mapping.scancode && !mapping.button.held {
 				mapping.button.held = true
 				mapping.button.just_pressed = true
+				any_just_pressed = true
 			}
 		}
 	}

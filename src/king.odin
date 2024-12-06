@@ -19,6 +19,8 @@ King :: struct {
 
 	animator: Animator,
 	up_step: bool,
+
+	is_chef: bool,
 }
 
 // Current state of the king's jump and float capabilities.
@@ -47,6 +49,11 @@ init_king :: proc(king: ^King, data: ^LevelData, config: ^Config) {
 draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^Platform, dt: f32) {
 	using king
 
+	if is_chef {
+		draw_chef(king, y_offset, sequences, platform, dt)
+		return
+	}
+
 	animator.frame_length_mod = 1
 	animator.sequence = &sequences.king_idle
 	if running_input {
@@ -59,8 +66,6 @@ draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^
 		animator.sequence = &sequences.king_jump
 	case JumpState.FLOAT:
 		animator.sequence = &sequences.king_float
-	case JumpState.POST_FLOAT:
-		animator.sequence = &sequences.king_post_float
 	}
 
 	animator.flipped = !facing_right
@@ -73,6 +78,11 @@ draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^
 // Accelerate in direction of input, or decelerate if input is zero.
 update_king_movement :: proc(king: ^King, input: ^Input, config: ^Config, dt: f32) {
 	using king
+
+	if is_chef {
+		update_chef_movement(king, input, config, dt)
+		return
+	}
 
 	running_input = false 
 	acceleration_direction: f32 = 0
@@ -121,6 +131,11 @@ update_king_movement :: proc(king: ^King, input: ^Input, config: ^Config, dt: f3
 update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using king
 
+	if is_chef {
+		update_chef_jump_state(king, input, config, sound_system, dt)
+		return
+	}
+
 	if jump_state == JumpState.GROUNDED || coyote_time > 0 {
 		coyote_time -= dt
 		if input.jump.just_pressed || jump_buffer > 0 {
@@ -154,7 +169,7 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 		if jump_state == JumpState.FLOAT {
 			sound_system.channels[0].sound.frequency += -velocity.y * 16 * dt
 			if velocity.y > 0 {
-				jump_state = JumpState.POST_FLOAT
+				//jump_state = JumpState.POST_FLOAT
 				//start_sound(sound_system, SoundType.POST_FLOAT)
 			}
 		} else {

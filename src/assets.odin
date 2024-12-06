@@ -40,6 +40,11 @@ Sequences :: struct {
 	foods: [4]Sequence,
 
     chef: Sequence,
+    chef_idle: Sequence,
+    chef_run: Sequence,
+    chef_jump: Sequence,
+    chef_float: Sequence,
+    chef_post_float: Sequence,
 }
 
 load_assets :: proc(assets: ^Assets, platform: ^Platform) {
@@ -52,16 +57,22 @@ load_assets :: proc(assets: ^Assets, platform: ^Platform) {
 		tile_left_src = {{128, 0}, {16, 16}}
 		tile_right_src = {{192, 0}, {16, 16}}
 
-		king_idle = {{{112, 16}, {16, 21}}, 2, {8, 21}, 0.15}
-		king_run = {{{0, 16}, {16, 21}}, 4, {8, 21}, 0.15}
-		king_jump = {{{96, 16}, {16, 21}}, 1, {8, 21}, 0.1}
-		king_float = {{{64, 16}, {16, 21}}, 1, {8, 21}, 0.1}
+		king_idle =       {{{112, 16}, {16, 21}}, 2, {8, 21}, 0.15}
+		king_run =        {{{0, 16}, {16, 21}}, 4, {8, 21}, 0.15}
+		king_jump =       {{{96, 16}, {16, 21}}, 1, {8, 21}, 0.1}
+		king_float =      {{{64, 16}, {16, 21}}, 1, {8, 21}, 0.1}
 		king_post_float = {{{80, 16}, {16, 21}}, 1, {8, 21}, 0.1}
 
 		guard_idle = {{{224, 16}, {16, 21}}, 2, {8, 21}, 0.15}
-		guard_run = {{{160, 16}, {16, 21}}, 4, {8, 21}, 0.15}
+		guard_run =  {{{160, 16}, {16, 21}}, 4, {8, 21}, 0.15}
 		guard_jump = {{{270, 16}, {16, 21}}, 1, {8, 21}, 0.1}
-		guard_end = {{{192, 16}, {16, 21}}, 2, {8, 21}, 0.1}
+		guard_end =  {{{192, 16}, {16, 21}}, 2, {8, 21}, 0.1}
+
+		chef_idle =       {{{112, 37}, {16, 21}}, 2, {8, 21}, 0.15}
+		chef_run =        {{{0,   37}, {16, 21}}, 4, {8, 21}, 0.15}
+		chef_jump =       {{{32,  37}, {16, 21}}, 1, {8, 21}, 0.1}
+		chef_float =      {{{64,  37}, {16, 21}}, 3, {8, 21}, 0.1}
+		chef_post_float = {{{80,  37}, {16, 21}}, 1, {8, 21}, 0.1}
 	}
 
     {

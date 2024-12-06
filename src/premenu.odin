@@ -3,6 +3,28 @@ package main
 update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
 
+	secret_code: [7]^Button = {
+		&input.left,
+		&input.left,
+		&input.right,
+		&input.right,
+		&input.left,
+		&input.right,
+		&input.left,
+	};
+
+	if secret_code[secret_code_current].just_pressed {
+		secret_code_current += 1
+		if secret_code_current > 6 {
+			session.king.is_chef = true
+			start_sound(&sound_system, SoundType.FOOD_EAT)
+			stop_music(&sound_system)
+			secret_code_current = 0
+		}
+	} else if input.left.just_pressed || input.right.just_pressed {
+		secret_code_current = 0
+	}
+
 	if input.jump.just_pressed {
 		init_session(&game.session, &game.config)
 		state = GameState.SESSION

@@ -39,7 +39,7 @@ init_audio :: proc(audio: ^Audio) {
 
 	device_config = MA.device_config_init(MA.device_type.playback)
 	device_config.playback.format = MA.format.f32
-	device_config.playback.channels = 2
+	device_config.playback.channels = 1
 	device_config.sampleRate = 48000
 	device_config.dataCallback = audio_data_callback
 	device_config.pUserData = &data
@@ -47,9 +47,8 @@ init_audio :: proc(audio: ^Audio) {
 	if MA.device_init(nil, &device_config, &device) != MA.result.SUCCESS {
 		fmt.println("Failed to open playback device")
 		return
-	}
-	else {
-		// fmt.println("Successfully opened playback device")
+	} else {
+		fmt.println("Successfully opened playback device")
 	}
 
 	for &osc_backend, i in data.osc_backends {
@@ -68,9 +67,8 @@ init_audio :: proc(audio: ^Audio) {
 	if MA.device_start(&device) != MA.result.SUCCESS {
 		fmt.println("Failed to start playback device")
 		MA.device_uninit(&device)
-	}
-	else {
-		// fmt.println("Successfully started playback device")
+	} else {
+		fmt.println("Successfully started playback device")
 	}
 }
 
@@ -94,15 +92,14 @@ audio_data_callback :: proc "c" (device: ^MA.device, output, input: rawptr, fram
 		    //mem.ptr_offset(output_f32, j * 2)^ += math.sin_f32(sin_index) * data.oscillators[i].amplitude
 
             // for square
-            //if int(data.oscillators[i].t * 2) % 4 == 0 do mem.ptr_offset(output_f32, j * 2)^ += data.oscillators[i].amplitude
             if (i == 0 && int(data.oscillators[i].t) % 2 == 0) || (i != 0 && int(data.oscillators[i].t * 2) % 4 == 0) {
-                mem.ptr_offset(output_f32, j * 2)^ += data.oscillators[i].amplitude
+                mem.ptr_offset(output_f32, j )^ += data.oscillators[i].amplitude
             } else {
-                mem.ptr_offset(output_f32, j * 2)^ -= data.oscillators[i].amplitude
+                mem.ptr_offset(output_f32, j )^ -= data.oscillators[i].amplitude
             }
 
-            if mem.ptr_offset(output_f32, j * 2)^ < -0.999 do mem.ptr_offset(output_f32, j * 2)^ = -0.999
-            else if mem.ptr_offset(output_f32, j * 2)^ > 0.999 do mem.ptr_offset(output_f32, j * 2)^ = 0.999
+            if mem.ptr_offset(output_f32, j )^ < -0.999 do mem.ptr_offset(output_f32, j )^ = -0.999
+            else if mem.ptr_offset(output_f32, j )^ > 0.999 do mem.ptr_offset(output_f32, j )^ = 0.999
 		}
 
         // for sin

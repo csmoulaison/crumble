@@ -33,7 +33,7 @@ draw_level_interstitial :: proc(session: ^Session, time_to_end: f32, assets: ^As
 	// Draw tower graphic
 	buffer_sprite(
 		platform,
-		IRect{{level_tower_to_draw * 53, 37}, {53, 128}},
+		IRect{{736 + level_tower_to_draw * 53, 37}, {53, 128}},
 		IVec2{center.x, center.y},
 		IVec2{29, 64},
 		false)

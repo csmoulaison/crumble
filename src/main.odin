@@ -3,11 +3,11 @@ import "core:fmt"
 
 // To do
 // * Music (5/7)
-//   - 1: Greensleeves [X]
-//   - 2: Dompe        [ ]
-//   - 3: Bach         [X]
-//   - 4: Speed        [X]
-//   - 5: Ballarde     [ ]
+//   - 1:
+//   - 2:
+//   - 3: Bach 1041    [X]
+//   - 4: Bach 1041 2  [x]
+//   - 5: Greensleeves [X]
 //   - 6: Islands      [X]
 //   - 7: Victory      [X]
 // * Any last visual telegraphs?

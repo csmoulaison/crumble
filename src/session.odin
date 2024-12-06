@@ -105,7 +105,10 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 		state = SessionState.END
 	}
 
-	if state == SessionState.END do return true
+	if state == SessionState.END {
+		king.is_chef = false
+		return true
+	}
 	return false
 }
 

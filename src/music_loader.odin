@@ -18,16 +18,17 @@ MusicLoadContext :: struct {
 	state: MusicLoadState,
 	styles: [MAX_MUSIC_STYLES]NoteSettings,
 	styles_len: int,
+	absolute_lengths: bool,
 };
-
 
 deserialize_music :: proc(result: ^MusicData, fname: string) {
 	//fmt.println("Loading music...", fname)
-    data, read_ok := os.read_entire_file(fname)
+    data, read_ok := os.read_entire_file(fname, context.allocator)
     if !read_ok {
 	    fmt.println("Read not ok!")
 	    os.exit(1)
     }
+    defer delete(data, context.allocator)
 
     loader: MusicLoadContext
 
@@ -53,7 +54,9 @@ deserialize_music :: proc(result: ^MusicData, fname: string) {
 
 		switch loader.state {
 		case MusicLoadState.SETTINGS:
-			result.tempo = f32(strconv.atoi(line))
+			fmt.println(fname)
+			result.tempo = read_float(line, 0, 2) * 100
+			loader.absolute_lengths = (len(line) > 2 && int(read_float(line, 3, 1) * 100) == 1)
 		case MusicLoadState.STYLES:
 			style: NoteSettings
 			style.amplitude = read_float(line, 0, 3)
@@ -78,10 +81,10 @@ deserialize_music :: proc(result: ^MusicData, fname: string) {
 		result.length = result.tracks[2].absolute_length
 	}
 
-	// fmt.println("Music loaded:", fname)
-	// fmt.println("  Length:", result.length)
-	// fmt.println("  track1:", result.tracks[1].notes_len)
-	// fmt.println("  track2:", result.tracks[2].notes_len)
+	 fmt.println("Music loaded:", fname)
+	 fmt.println("  Length:", result.length)
+	 fmt.println("  track1:", result.tracks[1].notes_len)
+	 fmt.println("  track2:", result.tracks[2].notes_len)
 }
 
 @(private="file")
@@ -108,13 +111,38 @@ push_note_from_line :: proc(line: string, loader: ^MusicLoadContext, track: ^Not
 		}
 	}
 
-	length_letter: u8 = line[4]
-	dotted: bool = (line[5] == '.')
-	style_index_char, ok := strings.substring(line, 7, 8)
-		if !ok {
-			fmt.println("Could not get substring for octave_char. Music data corrupted.")
-			os.exit(1)
+	style_index_char_pos: int = 7
+	length: f32 = 0
+	if loader.absolute_lengths {
+		style_index_char_pos += 2
+		length = read_float(line, 4, 4)
+	} else {
+		length_letter: u8 = line[4]
+		dotted: bool = (line[5] == '.')
+
+		switch length_letter {
+		case 'S':
+			length = 1
+		case 'E':
+			length = 2
+		case 'Q':
+			length = 4
+		case 'H':
+			length = 8
+		case 'W':
+			length = 16
 		}
+
+		if dotted {
+			length *= 1.5
+		}
+	}
+
+	style_index_char, ok := strings.substring(line, style_index_char_pos, style_index_char_pos + 1)
+	if !ok {
+		fmt.println("Could not get substring for style_index. Music data corrupted.")
+		os.exit(1)
+	}
 	style_index: int = strconv.atoi(style_index_char)
 
 	// Interpret data
@@ -166,24 +194,6 @@ push_note_from_line :: proc(line: string, loader: ^MusicLoadContext, track: ^Not
 
 	octave += style.octave_offset
 	note.frequency = frequencies[freq_index] * math.pow_f32(2, octave)
-
-	length: f32 = 0
-	switch length_letter {
-	case 'S':
-		length = 1
-	case 'E':
-		length = 2
-	case 'Q':
-		length = 4
-	case 'H':
-		length = 8
-	case 'W':
-		length = 16
-	}
-
-	if dotted {
-		length *= 1.5
-	}
 
 	if silent {
 		note.amplitude = 0

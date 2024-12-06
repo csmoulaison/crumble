@@ -4,10 +4,12 @@ MusicTracks :: struct {
     greensleeves: MusicData,
     dompe: MusicData,
     bach_1041: MusicData,
+    bach_1041_2: MusicData,
     speed: MusicData,
     ballard: MusicData,
     islands: MusicData,
     victory: MusicData,
+    bach_1067: MusicData,
 
     track_food_appear: NoteTrack,
     track_food_cooking: NoteTrack,
@@ -30,6 +32,10 @@ init_sound_system :: proc(sound_system: ^SoundSystem) {
 	deserialize_music(&sound_system.music.bach_1041, "music/music_bach_1041.mus")
 	deserialize_music(&sound_system.music.islands, "music/music_islands.mus")
 	deserialize_music(&sound_system.music.greensleeves, "music/music_greensleeves.mus")
+	deserialize_music(&sound_system.music.bach_1041_2, "music/music_bach_1041_2.mus")
+	deserialize_music(&sound_system.music.victory, "music/music_victory.mus")
+	deserialize_music(&sound_system.music.bach_1067, "music/music_bach_1067.mus")
+	deserialize_music(&sound_system.music.dompe, "music/music_dompe.mus")
 
 	tmp: MusicData
 
@@ -60,6 +66,10 @@ update_sound_system :: proc(sound_system: ^SoundSystem, audio: ^Audio, dt: f32) 
 	if music_trackhead.position > music_length {
 		music_trackhead.position = music_trackhead.position - music_length
 		music_trackhead.position = 0
+
+		// DEBUG for music editing!
+		//deserialize_music(&sound_system.music.bach_1041_2, "music/music_bach_1041_2.mus")
+		//start_music(1, sound_system)
 	}
 
 	// Sound channel

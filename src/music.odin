@@ -22,10 +22,10 @@ init_track :: proc() -> NoteTrack {
 
 start_music :: proc(level_index: int, sound_system: ^SoundSystem) {
 	musics: [7]^MusicData = {
-		&sound_system.music.speed,
-		&sound_system.music.speed,
+		&sound_system.music.bach_1067,
+		&sound_system.music.dompe,
 		&sound_system.music.bach_1041,
-		&sound_system.music.bach_1041,
+		&sound_system.music.bach_1041_2,
 		&sound_system.music.greensleeves,
 		&sound_system.music.islands,
 		&sound_system.music.victory,

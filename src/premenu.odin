@@ -51,6 +51,9 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 	token_text: IRect = {{114, 58}, {56, 7}}
 	if int(intro_elapsed_time) % 2 != 0 {
 		token_text.position.y += 7
+		if session.king.is_chef {
+			token_text.position.y += 7
+		}
 	}
 	if int(intro_elapsed_time * 2) % 2 != 0 {
 		buffer_sprite(platform, token_text, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 + 32}, IVec2{28, 3}, false)

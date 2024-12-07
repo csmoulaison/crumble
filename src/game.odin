@@ -20,7 +20,12 @@ Game :: struct {
 	leaderboard: Leaderboard,
 	sound_system: SoundSystem,
 	intro_elapsed_time: f32,
-	secret_code_current: int,}
+	secret_code_current: int,
+
+	// UI state
+	premenu_cycle_index: int,
+	premenu_cycle_bang: bool,
+}
 
 init_game :: proc(game: ^Game, platform: ^Platform) {
 	using game

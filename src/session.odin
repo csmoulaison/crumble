@@ -52,6 +52,7 @@ init_session :: proc(session: ^Session, config: ^Config) {
 	current_tower = 0
 	current_level = 0
 	total_points = 0
+	visual_points = 0
 
 	lives = config.starting_lives
 

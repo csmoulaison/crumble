@@ -80,8 +80,10 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 	pos_x = LOGICAL_WIDTH / 2 - 132
 	lives_frame: IRect = {{43, 58}, {47, 20}}
 	lives_icon: IRect = {{90, 73}, {9, 9}}
+	if king.is_chef {
+		lives_icon.position.x += 9
+	}
 	
-
 	buffer_sprite(platform, lives_frame, IVec2{pos_x, top_margin}, IVec2{0, 0}, false)
 	for i in 0..=lives {
 		buffer_sprite(platform, lives_icon, IVec2{pos_x + 4 + i * 10, top_margin + 8}, IVec2{0, 0}, false)

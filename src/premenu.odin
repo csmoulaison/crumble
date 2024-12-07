@@ -38,20 +38,22 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 	case 0:
 		draw_pre_credits(game, input, platform, dt)
 	case 1:
-		draw_pre_rules(game, input, platform, dt)
+		draw_pre_credits(game, input, platform, dt)
+		//draw_pre_rules(game, input, platform, dt)
 	case 2:
-		game.leaderboard.current_score = -1
-		draw_high_scores(&leaderboard, &config, &assets.fonts, platform, dt)
+		draw_pre_credits(game, input, platform, dt)
+		//game.leaderboard.current_score = -1
+		//draw_high_scores(&leaderboard, &config, &assets.fonts, platform, dt)
 	}
 
 	pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
 	pos_y: int = LOGICAL_HEIGHT - 64
-	font := assets.fonts.red
+	token_text: IRect = {{114, 58}, {56, 7}}
 	if int(intro_elapsed_time) % 2 != 0 {
-		font = assets.fonts.white
+		token_text.position.y += 7
 	}
 	if int(intro_elapsed_time * 2) % 2 != 0 {
-		buffer_text(platform, IVec2{pos_x, pos_y}, "Insert Token", font)
+		buffer_sprite(platform, token_text, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 + 32}, IVec2{28, 3}, false)
 	}
 }
 
@@ -62,52 +64,22 @@ draw_pre_credits :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f3
 
 	total_time: f32 = 15
 
-	row_height: int = 26
-	pos_y: int = 8
-	pos_x: int = 8
+	main_title: IRect = {{77, 100}, {63, 34}}
+	conner_credit: IRect = {{0, 115}, {77, 14}}
+	hannah_credit: IRect = {{0, 129}, {77, 14}}
 
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Programmer", assets.fonts.red)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Conner Moulaison", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Artists", assets.fonts.red)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Hannah Rants", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Conner Moulaison", assets.fonts.white)
-
-	pos_y = 8
-	pos_x = 196
-
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Technologies", assets.fonts.red)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Odin Language", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "SDL 2", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Miniaudio", assets.fonts.white)
-
-	pos_y = 8
-	pos_x = 350
-
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Music", assets.fonts.red)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Greensleeves", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "BWV 1041", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "What if I", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Never Speed?", assets.fonts.white)
-	pos_y += row_height
-
-	pos_x = LOGICAL_WIDTH / 2 - 7 * 8
-	pos_y = LOGICAL_HEIGHT / 3 * 2
-	
+	buffer_sprite(platform, main_title, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 64}, IVec2{31, 17}, false)
+	buffer_sprite(platform, conner_credit, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 24}, IVec2{39, 7}, false)
+	buffer_sprite(platform, hannah_credit, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2}, IVec2{39, 7}, false)
 }
 
 draw_pre_rules :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
+
+	if premenu_cycle_bang {
+		premenu_cycle_index += 1
+		premenu_cycle_bang = false
+	}
 
 	total_time: f32 = 15
 

@@ -54,7 +54,7 @@ deserialize_music :: proc(result: ^MusicData, fname: string) {
 
 		switch loader.state {
 		case MusicLoadState.SETTINGS:
-			fmt.println(fname)
+			//fmt.println(fname)
 			result.tempo = read_float(line, 0, 2) * 100
 			loader.absolute_lengths = (len(line) > 2 && int(read_float(line, 3, 1) * 100) == 1)
 		case MusicLoadState.STYLES:

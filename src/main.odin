@@ -2,19 +2,11 @@ package main
 import "core:fmt"
 
 // To do
-// * Music (5/7)
-//   - 1:
-//   - 2:
-//   - 3: Bach 1041    [X]
-//   - 4: Bach 1041 2  [x]
-//   - 5: Greensleeves [X]
-//   - 6: Islands      [X]
-//   - 7: Victory      [X]
-// * Any last visual telegraphs?
-// * Collisions?
-//   - Yes: combine colliders while counting tiles
-// * Opening screens improvement
-// * Level UI improvements?
+// * Graphix
+//   - The End text
+//   - Level interstitial text
+// * Collisions
+//   - combine colliders while counting tiles
 
 main :: proc() {
 	platform: ^Platform = new(Platform)

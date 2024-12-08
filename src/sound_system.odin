@@ -11,6 +11,7 @@ MusicTracks :: struct {
     victory: MusicData,
     bach_1067: MusicData,
 
+    track_startup: NoteTrack,
     track_food_appear: NoteTrack,
     track_food_cooking: NoteTrack,
     track_food_disappear: NoteTrack,
@@ -38,6 +39,9 @@ init_sound_system :: proc(sound_system: ^SoundSystem) {
 	deserialize_music(&sound_system.music.dompe, "music/music_dompe.mus")
 
 	tmp: MusicData
+
+	deserialize_music(&tmp, "music/track_startup.mus")
+	sound_system.music.track_startup = tmp.tracks[1]
 
 	deserialize_music(&tmp, "music/track_food_appear.mus")
 	sound_system.music.track_food_appear = tmp.tracks[1]

@@ -47,6 +47,7 @@ SoundType :: enum {
 	DOWN_STEP,
 	STEP,
 
+	STARTUP,
 	FOOD_APPEAR,
 	FOOD_DISAPPEAR,
 	FOOD_EAT,
@@ -168,6 +169,8 @@ start_sound :: proc(sound_system: ^SoundSystem, new_type: SoundType) {
 	case SoundType.FOOD_BLINK:
 		frequency = ROOT_FREQ * 2
 		speed = 16
+	case SoundType.STARTUP:
+		start_track(sound_system, sound_system.music.track_startup, true)
 	case SoundType.FOOD_COOKING:
 		start_track(sound_system, sound_system.music.track_food_cooking, true)
 	case SoundType.FOOD_APPEAR:
@@ -381,6 +384,8 @@ get_sound_priority :: proc(type: SoundType) -> i32 {
 		return 2
 	case SoundType.STEP:
 		return 2
+	case SoundType.STARTUP:
+		return 10
 	case SoundType.FOOD_APPEAR:
 		return 7
 	case SoundType.FOOD_DISAPPEAR:

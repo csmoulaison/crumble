@@ -62,7 +62,65 @@ update_high_scores :: proc(leaderboard: ^Leaderboard, input: ^Input) {
 	}
 }
 
-draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^Config, fonts: ^UIFonts, platform: ^Platform, dt: f32) {
+draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^Config, platform: ^Platform, dt: f32) {
+	using leaderboard
+	platform.logical_offset_active = false
+
+	time_to_toggle_blink -= dt
+	if time_to_toggle_blink < 0 {
+		time_to_toggle_blink = config.scoreboard_editing_blink_length
+		blink = !blink
+	}
+
+	top_margin: int = 156
+	col1_x: int = 247
+	col2_x: int = 311
+	col3_x: int = 374
+
+	// Draw headers
+	rank_text: IRect = {{0, 143}, {19, 7}}
+	score_text: IRect = {{6, 58}, {24, 7}}
+	name_text: IRect = {{0, 150}, {19, 7}}
+
+	buffer_sprite(platform, rank_text, IVec2{col1_x, top_margin}, IVec2{0, 0}, false)
+	buffer_sprite(platform, name_text, IVec2{col2_x, top_margin}, IVec2{0, 0}, false)
+	buffer_sprite(platform, score_text, IVec2{col3_x, top_margin}, IVec2{0, 0}, false)
+
+	// Draw score rows
+	row_y: int = top_margin + 20
+	place_text: IRect = {{140, 79}, {19, 7}}
+
+	for score, i in data.scores[:10] {
+		// Draw place
+		buffer_sprite(platform, place_text, IVec2{col1_x, row_y}, IVec2{0, 0}, false)
+
+		// Draw initials
+		initial_pos_x: int = col2_x + 2
+		for c, j in score.initials {
+			letter_index: int = index_from_letter(c)
+			initial_src: IRect = {{20 + letter_index * 5, 150}, {4, 7}}
+
+			if current_score == i && current_initial == j {
+				initial_src.position.y += 7
+				if blink {
+					initial_src.position.x = 15
+				}
+			}
+			
+			buffer_sprite(platform, initial_src, IVec2{initial_pos_x, row_y}, IVec2{0, 0}, false)
+			initial_pos_x += 5
+		}
+
+		// Draw score
+		draw_score(score.points, IVec2{col3_x - 16, row_y - 2}, platform)
+
+		// Iterate row position
+		place_text.position.y += 7
+		row_y += 13
+	}
+}
+
+draw_high_scores_old :: proc(leaderboard: ^Leaderboard, config: ^Config, fonts: ^UIFonts, platform: ^Platform, dt: f32) {
 	using leaderboard
 
 	platform.logical_offset_active = false

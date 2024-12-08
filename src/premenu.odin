@@ -43,34 +43,37 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		return
 	}
 
-	intro_elapsed_time += dt
-	switch int(intro_elapsed_time / 4) % 3 {
-	case 0:
-		draw_pre_credits(game, input, platform, dt)
-	case 1:
-		draw_pre_credits(game, input, platform, dt)
-		//draw_pre_rules(game, input, platform, dt)
-	case 2:
-		draw_pre_credits(game, input, platform, dt)
-		//game.leaderboard.current_score = -1
-		//draw_high_scores(&leaderboard, &config, &assets.fonts, platform, dt)
+	title: bool = false
+	if intro_elapsed_time > 1 {
+		title = true
 	}
 
-	pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
-	pos_y: int = LOGICAL_HEIGHT - 64
-	token_text: IRect = {{114, 58}, {56, 7}}
-	if int(intro_elapsed_time) % 2 != 0 {
-		token_text.position.y += 7
-		if session.king.is_chef {
-			token_text.position.y += 7
-		}
+	intro_elapsed_time += dt
+	switch int(intro_elapsed_time / 6) % 2 {
+	case 0:
+		draw_pre_credits(title, game, input, platform, dt)
+	case 1:
+		leaderboard.current_score = -1
+		draw_high_scores(&leaderboard, &config, platform, dt)
 	}
-	if int(intro_elapsed_time * 2) % 2 != 0 {
-		buffer_sprite(platform, token_text, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 + 32}, IVec2{28, 3}, false)
+
+	if title {
+		pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
+		pos_y: int = LOGICAL_HEIGHT - 64
+		token_text: IRect = {{114, 58}, {56, 7}}
+		if int(intro_elapsed_time) % 2 != 0 {
+			token_text.position.y += 7
+			if session.king.is_chef {
+				token_text.position.y += 7
+			}
+		}
+		if int(intro_elapsed_time * 2) % 2 == 0 {
+			buffer_sprite(platform, token_text, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 + 80}, IVec2{28, 3}, false)
+		}
 	}
 }
 
-draw_pre_credits :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
+draw_pre_credits :: proc(title: bool, game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
 
 	platform.logical_offset_active = false
@@ -81,7 +84,9 @@ draw_pre_credits :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f3
 	conner_credit: IRect = {{0, 115}, {77, 14}}
 	hannah_credit: IRect = {{0, 129}, {77, 14}}
 
-	buffer_sprite(platform, main_title, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 64}, IVec2{31, 17}, false)
+	if title {
+		buffer_sprite(platform, main_title, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 64}, IVec2{31, 17}, false)
+	}
 	buffer_sprite(platform, conner_credit, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 24}, IVec2{39, 7}, false)
 	buffer_sprite(platform, hannah_credit, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2}, IVec2{39, 7}, false)
 }

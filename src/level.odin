@@ -48,7 +48,6 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 	// Draw score
 	pos_x = LOGICAL_WIDTH / 2 - 72
 	score_frame: IRect = {{0, 58}, {43, 20}}
-	first_num_text: IRect = {{50, 82}, {5, 9}}
 
 	points: int = session.total_points + session.level_points
 	if session.visual_points < points {
@@ -64,17 +63,7 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 	}
 
 	buffer_sprite(platform, score_frame, IVec2{pos_x, top_margin}, IVec2{0, 0}, false)
-	for i in 0..<6 {
-		power10: int = 10
-		for j in 0..<i {
-			power10 *= 10
-		}
-		digit: int = (visual_points % power10) / (power10 / 10)
-
-		num_text: IRect = first_num_text
-		num_text.position.x += digit * 5
-		buffer_sprite(platform, num_text, IVec2{pos_x + 34 - i * 6, top_margin + 8}, IVec2{0, 0}, false)
-	}
+	draw_score(visual_points, IVec2{pos_x - 2, top_margin + 8}, platform)
 
 	// Draw remaining lives
 	pos_x = LOGICAL_WIDTH / 2 - 132

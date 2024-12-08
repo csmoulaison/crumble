@@ -1,6 +1,8 @@
 package main
 import "core:fmt"
 
+secret_code_len :: 7
+
 GameState :: enum {
 	MAIN_MENU,
 	SESSION,
@@ -20,7 +22,7 @@ Game :: struct {
 	leaderboard: Leaderboard,
 	sound_system: SoundSystem,
 	intro_elapsed_time: f32,
-	secret_code_current: int,
+	secret_code_inputs: [secret_code_len]^Button,
 
 	// UI state
 	premenu_cycle_index: int,
@@ -38,7 +40,6 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 
 	// DEBUG for making music
 	//start_music(1, &game.sound_system)
-	secret_code_current = 0
 
 	state = GameState.PRE_MAIN_MENU
 }

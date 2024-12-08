@@ -63,7 +63,8 @@ init_platform :: proc(platform: ^Platform) {
 	screen_width = display_mode.w
 	screen_height = display_mode.h
 
-	window = SDL.CreateWindow("Crumble King", 0, 0, screen_width, screen_height, SDL.WINDOW_BORDERLESS)
+	//window = SDL.CreateWindow("Crumble King", 0, 0, screen_width, screen_height, SDL.WINDOW_BORDERLESS)
+	window = SDL.CreateWindow("Crumble King", 0, 0, 0, 0, SDL.WINDOW_RESIZABLE)
 	renderer = SDL.CreateRenderer(window, -1, SDL.RENDERER_ACCELERATED)
 
 	sprite_atlas_handle = new_texture_handle(platform, "textures/sprite_atlas.bmp")

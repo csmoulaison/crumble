@@ -63,8 +63,8 @@ init_platform :: proc(platform: ^Platform) {
 	screen_width = display_mode.w
 	screen_height = display_mode.h
 
-	//window = SDL.CreateWindow("Crumble King", 0, 0, screen_width, screen_height, SDL.WINDOW_BORDERLESS)
-	window = SDL.CreateWindow("Crumble King", 0, 0, 0, 0, SDL.WINDOW_RESIZABLE)
+	window = SDL.CreateWindow("Crumble King", 0, 0, screen_width, screen_height, SDL.WINDOW_BORDERLESS)
+	//window = SDL.CreateWindow("Crumble King", 0, 0, 0, 0, SDL.WINDOW_RESIZABLE)
 	renderer = SDL.CreateRenderer(window, -1, SDL.RENDERER_ACCELERATED)
 
 	sprite_atlas_handle = new_texture_handle(platform, "textures/sprite_atlas.bmp")
@@ -170,18 +170,38 @@ update_platform :: proc(platform: ^Platform) {
 	}
 	sprites_len = 0
 
-	SDL.SetRenderDrawColor(
-		renderer,
-		0,
-		0,
-		0,
-		8);
 
 	// Scanlines
-	//for i: int = 0; i * pixel_scalar < int(screen_height); i += 1 {
-		//scanline_y: i32 = i32(pixel_scalar - 1 + i * pixel_scalar)
-		//SDL.RenderDrawLine(renderer, 0, scanline_y, screen_width, scanline_y)
-	//}
+	scanline_color_map: [8]i8 = {0, 0, 0, 0, 0, 0, 0, 0}
+	if pixel_scalar == 2 {
+		scanline_color_map[0] = 64
+		scanline_color_map[1] = 0
+	} else if pixel_scalar == 3 {
+		scanline_color_map[0] = -16
+		scanline_color_map[1] = 2
+		scanline_color_map[2] = -96
+	} else if pixel_scalar == 4 {
+		scanline_color_map[0] = 127
+		scanline_color_map[1] = 0
+		scanline_color_map[2] = 127
+		scanline_color_map[3] = 127
+	}
+	for i: int = 0; i * pixel_scalar < int(screen_height); i += 1 {
+		if pixel_scalar == 3 {
+			for j: int = 0; j < pixel_scalar; j += 1 {
+				scanline_y: i32 = i32(pixel_scalar + i * pixel_scalar + j)
+
+				if scanline_color_map[j] < 0 {
+					SDL.SetRenderDrawBlendMode(renderer, SDL.BlendMode.BLEND)
+					SDL.SetRenderDrawColor(renderer, 0, 0, 0, transmute(u8)math.abs(scanline_color_map[j]))
+				} else {
+					SDL.SetRenderDrawBlendMode(renderer, SDL.BlendMode.MUL)
+					SDL.SetRenderDrawColor(renderer, 255, 255, 255, transmute(u8)math.abs(scanline_color_map[j]))
+				}
+				SDL.RenderDrawLine(renderer, 0, scanline_y, screen_width, scanline_y)
+			}
+		}
+	}
 
 	SDL.RenderPresent(renderer)
 	
@@ -200,6 +220,11 @@ update_platform :: proc(platform: ^Platform) {
 		case SDL.EventType.KEYUP:
 			keyups[keyups_len] = event.key.keysym.scancode
 			keyups_len += 1
+		case SDL.EventType.WINDOWEVENT:
+			if event.window.event == SDL.WindowEventID.RESIZED {
+				screen_width = event.window.data1
+				screen_height = event.window.data2
+			}
 		}
 	}
 }

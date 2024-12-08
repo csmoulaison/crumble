@@ -5,6 +5,7 @@ import "core:fmt"
 // * Graphix
 //   - The End text
 //   - Level interstitial text
+// * Seperate Chef high scores
 // * Collisions
 //   - combine colliders while counting tiles
 

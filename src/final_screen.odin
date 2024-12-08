@@ -59,15 +59,21 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
             buffer_sprite(platform, IRect{{enemy_src_x, 16},{16, 21}}, IVec2{LOGICAL_WIDTH / 2 + i * 96 - 152, LOGICAL_HEIGHT - 32}, IVec2{8,21}, flipped)
         }
 
+		platform.logical_offset_active = false
+		end_titles: IRect = {{77, 134}, {62, 16}}
+		buffer_sprite(platform, end_titles, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 44}, IVec2{31, 8}, false)
+
+		secret_code: IRect = {{150, 149}, {4, 7}}
+		for i in 0..<secret_code_len {
+			if time_to_next_state < f32(-4 - i) {
+				x_off: int = i * 6 - 18
+				buffer_sprite(platform, secret_code, IVec2{LOGICAL_WIDTH / 2 + x_off, LOGICAL_HEIGHT / 2 - 64}, IVec2{2, 3}, false)
+				secret_code.position.x += 6
+			}
+		}
+		platform.logical_offset_active = true
 
         draw_fireworks(&session.particle_system, platform)
-
-        font := assets.fonts.red
-        if int(time_to_next_state * 8) % 2 == 0 {
-            font = assets.fonts.white
-        }
-
-        buffer_text(platform, {LOGICAL_WIDTH / 2 - 35, LOGICAL_HEIGHT - 196}, "The End", font)
     } else {
         if king.jump_state != JumpState.GROUNDED {
             king_y_offset: f32 = 0

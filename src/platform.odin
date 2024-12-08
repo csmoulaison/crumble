@@ -177,7 +177,7 @@ update_platform :: proc(platform: ^Platform) {
 			scanline_color_map[0] = 64
 			scanline_color_map[1] = 0
 		} else if pixel_scalar == 3 {
-			scanline_color_map[0] = -16
+			scanline_color_map[0] = -64
 			scanline_color_map[1] = 2
 			scanline_color_map[2] = -96
 		} else if pixel_scalar == 4 {

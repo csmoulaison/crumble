@@ -51,7 +51,7 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	switch state {
 	case GameState.STARTUP:
 		intro_elapsed_time += dt
-		if intro_elapsed_time > 0.5 {
+		if intro_elapsed_time > 0.25 {
 			start_sound(&sound_system, SoundType.STARTUP)
 			state = GameState.PRE_MAIN_MENU
 			intro_elapsed_time = 0
@@ -73,6 +73,7 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 		// game state if we instead want to advance the currently edited initial
 		if (input.select.just_pressed && (leaderboard.current_score < 0 || leaderboard.current_score > 9 || leaderboard.current_initial > 2)) || input.quit.just_pressed {
 			state = GameState.PRE_MAIN_MENU
+			intro_elapsed_time = 1
 			serialize_leaderboard(&leaderboard.data)
             stop_music(&sound_system)
 		}

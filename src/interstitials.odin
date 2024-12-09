@@ -14,15 +14,7 @@ draw_level_interstitial :: proc(session: ^Session, time_to_end: f32, assets: ^As
 	tower_height: int = 128
 	level_y_height := center.y + tower_height / 2 + 20
 
-	// Draw level text
-	level_str := strings.builder_make()
-	strings.write_string(&level_str, "Level ")
-	strings.write_int(&level_str, session.current_level + 1)
-	buffer_text(
-		platform, 
-		{center.x - 31, level_y_height}, 
-		strings.to_string(level_str), 
-		assets.fonts.white)
+	draw_level_indicator(IVec2{LOGICAL_WIDTH / 2 - 3, LOGICAL_HEIGHT / 2 + 60}, session, platform)
 
 	level_tower_to_draw := session.current_level
 

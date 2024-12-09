@@ -34,19 +34,10 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 	col_width: int = 64
 
 	// Draw level indicator
-	pos_x: int = LOGICAL_WIDTH / 2
-	max_title_width: int = 49
-
-	level_head: IRect = {{90, 65}, {24, 8}}
-	level_num_text: IRect = {{0 + session.current_level * 7, 78}, {7, 7}}
-	level_title_text: IRect = {{0, 85 + session.current_level * 5}, {max_title_width, 5}}
-
-	buffer_sprite(platform, level_head, IVec2{pos_x, top_margin}, IVec2{12, 0}, false)
-	buffer_sprite(platform, level_num_text, IVec2{pos_x, top_margin + 7}, IVec2{3, 0}, false)
-	buffer_sprite(platform, level_title_text, IVec2{pos_x, top_margin + 15}, IVec2{max_title_width / 2, 0}, false)
+	draw_level_indicator(IVec2{LOGICAL_WIDTH / 2, top_margin}, session, platform)
 
 	// Draw score
-	pos_x = LOGICAL_WIDTH / 2 - 72
+	pos_x: int = LOGICAL_WIDTH / 2 - 72
 	score_frame: IRect = {{0, 58}, {43, 20}}
 
 	points: int = session.total_points + session.level_points

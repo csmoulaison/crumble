@@ -3,7 +3,6 @@ import "core:fmt"
 
 // To do
 // * Graphix
-//   - The End text
 //   - Level interstitial text
 // * Seperate Chef high scores
 // * Collisions

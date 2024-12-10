@@ -131,13 +131,13 @@ update_platform :: proc(platform: ^Platform) {
 	//SDL.RenderDrawLine(renderer, i32(logical_pillarbox), 0, i32(logical_pillarbox), screen_height)
 
 	// Screen space center line
-	SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
-	SDL.RenderDrawLine(renderer, screen_width / 2, 0, screen_width / 2, screen_height)
+	//SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
+	//SDL.RenderDrawLine(renderer, screen_width / 2, 0, screen_width / 2, screen_height)
 
 	// Logical space center line
-	SDL.SetRenderDrawColor(renderer, 0, 255, 0, 255)
-	x: i32 = i32((LOGICAL_WIDTH / 2) + offset.x) * i32(pixel_scalar)
-	SDL.RenderDrawLine(renderer, x, 0, x, screen_height)
+	//SDL.SetRenderDrawColor(renderer, 0, 255, 0, 255)
+	//x: i32 = i32((LOGICAL_WIDTH / 2) + offset.x) * i32(pixel_scalar)
+	//SDL.RenderDrawLine(renderer, x, 0, x, screen_height)
 
 	for &sprite in sprites[:sprites_len] {
 		using sprite

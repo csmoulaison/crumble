@@ -11,6 +11,7 @@ EnemyState :: enum {
 	PATROL,
 	CHASE,
 	SEEN_JUMP,
+	DEAD,
 }
 
 // TODO Maybe just a x direction (bool) and calculate speed based on state and then a y velocity for jumping. x direction doubles as is_flipped
@@ -23,6 +24,8 @@ Enemy :: struct {
 	time_to_next_state: f32,
 	animator: Animator,
 	surface_index: int,
+
+	x_velocity: f32,
 }
 
 EnemyList :: struct {
@@ -47,6 +50,8 @@ draw_enemies :: proc(enemy_list: ^EnemyList, sequences: ^Sequences, platform: ^P
 			animator.frame_length_mod = 2
 			animator.flipped = !facing_right
 		case EnemyState.SEEN_JUMP:
+			animator.sequence = &sequences.guard_jump
+		case EnemyState.DEAD:
 			animator.sequence = &sequences.guard_jump
 		}
 
@@ -142,6 +147,10 @@ update_enemy :: proc(enemy: ^Enemy, king: ^King, surface_map: ^SurfaceMap, confi
 			if !facing_right do x_movement *= -1
 			position.x += x_movement * dt
 		}
+	case EnemyState.DEAD:
+		y_velocity += config.king_base_gravity * dt
+		position.y += y_velocity * dt
+		position.x += x_velocity * dt
 	}
 }
 
@@ -167,11 +176,23 @@ check_king_seen :: proc(enemy: ^Enemy, king_position: Vec2, king_surface: int, e
 	facing_right == (king_position.x - position.x > 0)
 }
 
-check_king_caught :: proc(enemy_list: ^EnemyList, king: ^King) -> bool {
+check_king_caught :: proc(enemy_list: ^EnemyList, king: ^King, sound_system: ^SoundSystem) -> bool {
 	for &enemy in enemy_list.enemies[:enemy_list.len] {
+		if enemy.state == EnemyState.DEAD {
+			continue
+		}
+
 		king_collider := Rect{{-5, -16}, {10, 16}}
 		enemy_collider := Rect{{-5, -16}, {10, 16}}
 		if is_colliding(&king_collider, &king.position, &enemy_collider, &enemy.position) {
+			if king.character == Character.BUILDER && king.jump_state == JumpState.GROUNDED {
+				enemy.state = EnemyState.DEAD
+				enemy.y_velocity = -100
+				enemy.x_velocity = king.velocity.x
+				start_sound(sound_system, SoundType.LAND)
+				return false
+			}
+			
 			return true
 		}
 	}

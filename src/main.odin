@@ -1,12 +1,16 @@
 package main
 import "core:fmt"
 
-// To do
-// * Graphix
-//   - Level interstitial text
-// * Seperate Chef high scores
-// * Collisions
-//   - combine colliders while counting tiles
+// TODO
+// * Chef leads to ...
+//   * Sudden death leads to (direct unlock) ...
+//     * Mathilda character leads to ...
+//       * Fun cheats (slow, fast, etc.)
+//   * Single health tiles leads to ...
+//     * Food hint (certain food order on first level)
+//       Calibrate number of foods to achieve the right chaos
+//       Leads to ...
+//       * Builder character
 
 main :: proc() {
 	platform: ^Platform = new(Platform)

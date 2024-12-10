@@ -20,7 +20,7 @@ King :: struct {
 	animator: Animator,
 	up_step: bool,
 
-	is_chef: bool,
+	character: Character,
 }
 
 // Current state of the king's jump and float capabilities.
@@ -29,6 +29,12 @@ JumpState :: enum {
 	JUMP,
 	FLOAT,
 	POST_FLOAT,
+}
+
+Character :: enum {
+	KING,
+	CHEF,
+	BUILDER,
 }
 
 // Initialize the starting values of king data.
@@ -49,8 +55,12 @@ init_king :: proc(king: ^King, data: ^LevelData, config: ^Config) {
 draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^Platform, dt: f32) {
 	using king
 
-	if is_chef {
+	#partial switch(character) {
+	case Character.CHEF:
 		draw_chef(king, y_offset, sequences, platform, dt)
+		return
+	case Character.BUILDER:
+		draw_builder(king, y_offset, sequences, platform, dt)
 		return
 	}
 
@@ -79,8 +89,12 @@ draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^
 update_king_movement :: proc(king: ^King, input: ^Input, config: ^Config, dt: f32) {
 	using king
 
-	if is_chef {
+	#partial switch(character) {
+	case Character.CHEF:
 		update_chef_movement(king, input, config, dt)
+		return
+	case Character.BUILDER:
+		update_builder_movement(king, input, config, dt)
 		return
 	}
 
@@ -131,8 +145,12 @@ update_king_movement :: proc(king: ^King, input: ^Input, config: ^Config, dt: f3
 update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using king
 
-	if is_chef {
+	#partial switch(character) {
+	case Character.CHEF:
 		update_chef_jump_state(king, input, config, sound_system, dt)
+		return
+	case Character.BUILDER:
+		update_builder_jump_state(king, input, config, sound_system, dt)
 		return
 	}
 

@@ -24,6 +24,7 @@ Session :: struct {
 	tilemap: Tilemap,
 	surface_map: SurfaceMap,
 	scorepop: Scorepop,
+	scorepop_oneup: Scorepop,
 	particle_system: ParticleSystem,
 
 	// UI state
@@ -104,6 +105,7 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 	}
 
 	update_scorepop(&scorepop, dt)
+	update_scorepop(&scorepop_oneup, dt * 2)
 
 	// Check for force exit
 	if input.quit.just_pressed {
@@ -111,7 +113,6 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 	}
 
 	if state == SessionState.END {
-		king.is_chef = false
 		return true
 	}
 	return false

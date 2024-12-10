@@ -20,6 +20,7 @@ handle_food_reset :: proc(session: ^Session, config: ^Config, sound_system: ^Sou
 		active_windows_len = windows_len
 		start_food_cycle(&session.food, config)
 		start_sound(sound_system, SoundType.ENEMY_ALARMED)
+		start_music(session.current_level, sound_system)
 		return SessionState.LEVEL_ACTIVE
 	}
 

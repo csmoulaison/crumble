@@ -62,10 +62,10 @@ init_sound_system :: proc(sound_system: ^SoundSystem) {
 	sound_system.music.track_king_die = tmp.tracks[1]
 }
 
-update_sound_system :: proc(sound_system: ^SoundSystem, audio: ^Audio, dt: f32) {
+update_sound_system :: proc(sound_system: ^SoundSystem, audio: ^Audio, food_round: int, dt: f32) {
 	using sound_system
 
-	tempo: f32 = dt * music_tempo
+	tempo: f32 = dt * music_tempo + music_tempo * f32(food_round) * 0.25 * dt
 	music_trackhead.position += tempo
 	if music_trackhead.position > music_length {
 		music_trackhead.position = music_trackhead.position - music_length

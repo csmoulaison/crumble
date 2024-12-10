@@ -6,6 +6,7 @@ import "core:strings"
 
 MAX_HIGH_SCORES :: 100
 LEADERBOARD_FNAME :: "data/leaderboard.score"
+SECRET_LEADERBOARD_FNAME :: "data/leaderboard_secret.score"
 SCORE_LETTER_COUNT :: 26
 
 Score :: struct {
@@ -29,10 +30,36 @@ Leaderboard :: struct {
 	blink: bool,
 }
 
-update_high_scores :: proc(leaderboard: ^Leaderboard, input: ^Input) {
+update_high_scores :: proc(game: ^Game, input: ^Input) {
+	leaderboard := &game.leaderboard
+	leaderboard_fname := LEADERBOARD_FNAME
+
+	#partial switch game.session.king.character {
+	case Character.CHEF:
+		leaderboard = &game.secret_leaderboard
+		leaderboard_fname = SECRET_LEADERBOARD_FNAME
+	case Character.BUILDER:
+		leaderboard = &game.secret_leaderboard
+		leaderboard_fname = SECRET_LEADERBOARD_FNAME
+	}
+
 	using leaderboard
 
+	exiting: bool = false
+	defer if exiting {
+		serialize_leaderboard(leaderboard_fname, &data)
+
+        stop_music(&game.sound_system)
+		game.session.king.character = Character.KING
+
+		game.state = GameState.PRE_MAIN_MENU
+		game.intro_elapsed_time = 1
+	}
+
 	if current_score < 0 || current_score > 9 {
+		if input.select.just_pressed {
+			exiting = true
+		}
 		return
 	}
 
@@ -60,10 +87,23 @@ update_high_scores :: proc(leaderboard: ^Leaderboard, input: ^Input) {
 		current_initial -= 1
 		if current_initial < 0 do current_initial = 0
 	}
+
+	if (input.select.just_pressed && current_initial > 2) || input.quit.just_pressed {
+		exiting = true
+	}
 }
 
-draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^Config, platform: ^Platform, dt: f32) {
+draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: f32) {
+	leaderboard := &game.leaderboard
+	#partial switch game.session.king.character {
+	case Character.CHEF:
+		leaderboard = &game.secret_leaderboard
+	case Character.BUILDER:
+		leaderboard = &game.secret_leaderboard
+	}
+
 	using leaderboard
+
 	platform.logical_offset_active = false
 
 	time_to_toggle_blink -= dt
@@ -89,6 +129,12 @@ draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^Config, platform: ^
 	// Draw score rows
 	row_y: int = top_margin + 20
 	place_text: IRect = {{140, 79}, {19, 7}}
+	#partial switch game.session.king.character {
+	case Character.CHEF:
+		place_text.position.x += 19
+	case Character.BUILDER:
+		place_text.position.x += 19
+	}
 
 	for score, i in data.scores[:10] {
 		// Draw place
@@ -120,74 +166,18 @@ draw_high_scores :: proc(leaderboard: ^Leaderboard, config: ^Config, platform: ^
 	}
 }
 
-draw_high_scores_old :: proc(leaderboard: ^Leaderboard, config: ^Config, fonts: ^UIFonts, platform: ^Platform, dt: f32) {
-	using leaderboard
-
-	platform.logical_offset_active = false
-
-	time_to_toggle_blink -= dt
-	if time_to_toggle_blink < 0 {
-		time_to_toggle_blink = config.scoreboard_editing_blink_length
-		blink = !blink
+add_high_score :: proc(game: ^Game, new_score: Score) {
+	leaderboard := &game.leaderboard
+	leaderboard_fname: string = LEADERBOARD_FNAME
+	#partial switch game.session.king.character {
+	case Character.CHEF:
+		leaderboard = &game.secret_leaderboard
+		leaderboard_fname = SECRET_LEADERBOARD_FNAME
+	case Character.BUILDER:
+		leaderboard = &game.secret_leaderboard
+		leaderboard_fname = SECRET_LEADERBOARD_FNAME
 	}
 
-	suffixes: [10]string = { "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", };
-
-	col_width: int = LOGICAL_WIDTH / 4
-	pos_x_1: int = LOGICAL_WIDTH / 2 - col_width
-	pos_x_2: int = pos_x_1 + col_width - 7 * 2
-	pos_x_3: int = pos_x_2 + col_width - 5 * 2
-
-	row_height: int = 26
-	pos_y: int = LOGICAL_HEIGHT / 2 - 6 * row_height + row_height / 2
-
-	buffer_text(platform, {pos_x_1 - 3, pos_y}, "RANK", fonts.white)
-	buffer_text(platform, {pos_x_2 - 3, pos_y}, "SCORE", fonts.white)
-	buffer_text(platform, {pos_x_3 - 3, pos_y}, "NAME", fonts.white)
-	pos_y += row_height
-
-	for score, i in data.scores[:10] {
-		font := fonts.white
-		if current_score == i {
-			font = fonts.red
-		}
-
-		place_str := strings.builder_make()
-		strings.write_int(&place_str, i + 1)
-		strings.write_string(&place_str, suffixes[i])
-		buffer_text(platform, {pos_x_1, pos_y}, strings.to_string(place_str), font)
-
-		score_str := strings.builder_make()
-		strings.write_int(&score_str, score.points)
-		buffer_text(platform, {pos_x_2, pos_y}, strings.to_string(score_str), fonts.red)
-
-		for c, j in score.initials {
-			initial_str := strings.builder_make()
-			initial_off_x := 0
-
-			if current_score == i {
-				font = fonts.white
-				if current_initial == j {
-					font = fonts.red
-					if blink {
-						strings.write_rune(&initial_str, '.')
-						initial_off_x += 1
-					} else {
-						strings.write_rune(&initial_str, c)
-					}
-				} else {
-					strings.write_rune(&initial_str, c)
-				}
-			} else {
-				strings.write_rune(&initial_str, c)
-			}
-			buffer_text(platform, {pos_x_3 + 8 * j + initial_off_x, pos_y}, strings.to_string(initial_str), font)
-		}
-		pos_y += row_height
-	}
-}
-
-add_high_score :: proc(leaderboard: ^Leaderboard, new_score: Score) {
 	using leaderboard
 
 	if data.len > MAX_HIGH_SCORES {
@@ -214,16 +204,16 @@ add_high_score :: proc(leaderboard: ^Leaderboard, new_score: Score) {
 		}
 	}
 
-	serialize_leaderboard(&leaderboard.data)
+	serialize_leaderboard(leaderboard_fname, &leaderboard.data)
 }
 
-serialize_leaderboard :: proc (data: ^LeaderboardData) -> (ok: bool) {
+serialize_leaderboard :: proc (fname: string, data: ^LeaderboardData) -> (ok: bool) {
 	bytes := mem.byte_slice(data, size_of(LeaderboardData))
-    return os.write_entire_file(LEADERBOARD_FNAME, bytes)
+    return os.write_entire_file(fname, bytes)
 }
 
-deserialize_leaderboard :: proc(result: ^LeaderboardData) -> (ok: bool) {
-    data, read_ok := os.read_entire_file(LEADERBOARD_FNAME)
+deserialize_leaderboard :: proc(fname: string, result: ^LeaderboardData) -> (ok: bool) {
+    data, read_ok := os.read_entire_file(fname)
     if !read_ok {
 		result.len = 10
        return false

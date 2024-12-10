@@ -16,6 +16,16 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		&input.right,
 	};
 
+	secret_code_builder: [secret_code_len]^Button = {
+		&input.left,
+		&input.left,
+		&input.right,
+		&input.right,
+		&input.right,
+		&input.left,
+		&input.right,
+	};
+
 	if input.left.just_pressed || input.right.just_pressed {
 		for i in 0..<secret_code_len - 1 {
 			secret_code_inputs[i] = secret_code_inputs[i + 1]
@@ -28,8 +38,18 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 	}
 
 	if secret_code_inputs == secret_code {
-		session.king.is_chef = true
+		session.king.character = Character.CHEF
 		start_sound(&sound_system, SoundType.FOOD_EAT)
+		stop_music(&sound_system)
+
+		for i in 0..<secret_code_len {
+			secret_code_inputs[i] = nil
+		}
+	}
+
+	if secret_code_inputs == secret_code_builder {
+		session.king.character = Character.BUILDER
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		stop_music(&sound_system)
 
 		for i in 0..<secret_code_len {
@@ -54,7 +74,8 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		draw_pre_credits(title, game, input, platform, dt)
 	case 1:
 		leaderboard.current_score = -1
-		draw_high_scores(&leaderboard, &config, platform, dt)
+		secret_leaderboard.current_score = -1
+		draw_high_scores(game, &config, platform, dt)
 	}
 
 	if title {
@@ -63,7 +84,11 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		token_text: IRect = {{114, 58}, {56, 7}}
 		if int(intro_elapsed_time) % 2 != 0 {
 			token_text.position.y += 7
-			if session.king.is_chef {
+
+			#partial switch session.king.character {
+			case Character.CHEF:
+				token_text.position.y += 7
+			case Character.BUILDER:
 				token_text.position.y += 7
 			}
 		}

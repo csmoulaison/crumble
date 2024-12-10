@@ -15,9 +15,9 @@ init_level :: proc(session: ^Session, data: ^LevelData, config: ^Config) {
 	time_to_next_state = config.pre_active_length
 	level_points = 0
 
-	init_tilemap(&tilemap, &level_data)
+	init_tilemap(&tilemap, config, &level_data)
 	init_king(&king, &level_data, config)
-	init_food(&food, &level_data, config)
+	init_food(&session.food, &level_data, config)
 	init_enemies(&enemy_list, &level_data)
 
 	king.foods_eaten = 0
@@ -57,15 +57,19 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 	draw_score(visual_points, IVec2{pos_x - 2, top_margin + 8}, platform)
 
 	// Draw remaining lives
-	pos_x = LOGICAL_WIDTH / 2 - 132
+	pos_x = LOGICAL_WIDTH / 2 - 122
 	lives_frame: IRect = {{43, 58}, {47, 20}}
 	lives_icon: IRect = {{90, 73}, {9, 9}}
-	if king.is_chef {
+
+	#partial switch session.king.character {
+	case Character.CHEF:
+		lives_icon.position.x += 9
+	case Character.BUILDER:
 		lives_icon.position.x += 9
 	}
 	
 	buffer_sprite(platform, lives_frame, IVec2{pos_x, top_margin}, IVec2{0, 0}, false)
-	for i in 0..=lives {
+	for i in 0..<lives {
 		buffer_sprite(platform, lives_icon, IVec2{pos_x + 4 + i * 10, top_margin + 8}, IVec2{0, 0}, false)
 	}
 
@@ -93,7 +97,9 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 		draw_king(&king, 0, &assets.sequences, platform, dt)
 	}
 	draw_enemies(&enemy_list, &assets.sequences, platform, dt)
+
 	draw_scorepop(&scorepop, platform)
+	draw_scorepop(&scorepop_oneup, platform)
 }
 
 serialize_level :: proc(data: ^LevelData, index: int) -> (ok: bool) {

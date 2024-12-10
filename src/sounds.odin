@@ -160,8 +160,8 @@ start_sound :: proc(sound_system: ^SoundSystem, new_type: SoundType) {
 		amplitude = 0
 	case SoundType.LAND:
 		speed = 12
-		frequency = ROOT_FREQ / 4
-		amplitude = 0
+		frequency = ROOT_FREQ * 2 + rand.float32() * 600
+		amplitude = 0.6
 	case SoundType.STEP:
 		speed = 28
 		frequency = ROOT_FREQ * step_mod + rand.float32() * 600
@@ -285,9 +285,9 @@ update_sound :: proc(sound: ^SoundState, audio: ^Audio, oscillator_index: int, d
 		set_frequency(oscillator, frequency)
 		set_amplitude(oscillator, amplitude)
 	case SoundType.LAND:
-		frequency = (ROOT_FREQ) - ROOT_FREQ * t
+		frequency -= 600 * speed * dt
 		set_frequency(oscillator, frequency)
-		set_amplitude(oscillator, amplitude - amplitude * t)
+		set_amplitude(oscillator, amplitude)
 	case SoundType.STEP:
 		frequency -= 600 * speed * dt
 
@@ -373,7 +373,7 @@ get_sound_priority :: proc(type: SoundType) -> i32 {
 	case SoundType.POST_FLOAT:
 		return 6
 	case SoundType.LAND:
-		return 4
+		return 10
 	case SoundType.FOOD_BLINK:
 		return 7
 	case SoundType.FOOD_COOKING:

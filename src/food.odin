@@ -35,6 +35,7 @@ Food :: struct {
 	current_window: int,
 	current_food_offset: int,
     eaten_food_offsets: [MAX_FOODS_EATEN]int,
+    round: int,
 	// TODO this can be extrapolated from foods_eaten, yeah?
 	level_complete: bool,
 	animator: Animator,
@@ -63,6 +64,7 @@ init_food :: proc(food: ^Food, data: ^LevelData, config: ^Config) {
 
 	active_windows_len = windows_len
 
+	round = 0
 	start_food_cycle(food, config)
 	time_to_blink_toggle = 0
 	level_complete = false
@@ -207,10 +209,12 @@ update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_sy
 			session.state = SessionState.HITCH
 			session.time_to_next_state = config.food_hitch_length
 		} else {
+			stop_music(sound_system)
 			food.phase = FoodPhase.RESET
 			session.state = SessionState.FOOD_RESET
 			session.time_to_next_state = config.food_reset_length
 			food.time_to_blink_toggle = 0
+			food.round += 1
 		}
 	}
 }
@@ -228,6 +232,12 @@ update_pot_bounce :: proc(food: ^Food, king: ^King, session: ^Session, sound_sys
 		start_sound(sound_system, SoundType.POT_BOUNCE)
 		pop_score(&session.scorepop, pot_pos + Vec2{26, -16}, ScorepopType.POT)
 		session.level_points += 50
+
+		if session.lives < config.starting_lives {
+			session.lives += 1
+			pop_score(&session.scorepop_oneup, pot_pos + Vec2{38, -24}, ScorepopType.ONEUP)
+			session.scorepop_oneup.time_to_end = 4
+		}
 
 		session.state = SessionState.POST_WIN
 		session.time_to_next_state = config.post_win_length

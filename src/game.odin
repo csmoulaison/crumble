@@ -21,6 +21,7 @@ Game :: struct {
 	main_menu: MainMenu,
 	session: Session,
 	leaderboard: Leaderboard,
+	secret_leaderboard: Leaderboard,
 	sound_system: SoundSystem,
 	intro_elapsed_time: f32,
 	secret_code_inputs: [secret_code_len]^Button,
@@ -34,7 +35,8 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 	using game
 
 	load_assets(&assets, platform)
-	deserialize_leaderboard(&leaderboard.data)
+	deserialize_leaderboard(LEADERBOARD_FNAME, &leaderboard.data)
+	deserialize_leaderboard(SECRET_LEADERBOARD_FNAME, &secret_leaderboard.data)
 	init_main_menu(&main_menu)
 	init_config(&game.config)
 	init_sound_system(&game.sound_system)
@@ -64,20 +66,12 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 		draw_session(&session, &assets, &config, &sound_system, platform, dt)
 
 		if session.state == SessionState.END {
-			add_high_score(&leaderboard, Score{"AAA", session.total_points})
+			add_high_score(game, Score{"AAA", session.total_points})
 			state = GameState.HIGH_SCORES
 		}
 	case GameState.HIGH_SCORES:
-		update_high_scores(&leaderboard, input)
-		// This impeccable if clause prevents the "select" button from changing the
-		// game state if we instead want to advance the currently edited initial
-		if (input.select.just_pressed && (leaderboard.current_score < 0 || leaderboard.current_score > 9 || leaderboard.current_initial > 2)) || input.quit.just_pressed {
-			state = GameState.PRE_MAIN_MENU
-			intro_elapsed_time = 1
-			serialize_leaderboard(&leaderboard.data)
-            stop_music(&sound_system)
-		}
-		draw_high_scores(&leaderboard, &config, platform, dt)
+		update_high_scores(game, input)
+		draw_high_scores(game, &config, platform, dt)
 	case GameState.PRE_MAIN_MENU:
 		update_pre_menu(game, input, platform, dt)
 	case GameState.QUIT:
@@ -86,8 +80,8 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 
     // Close to the shittest thing in this entire codebase
     if state == GameState.SESSION && session.state == SessionState.POST_LOSS && session.lives == 0 {
-        update_sound_system(&sound_system, &platform.audio, dt * 0.9) 
+        update_sound_system(&sound_system, &platform.audio, session.food.round, dt * 0.9) 
     } else {
-        update_sound_system(&sound_system, &platform.audio, dt)
+        update_sound_system(&sound_system, &platform.audio, session.food.round, dt)
     }
 }

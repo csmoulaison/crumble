@@ -10,6 +10,7 @@ ScorepopType :: enum {
 	LITTLE,
 	BIG,
 	POT,
+	ONEUP,
 }
 
 update_scorepop :: proc(scorepop: ^Scorepop, dt: f32) {
@@ -35,7 +36,7 @@ pop_score :: proc(scorepop: ^Scorepop, new_position: Vec2, type: ScorepopType) {
 	using scorepop
 
 	position = ivec2_from_vec2(new_position)
-	time_to_end = 1
+	time_to_end = 2
 
 	switch type {
 	case ScorepopType.LITTLE:
@@ -44,5 +45,7 @@ pop_score :: proc(scorepop: ^Scorepop, new_position: Vec2, type: ScorepopType) {
 		src = {{313, 16}, {7, 8}}
 	case ScorepopType.POT:
 		src = {{321, 16}, {7, 8}}
+	case ScorepopType.ONEUP:
+		src = {{329, 24}, {14, 7}}
 	}
 }

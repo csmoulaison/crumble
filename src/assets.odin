@@ -45,6 +45,13 @@ Sequences :: struct {
     chef_jump: Sequence,
     chef_float: Sequence,
     chef_post_float: Sequence,
+
+    builder: Sequence,
+    builder_idle: Sequence,
+    builder_run: Sequence,
+    builder_jump: Sequence,
+    builder_float: Sequence,
+    builder_post_float: Sequence,
 }
 
 load_assets :: proc(assets: ^Assets, platform: ^Platform) {
@@ -73,6 +80,12 @@ load_assets :: proc(assets: ^Assets, platform: ^Platform) {
 		chef_jump =       {{{32,  37}, {16, 21}}, 1, {8, 21}, 0.1}
 		chef_float =      {{{64,  37}, {16, 21}}, 3, {8, 21}, 0.1}
 		chef_post_float = {{{80,  37}, {16, 21}}, 1, {8, 21}, 0.1}
+
+		builder_idle =       {{{593, 142}, {16, 21}}, 2, {8, 21}, 0.15}
+		builder_run =        {{{480, 142}, {16, 21}}, 4, {8, 21}, 0.15}
+		builder_jump =       {{{544, 142}, {16, 21}}, 1, {8, 21}, 0.1}
+		builder_float =      {{{480, 142}, {16, 21}}, 1, {8, 21}, 0.1}
+		builder_post_float = {{{544, 142}, {16, 21}}, 1, {8, 21}, 0.1}
 	}
 
     {

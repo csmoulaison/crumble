@@ -42,6 +42,7 @@ Config :: struct {
 	enemy_lost_pause_length: f32,
 
 	tile_crumble_length: f32,
+	tile_degrade_length: f32,
 
 	scoreboard_editing_blink_length: f32,
 }
@@ -90,6 +91,7 @@ init_config :: proc(config: ^Config) {
 	food_end_points = 200
 
 	tile_crumble_length = 0.5
+	tile_degrade_length = 13
 
 	scoreboard_editing_blink_length = 0.5
 }

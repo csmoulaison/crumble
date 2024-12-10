@@ -9,22 +9,30 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 		update_enemy(&enemy, &king, &surface_map, config, sound_system, dt)
 	}
 
-	update_tile_crumble(&tilemap, dt)
+	update_tile_crumble(&tilemap, config, dt)
 
 	update_king_movement(&king, input, config, dt)
 	update_king_jump_state(&king, input, config, sound_system, dt)
 
-	physics_iterations: int = 1
-	for i: int = 0; i < physics_iterations - 1; i += 1 {
-		//apply_king_velocity_and_crumble_tiles(&king, &tilemap, &config.king, &config.tile, dt / f32(physics_iterations))
-	}
-
-	tile_to_crumble: int = apply_king_velocity_and_crumble_tiles(&king, &tilemap, sound_system, config, dt / f32(physics_iterations))
+	tile_to_crumble: int = apply_king_velocity_and_crumble_tiles(&king, &tilemap, sound_system, config, dt)
 	// Crumble the closest tile if there is one
 	if tile_to_crumble != -1 && !tilemap[tile_to_crumble].is_crumbling {
 		tile := &tilemap[tile_to_crumble]
-		tile.is_crumbling = true
-		tile.time_till_crumble = config.tile_crumble_length
+
+		if king.character != Character.BUILDER {
+			tile.is_crumbling = true
+			tile.time_till_crumble = config.tile_crumble_length
+		} else {
+			tile.is_crumbling = false
+			tile.time_till_crumble = config.tile_degrade_length
+			if tile.health > 0 && tile.health < MAX_TILE_HEALTH {
+				tile.health += 1
+			}
+		}
+	}
+
+	if king.character == Character.BUILDER {
+		update_tile_degrade(&tilemap, config, dt)
 	}
 
 	if (input.left.held || input.right.held) && king.animator.just_advanced_frame && king.jump_state == JumpState.GROUNDED {
@@ -42,7 +50,7 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 	
 	// Check lose state
 	is_king_out_of_bounds := king.position.y > LOGICAL_HEIGHT + 96
-	if is_king_out_of_bounds || check_king_caught(&enemy_list, &king) {
+	if is_king_out_of_bounds || check_king_caught(&enemy_list, &king, sound_system) {
 		stop_music(sound_system)
 
         if lives == 0 {

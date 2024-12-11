@@ -60,20 +60,23 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
         }
 
 		platform.logical_offset_active = false
+
 		end_titles: IRect = {{77, 134}, {62, 16}}
 		buffer_sprite(platform, end_titles, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 44}, IVec2{31, 8}, false)
 
-		secret_code: IRect = {{150, 149}, {4, 7}}
-		for i in 0..<secret_code_len {
-			if time_to_next_state < f32(-4 - i) {
-				x_off: int = i * 6 - 18
-				buffer_sprite(platform, secret_code, IVec2{LOGICAL_WIDTH / 2 + x_off, LOGICAL_HEIGHT / 2 - 64}, IVec2{2, 3}, false)
-				secret_code.position.x += 6
+		secret_code_src: IRect = {{150, 149}, {8, 8}}
+		secret_code_pos: IVec2 = IVec2{LOGICAL_WIDTH / 2 - 8 * (secret_code_len / 2), LOGICAL_HEIGHT / 2 - 64}
+
+		if session.king.character == Character.KING {
+			if session.mod_one_life {
+				draw_secret_code(
 			}
+			draw_secret_code(code_chef, secret_code_src, secret_code_pos, time_to_next_state, platform)
 		}
+
 		platform.logical_offset_active = true
 
-        draw_fireworks(&session.particle_system, platform)
+		draw_fireworks(&session.particle_system, platform)
     } else {
         if king.jump_state != JumpState.GROUNDED {
             king_y_offset: f32 = 0
@@ -92,3 +95,13 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
 
     buffer_sprite(platform, IRect{{chef_src_x, 32},{16,23}}, IVec2{LOGICAL_WIDTH / 2 + 8, LOGICAL_HEIGHT - 96}, IVec2{7,23}, false)
 }	
+
+draw_secret_code(code: [secret_code_len]^int, start_spr: IRect, pos: IVec2, t: f32, platform, ^Platform) {
+	for i in 0..<secret_code_len {
+		if t < f32(-4 - i) {
+			spr: IRect = start_spr
+			spr.position.x += spr.size.x
+			buffer_sprite(platform, spr, IVec2{pos.x + spr.size.x * i, pos.y}, IVec2{0, 0}, false)
+		}
+	}
+}

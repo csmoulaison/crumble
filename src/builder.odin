@@ -73,7 +73,7 @@ update_builder_movement :: proc(builder: ^King, input: ^Input, config: ^Config, 
 	velocity.x = clamp(velocity.x, -config.king_max_speed, config.king_max_speed)
 }
 
-update_builder_jump_state:: proc(builder: ^King, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
+update_builder_jump_state:: proc(builder: ^King, mod_low_grav: bool, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using builder
 
 	if jump_state == JumpState.GROUNDED || coyote_time > 0 {

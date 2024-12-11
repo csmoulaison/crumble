@@ -2,15 +2,16 @@ package main
 import "core:fmt"
 
 // TODO
-// * Chef leads to ...
-//   * Sudden death leads to (direct unlock) ...
-//     * Mathilda character leads to ...
-//       * Fun cheats (slow, fast, etc.)
-//   * Single health tiles leads to ...
-//     * Food hint (certain food order on first level)
-//       Calibrate number of foods to achieve the right chaos
-//       Leads to ...
-//       * Builder character
+// Full unlock list:
+// * king -> chef
+//   * chef -> one_life, one_tile_health
+//     * one_life -> slow, fast, low_grav
+//       * slow     -> color 1 (per character)
+//       * fast     -> color 2 (...)
+//       * low_grav -> color 3 (...)
+//     * one_tile_health -> food_hint
+//       * food_hint -> builder
+//         * builder -> king final
 
 main :: proc() {
 	platform: ^Platform = new(Platform)
@@ -32,9 +33,13 @@ main :: proc() {
 			break
 		}
 
-		update_game(game, input, platform, clock.dt)
+		dt := clock.dt
+		if game.session.mod_speed_state == ModSpeedState.FAST do dt *= 1.5
+		else if game.session.mod_speed_State == ModSpeedState.SLOW do dt *= 0.33
+
+		update_game(game, input, platform, dt)
 		update_clock(&clock)
-		platform.time_passed += clock.dt
+		platform.time_passed += dt
 	}
 
 	cleanup_platform(platform)

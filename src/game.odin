@@ -1,15 +1,20 @@
 package main
 import "core:fmt"
 
-secret_code_len :: 7
+secret_code_len :: 8
 
 GameState :: enum {
 	STARTUP,
-	MAIN_MENU,
 	SESSION,
 	HIGH_SCORES,
 	PRE_MAIN_MENU,
 	QUIT,
+}
+
+ModSpeedState :: enum {
+	NORMAL,
+	SLOW,
+	FAST,
 }
 
 Game :: struct {
@@ -18,13 +23,13 @@ Game :: struct {
 	config: Config,
 
 	// State specific data
-	main_menu: MainMenu,
 	session: Session,
 	leaderboard: Leaderboard,
-	secret_leaderboard: Leaderboard,
+	leaderboard_chef: Leaderboard,
+	leaderboard_builder: Leaderboard,
 	sound_system: SoundSystem,
 	intro_elapsed_time: f32,
-	secret_code_inputs: [secret_code_len]^Button,
+	secret_code_inputs: [secret_code_len]^int,
 
 	// UI state
 	premenu_cycle_index: int,
@@ -37,7 +42,7 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 	load_assets(&assets, platform)
 	deserialize_leaderboard(LEADERBOARD_FNAME, &leaderboard.data)
 	deserialize_leaderboard(SECRET_LEADERBOARD_FNAME, &secret_leaderboard.data)
-	init_main_menu(&main_menu)
+
 	init_config(&game.config)
 	init_sound_system(&game.sound_system)
 

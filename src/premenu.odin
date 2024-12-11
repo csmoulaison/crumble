@@ -1,57 +1,60 @@
 package main
 import "core:fmt"
 
+code_chef     :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
+code_one_life :: [secret_code_len]^Button = { &input.right, &input.left, &input.left, &input.right, &input.left, &input.left, &input.right, &input.right, }
+code_crumbled :: [secret_code_len]^Button = { &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.left, &input.right, }
+code_builder  :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
+code_slow     :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
+code_fast     :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
+code_low_grav :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
+
 update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
-
-	platform.logical_offset_active = false
-
-	secret_code: [secret_code_len]^Button = {
-		&input.left,
-		&input.left,
-		&input.right,
-		&input.left,
-		&input.left,
-		&input.right,
-		&input.right,
-	};
-
-	secret_code_builder: [secret_code_len]^Button = {
-		&input.left,
-		&input.left,
-		&input.right,
-		&input.right,
-		&input.right,
-		&input.left,
-		&input.right,
-	};
 
 	if input.left.just_pressed || input.right.just_pressed {
 		for i in 0..<secret_code_len - 1 {
 			secret_code_inputs[i] = secret_code_inputs[i + 1]
 		}
 		if input.left.just_pressed {
-			secret_code_inputs[secret_code_len - 1] = &input.left
+			secret_code_inputs[secret_code_len - 1] = 0
 		} else {
-			secret_code_inputs[secret_code_len - 1] = &input.right
+			secret_code_inputs[secret_code_len - 1] = 1
 		}
 	}
 
-	if secret_code_inputs == secret_code {
+	code_success: bool = false
+	if secret_code_inputs == code_chef {
 		session.king.character = Character.CHEF
 		start_sound(&sound_system, SoundType.FOOD_EAT)
-		stop_music(&sound_system)
-
-		for i in 0..<secret_code_len {
-			secret_code_inputs[i] = nil
-		}
-	}
-
-	if secret_code_inputs == secret_code_builder {
+		code_success = true
+	} else if secret_code_inputs == code_builder {
 		session.king.character = Character.BUILDER
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
-		stop_music(&sound_system)
+		code_success = true
+	} else if secret_code_inputs == code_one_life {
+		session.mod_one_life = true
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_crumbled {
+		session.mod_crumbled = true
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_slow {
+		session.mod_speed_state = ModSpeedState.SLOW
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_fast {
+		session.mod_speed_state = ModSpeedState.FAST
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_low_grav {
+		session.mod_low_grav = true
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	}
 
+	if code_success {
 		for i in 0..<secret_code_len {
 			secret_code_inputs[i] = nil
 		}
@@ -62,6 +65,8 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		state = GameState.SESSION
 		return
 	}
+
+	platform.logical_offset_active = false
 
 	title: bool = false
 	if intro_elapsed_time > 1 {
@@ -89,7 +94,7 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 			case Character.CHEF:
 				token_text.position.y += 7
 			case Character.BUILDER:
-				token_text.position.y += 7
+				token_text.position.y += 14
 			}
 		}
 		if int(intro_elapsed_time * 2) % 2 == 0 {
@@ -114,49 +119,4 @@ draw_pre_credits :: proc(title: bool, game: ^Game, input: ^Input, platform: ^Pla
 	}
 	buffer_sprite(platform, conner_credit, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 24}, IVec2{39, 7}, false)
 	buffer_sprite(platform, hannah_credit, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2}, IVec2{39, 7}, false)
-}
-
-draw_pre_rules :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
-	using game
-
-	if premenu_cycle_bang {
-		premenu_cycle_index += 1
-		premenu_cycle_bang = false
-	}
-
-	total_time: f32 = 15
-
-	header_height: int = 26
-	row_height: int = 32
-	pos_y: int = 8
-	pos_x: int = 8
-
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Rules", assets.fonts.red)
-	pos_y += header_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Eat food", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Avoid enemies", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Double jump to float", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Bounce on pot to end level", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Beware of crumbling floor", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Eating makes you heavier", assets.fonts.white)
-
-	pos_y = 8
-	pos_x = 256
-
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Tips", assets.fonts.red)
-	pos_y += header_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Float in opposite", assets.fonts.white)
-	pos_y += header_height - 2
-	buffer_text(platform, IVec2{pos_x, pos_y}, "direction for a boost", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Stay in the air", assets.fonts.white)
-	pos_y += row_height
-	buffer_text(platform, IVec2{pos_x, pos_y}, "Enemies are stunned by", assets.fonts.white)
-	pos_y += header_height - 2
-	buffer_text(platform, IVec2{pos_x, pos_y}, "losing sight of you", assets.fonts.white)
 }

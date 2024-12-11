@@ -86,7 +86,7 @@ update_chef_movement :: proc(chef: ^King, input: ^Input, config: ^Config, dt: f3
 	velocity.x = clamp(velocity.x, -config.king_max_speed, config.king_max_speed)
 }
 
-update_chef_jump_state:: proc(chef: ^King, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
+update_chef_jump_state:: proc(chef: ^King, mod_low_grav: bool, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using chef
 
 	if jump_state == JumpState.GROUNDED || coyote_time > 0 {

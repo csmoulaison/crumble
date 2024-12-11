@@ -30,6 +30,12 @@ Session :: struct {
 	// UI state
 	visual_points: int,
 	visual_points_countdown: f32,
+
+	// Modifier state
+	mod_one_life: bool,
+	mod_crumbled: bool,
+	mod_low_grav: bool,
+	mod_speed_state: ModSpeedState,
 }
 
 SessionState :: enum {
@@ -68,9 +74,14 @@ init_session :: proc(session: ^Session, config: ^Config) {
 handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) -> (ready_to_close: bool) {
 	using session
 
+	// DEBUG level advancer
 	if input.editor_incr_lvl.just_pressed {
 		try_advance_level(session, config)
 		return false
+	}
+
+	if mod_one_life && lives > 1 {
+		lives = 1
 	}
 
 	#partial switch state {

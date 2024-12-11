@@ -6,7 +6,8 @@ import "core:strings"
 
 MAX_HIGH_SCORES :: 100
 LEADERBOARD_FNAME :: "data/leaderboard.score"
-SECRET_LEADERBOARD_FNAME :: "data/leaderboard_secret.score"
+LEADERBOARD_CHEF_FNAME :: "data/leaderboard_chef.score"
+LEADERBOARD_BUILDER_FNAME :: "data/leaderboard_builder.score"
 SCORE_LETTER_COUNT :: 26
 
 Score :: struct {
@@ -31,33 +32,42 @@ Leaderboard :: struct {
 }
 
 update_high_scores :: proc(game: ^Game, input: ^Input) {
-	leaderboard := &game.leaderboard
-	leaderboard_fname := LEADERBOARD_FNAME
-
-	#partial switch game.session.king.character {
-	case Character.CHEF:
-		leaderboard = &game.secret_leaderboard
-		leaderboard_fname = SECRET_LEADERBOARD_FNAME
-	case Character.BUILDER:
-		leaderboard = &game.secret_leaderboard
-		leaderboard_fname = SECRET_LEADERBOARD_FNAME
-	}
-
-	using leaderboard
-
 	exiting: bool = false
 	defer if exiting {
 		serialize_leaderboard(leaderboard_fname, &data)
 
-        stop_music(&game.sound_system)
+		stop_music(&game.sound_system)
 		game.session.king.character = Character.KING
+		game.mod_one_life = false
+		game.mod_crumbled = false
+		game.mod_low_grav = false
+		game.mod_speed_state = ModSpeedState.NORMAL
 
 		game.state = GameState.PRE_MAIN_MENU
 		game.intro_elapsed_time = 1
 	}
 
+	if !is_game_high_score_eligible(game) && (input.select.just_pressed || input.quit.just_pressed) {
+		exiting = true
+		return
+	}
+
+	leaderboard := &game.leaderboard
+	leaderboard_fname := LEADERBOARD_FNAME
+
+	#partial switch game.session.king.character {
+	case Character.CHEF:
+		leaderboard = &game.leaderboard_chef
+		leaderboard_fname = LEADERBOARD_CHEF_FNAME
+	case Character.BUILDER:
+		leaderboard = &game.leaderboard_builder
+		leaderboard_fname = LEADERBOARD_CHEF_FNAME
+	}
+
+	using leaderboard
+
 	if current_score < 0 || current_score > 9 {
-		if input.select.just_pressed {
+		if input.select.just_pressed || input.quit.just_pressed {
 			exiting = true
 		}
 		return
@@ -94,12 +104,25 @@ update_high_scores :: proc(game: ^Game, input: ^Input) {
 }
 
 draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: f32) {
+	top_margin: int = 156
+	col1_x: int = 247
+	col2_x: int = 311
+	col3_x: int = 374
+
+	// Draw final score if game isn't eligible for a high score
+	if !is_game_high_score_eligible(game) {
+		final_score: IRect = {{114, 58}, {51, 7}}	
+		buffer_sprite(platform, final_score, IVec2{LOGICAL_WIDTH / 2, top_margin}, IVec2{25, 0}, false)
+		draw_score(score.points, IVec2{col3_x - 16, top_margin}, platform)
+	}
+
+	// Otherwise draw appropriate leaderboard
 	leaderboard := &game.leaderboard
 	#partial switch game.session.king.character {
 	case Character.CHEF:
-		leaderboard = &game.secret_leaderboard
+		leaderboard = &game.leaderboard_chef
 	case Character.BUILDER:
-		leaderboard = &game.secret_leaderboard
+		leaderboard = &game.leaderboard_builder
 	}
 
 	using leaderboard
@@ -111,11 +134,6 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 		time_to_toggle_blink = config.scoreboard_editing_blink_length
 		blink = !blink
 	}
-
-	top_margin: int = 156
-	col1_x: int = 247
-	col2_x: int = 311
-	col3_x: int = 374
 
 	// Draw headers
 	rank_text: IRect = {{0, 143}, {19, 7}}
@@ -133,7 +151,7 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 	case Character.CHEF:
 		place_text.position.x += 19
 	case Character.BUILDER:
-		place_text.position.x += 19
+		place_text.position.x += 38
 	}
 
 	for score, i in data.scores[:10] {
@@ -171,11 +189,11 @@ add_high_score :: proc(game: ^Game, new_score: Score) {
 	leaderboard_fname: string = LEADERBOARD_FNAME
 	#partial switch game.session.king.character {
 	case Character.CHEF:
-		leaderboard = &game.secret_leaderboard
-		leaderboard_fname = SECRET_LEADERBOARD_FNAME
+		leaderboard = &game.leaderboard_chef
+		leaderboard_fname = LEADERBOARD_CHEF_FNAME
 	case Character.BUILDER:
-		leaderboard = &game.secret_leaderboard
-		leaderboard_fname = SECRET_LEADERBOARD_FNAME
+		leaderboard = &game.leaderboard_builder
+		leaderboard_fname = LEADERBOARD_BUILDER_FNAME
 	}
 
 	using leaderboard
@@ -230,10 +248,6 @@ index_from_letter :: proc(letter: rune) -> int {
 	return 0
 }
 
-letter_from_index :: proc(index: int) -> rune {
-	return get_letter_list()[index]
-}
-
 @(private="file")
 get_letter_list :: proc() -> [SCORE_LETTER_COUNT]rune {
 	return [SCORE_LETTER_COUNT]rune {
@@ -263,4 +277,8 @@ get_letter_list :: proc() -> [SCORE_LETTER_COUNT]rune {
 		'X',
 		'Y',
 		'Z',}
+}
+
+is_session_eligible_for_high_score :: proc(Game^ game) -> bool {
+	return !(mod_one_life || mod_crumbled || mod_low_grav || mod_speed_state != ModSpeedState.NORMAL)
 }

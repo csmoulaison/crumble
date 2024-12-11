@@ -23,12 +23,20 @@ TileOrientation :: enum {
 	ISLAND,
 }
 
-init_tilemap :: proc(tilemap: ^Tilemap, config: ^Config, data: ^LevelData) {
+init_tilemap :: proc(tilemap: ^Tilemap, mod_crumbled: bool, config: ^Config, data: ^LevelData) {
 	for tile, i in data.tiles {
-		if tile != 0 do tilemap[i].health = MAX_TILE_HEALTH
-		else do tilemap[i].health = 0
 
-		tilemap[i].time_till_crumble = 0
+		if tile != 0 {
+			tilemap[i].health = MAX_TILE_HEALTH
+			tilemap[i].time_till_crumble = 0
+			if mod_crumbled {
+				tilemap[i].health = 1
+				tilemap[i].time_till_crumble = config.tile_degrade_length
+			}
+		}
+		else {
+			tilemap[i].health = 0
+		}
 	}
 }
 

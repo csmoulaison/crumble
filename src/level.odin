@@ -65,7 +65,7 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 	case Character.CHEF:
 		lives_icon.position.x += 9
 	case Character.BUILDER:
-		lives_icon.position.x += 9
+		lives_icon.position.x += 18
 	}
 	
 	buffer_sprite(platform, lives_frame, IVec2{pos_x, top_margin}, IVec2{0, 0}, false)

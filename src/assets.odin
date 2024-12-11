@@ -2,13 +2,7 @@ package main
 
 Assets :: struct {
 	sequences: Sequences,
-	fonts: UIFonts,
     config: Config,
-}
-
-UIFonts :: struct {
-	white: int,
-	red: int,
 }
 
 Sequences :: struct {
@@ -87,12 +81,6 @@ load_assets :: proc(assets: ^Assets, platform: ^Platform) {
 		builder_float =      {{{480, 142}, {16, 21}}, 1, {8, 21}, 0.1}
 		builder_post_float = {{{544, 142}, {16, 21}}, 1, {8, 21}, 0.1}
 	}
-
-    {
-        using fonts
-        white = new_font_handle(platform, "textures/font_white.bmp")
-        red = new_font_handle(platform, "textures/font_red.bmp")
-    }
 
     init_config(&config)
 }

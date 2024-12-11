@@ -142,15 +142,15 @@ update_king_movement :: proc(king: ^King, input: ^Input, config: ^Config, dt: f3
 }
 
 // Updates king jump state from input, performing state machine functionality related to jumping.
-update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
+update_king_jump_state :: proc(king: ^King, mod_low_grav: bool, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using king
 
 	#partial switch(character) {
 	case Character.CHEF:
-		update_chef_jump_state(king, input, config, sound_system, dt)
+		update_chef_jump_state(king, mod_low_grav, input, config, sound_system, dt)
 		return
 	case Character.BUILDER:
-		update_builder_jump_state(king, input, config, sound_system, dt)
+		update_builder_jump_state(king, mod_low_grav, input, config, sound_system, dt)
 		return
 	}
 
@@ -200,6 +200,10 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 		}
 	}
 
+	gravity_mod := 1
+	if mod_low_grav {
+		gravity_mod = 0.66
+	}
 	velocity.y += config.king_base_gravity * gravity_scale * dt
 }
 

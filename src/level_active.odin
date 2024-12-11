@@ -12,7 +12,7 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 	update_tile_crumble(&tilemap, config, dt)
 
 	update_king_movement(&king, input, config, dt)
-	update_king_jump_state(&king, input, config, sound_system, dt)
+	update_king_jump_state(&king, mod_low_grav, input, config, sound_system, dt)
 
 	tile_to_crumble: int = apply_king_velocity_and_crumble_tiles(&king, &tilemap, sound_system, config, dt)
 	// Crumble the closest tile if there is one
@@ -25,7 +25,13 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 		} else {
 			tile.is_crumbling = false
 			tile.time_till_crumble = config.tile_degrade_length
-			if tile.health > 0 && tile.health < MAX_TILE_HEALTH {
+
+			max_health := MAX_TILE_HEALTH
+			if mod_crumbled {
+				max_health = 1
+			}
+
+			if tile.health > 0 && tile.health < max_health {
 				tile.health += 1
 			}
 		}

@@ -65,13 +65,16 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
 		buffer_sprite(platform, end_titles, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 44}, IVec2{31, 8}, false)
 
 		secret_code_src: IRect = {{150, 149}, {8, 8}}
-		secret_code_pos: IVec2 = IVec2{LOGICAL_WIDTH / 2 - 8 * (secret_code_len / 2), LOGICAL_HEIGHT / 2 - 64}
+		secret_code_pos: IVec2 = IVec2{LOGICAL_WIDTH / 2 - 9 * (secret_code_len / 2) + 1, LOGICAL_HEIGHT / 2 - 96}
 
 		if session.king.character == Character.KING {
 			if session.mod_one_life {
-				draw_secret_code(
 			}
 			draw_secret_code(code_chef, secret_code_src, secret_code_pos, time_to_next_state, platform)
+		} else if session.king.character == Character.CHEF {
+			draw_secret_code(code_one_life, secret_code_src, secret_code_pos, time_to_next_state - 0.5, platform)
+			secret_code_pos.y -= 11
+			draw_secret_code(code_crumbled, secret_code_src, secret_code_pos, time_to_next_state, platform)
 		}
 
 		platform.logical_offset_active = true
@@ -96,12 +99,14 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
     buffer_sprite(platform, IRect{{chef_src_x, 32},{16,23}}, IVec2{LOGICAL_WIDTH / 2 + 8, LOGICAL_HEIGHT - 96}, IVec2{7,23}, false)
 }	
 
-draw_secret_code(code: [secret_code_len]^int, start_spr: IRect, pos: IVec2, t: f32, platform, ^Platform) {
+draw_secret_code :: proc(code: [secret_code_len]int, start_spr: IRect, pos: IVec2, t: f32, platform: ^Platform) {
 	for i in 0..<secret_code_len {
 		if t < f32(-4 - i) {
 			spr: IRect = start_spr
-			spr.position.x += spr.size.x
-			buffer_sprite(platform, spr, IVec2{pos.x + spr.size.x * i, pos.y}, IVec2{0, 0}, false)
+			if code[i] == 1 {
+				spr.position.x += spr.size.x
+			}
+			buffer_sprite(platform, spr, IVec2{pos.x + (spr.size.x + 1) * i, pos.y}, IVec2{0, 0}, false)
 		}
 	}
 }

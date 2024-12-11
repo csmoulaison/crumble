@@ -200,7 +200,7 @@ update_king_jump_state :: proc(king: ^King, mod_low_grav: bool, input: ^Input, c
 		}
 	}
 
-	gravity_mod := 1
+	gravity_mod: f32 = 1
 	if mod_low_grav {
 		gravity_mod = 0.66
 	}

@@ -67,6 +67,8 @@ init_session :: proc(session: ^Session, config: ^Config) {
 	init_level(session, &level_data, config)
 	init_fireworks(&particle_system)
 
+	//state = SessionState.FINAL_SCREEN
+	//king.character = Character.CHEF
 	state = SessionState.PRE_LEVEL_SCREEN
 	time_to_next_state = config.level_interstitial_length
 }
@@ -80,8 +82,8 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 		return false
 	}
 
-	if mod_one_life && lives > 1 {
-		lives = 1
+	if mod_one_life && lives > 0 {
+		lives = 0
 	}
 
 	#partial switch state {
@@ -150,8 +152,6 @@ draw_session :: proc(session: ^Session, assets: ^Assets, config: ^Config, sound_
 		draw_king(&king, int(king_y_offset), &assets.sequences, platform, dt)
 	case SessionState.PRE_LEVEL_SCREEN:
 		draw_level_interstitial(session, time_to_next_state, assets, platform, dt)
-	case SessionState.PRE_SESSION_SCREEN:
-		draw_pre_session_screen(session, assets, platform, time_to_next_state)
 	}
 }
 

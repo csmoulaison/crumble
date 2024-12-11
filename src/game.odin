@@ -29,7 +29,7 @@ Game :: struct {
 	leaderboard_builder: Leaderboard,
 	sound_system: SoundSystem,
 	intro_elapsed_time: f32,
-	secret_code_inputs: [secret_code_len]^int,
+	secret_code_inputs: [secret_code_len]int,
 
 	// UI state
 	premenu_cycle_index: int,
@@ -41,7 +41,8 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 
 	load_assets(&assets, platform)
 	deserialize_leaderboard(LEADERBOARD_FNAME, &leaderboard.data)
-	deserialize_leaderboard(SECRET_LEADERBOARD_FNAME, &secret_leaderboard.data)
+	deserialize_leaderboard(LEADERBOARD_CHEF_FNAME, &leaderboard_chef.data)
+	deserialize_leaderboard(LEADERBOARD_BUILDER_FNAME, &leaderboard_builder.data)
 
 	init_config(&game.config)
 	init_sound_system(&game.sound_system)
@@ -63,15 +64,14 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 			state = GameState.PRE_MAIN_MENU
 			intro_elapsed_time = 0
 		}
-	case GameState.MAIN_MENU:
-		handle_main_menu(game, &main_menu, input, &sound_system)
-		draw_main_menu(&main_menu, &assets, platform, dt)
 	case GameState.SESSION:
 		handle_session(&session, input, &config, &sound_system, dt)
 		draw_session(&session, &assets, &config, &sound_system, platform, dt)
 
 		if session.state == SessionState.END {
-			add_high_score(game, Score{"AAA", session.total_points})
+			if is_session_eligible_for_high_score(game) {
+				add_high_score(game, Score{"AAA", session.total_points})
+			}
 			state = GameState.HIGH_SCORES
 		}
 	case GameState.HIGH_SCORES:

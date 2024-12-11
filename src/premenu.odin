@@ -1,13 +1,28 @@
 package main
 import "core:fmt"
 
-code_chef     :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
-code_one_life :: [secret_code_len]^Button = { &input.right, &input.left, &input.left, &input.right, &input.left, &input.left, &input.right, &input.right, }
-code_crumbled :: [secret_code_len]^Button = { &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.left, &input.right, }
-code_builder  :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
-code_slow     :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
-code_fast     :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
-code_low_grav :: [secret_code_len]^Button = { &input.left, &input.left, &input.right, &input.left, &input.right, &input.right, &input.left, &input.right, }
+// Character codes
+code_chef:     [secret_code_len]int: { 0, 0, 1, 1, 0, 1, 0, 1, }
+code_builder:  [secret_code_len]int: { 1, 0, 0, 1, 0, 0, 1, 1, }
+// Modifier codes
+code_one_life: [secret_code_len]int: { 0, 0, 1, 0, 1, 1, 0, 1, }
+code_crumbled: [secret_code_len]int: { 1, 1, 0, 1, 0, 0, 1, 0, }
+code_low_grav: [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 0, }
+code_slow:     [secret_code_len]int: { 0, 0, 1, 0, 1, 0, 0, 1, }
+code_fast:     [secret_code_len]int: { 1, 0, 0, 1, 0, 1, 1, 0, }
+// Alternate skin codes
+code_king1:    [secret_code_len]int: { 1, 1, 0, 0, 1, 1, 0, 1, }
+code_king2:    [secret_code_len]int: { 0, 1, 1, 0, 0, 0, 0, 1, }
+code_king3:    [secret_code_len]int: { 0, 0, 0, 1, 1, 1, 0, 0, }
+code_king4:    [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
+code_chef1:    [secret_code_len]int: { 1, 0, 0, 1, 1, 1, 1, 0, }
+code_chef2:    [secret_code_len]int: { 1, 1, 1, 0, 0, 0, 1, 1, }
+code_chef3:    [secret_code_len]int: { 0, 0, 1, 1, 0, 0, 1, 0, }
+code_builder1: [secret_code_len]int: { 0, 1, 0, 1, 0, 1, 1, 1, }
+code_builder2: [secret_code_len]int: { 1, 1, 1, 0, 1, 0, 1, 0, }
+code_builder3: [secret_code_len]int: { 0, 0, 1, 1, 0, 1, 1, 0, }
+// Food code sequence. Only the first 4 are real
+code_food:     [secret_code_len]int: { 2, 4, 1, 3, 0, 0, 0, 0, }
 
 update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
@@ -56,7 +71,7 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 
 	if code_success {
 		for i in 0..<secret_code_len {
-			secret_code_inputs[i] = nil
+			secret_code_inputs[i] = -1
 		}
 	}
 
@@ -79,14 +94,15 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		draw_pre_credits(title, game, input, platform, dt)
 	case 1:
 		leaderboard.current_score = -1
-		secret_leaderboard.current_score = -1
+		leaderboard_chef.current_score = -1
+		leaderboard_builder.current_score = -1
 		draw_high_scores(game, &config, platform, dt)
 	}
 
 	if title {
 		pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
 		pos_y: int = LOGICAL_HEIGHT - 64
-		token_text: IRect = {{114, 58}, {56, 7}}
+		token_text: IRect = {{229, 37}, {56, 7}}
 		if int(intro_elapsed_time) % 2 != 0 {
 			token_text.position.y += 7
 

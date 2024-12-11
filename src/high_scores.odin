@@ -32,26 +32,6 @@ Leaderboard :: struct {
 }
 
 update_high_scores :: proc(game: ^Game, input: ^Input) {
-	exiting: bool = false
-	defer if exiting {
-		serialize_leaderboard(leaderboard_fname, &data)
-
-		stop_music(&game.sound_system)
-		game.session.king.character = Character.KING
-		game.mod_one_life = false
-		game.mod_crumbled = false
-		game.mod_low_grav = false
-		game.mod_speed_state = ModSpeedState.NORMAL
-
-		game.state = GameState.PRE_MAIN_MENU
-		game.intro_elapsed_time = 1
-	}
-
-	if !is_game_high_score_eligible(game) && (input.select.just_pressed || input.quit.just_pressed) {
-		exiting = true
-		return
-	}
-
 	leaderboard := &game.leaderboard
 	leaderboard_fname := LEADERBOARD_FNAME
 
@@ -65,6 +45,26 @@ update_high_scores :: proc(game: ^Game, input: ^Input) {
 	}
 
 	using leaderboard
+
+	exiting: bool = false
+	defer if exiting {
+		serialize_leaderboard(leaderboard_fname, &data)
+
+		stop_music(&game.sound_system)
+		game.session.king.character = Character.KING
+		game.session.mod_one_life = false
+		game.session.mod_crumbled = false
+		game.session.mod_low_grav = false
+		game.session.mod_speed_state = ModSpeedState.NORMAL
+
+		game.state = GameState.PRE_MAIN_MENU
+		game.intro_elapsed_time = 1
+	}
+
+	if !is_session_eligible_for_high_score(game) && (input.select.just_pressed || input.quit.just_pressed) {
+		exiting = true
+		return
+	}
 
 	if current_score < 0 || current_score > 9 {
 		if input.select.just_pressed || input.quit.just_pressed {
@@ -110,10 +110,10 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 	col3_x: int = 374
 
 	// Draw final score if game isn't eligible for a high score
-	if !is_game_high_score_eligible(game) {
+	if !is_session_eligible_for_high_score(game) {
 		final_score: IRect = {{114, 58}, {51, 7}}	
 		buffer_sprite(platform, final_score, IVec2{LOGICAL_WIDTH / 2, top_margin}, IVec2{25, 0}, false)
-		draw_score(score.points, IVec2{col3_x - 16, top_margin}, platform)
+		draw_score(game.session.total_points, IVec2{col3_x - 16, top_margin}, platform)
 	}
 
 	// Otherwise draw appropriate leaderboard
@@ -249,6 +249,11 @@ index_from_letter :: proc(letter: rune) -> int {
 }
 
 @(private="file")
+letter_from_index :: proc(index: int) -> rune {
+	return get_letter_list()[index]
+}
+
+@(private="file")
 get_letter_list :: proc() -> [SCORE_LETTER_COUNT]rune {
 	return [SCORE_LETTER_COUNT]rune {
 		'A',
@@ -279,6 +284,7 @@ get_letter_list :: proc() -> [SCORE_LETTER_COUNT]rune {
 		'Z',}
 }
 
-is_session_eligible_for_high_score :: proc(Game^ game) -> bool {
+is_session_eligible_for_high_score :: proc(game: ^Game) -> bool {
+	using game.session
 	return !(mod_one_life || mod_crumbled || mod_low_grav || mod_speed_state != ModSpeedState.NORMAL)
 }

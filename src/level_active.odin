@@ -26,7 +26,7 @@ handle_level_active:: proc(session: ^Session, input: ^Input, data: ^LevelData, c
 			tile.is_crumbling = false
 			tile.time_till_crumble = config.tile_degrade_length
 
-			max_health := MAX_TILE_HEALTH
+			max_health: u8 = MAX_TILE_HEALTH
 			if mod_crumbled {
 				max_health = 1
 			}

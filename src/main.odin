@@ -2,6 +2,8 @@ package main
 import "core:fmt"
 
 // TODO
+// * Gravity mod not working
+// 
 // Full unlock list:
 // * king -> chef
 //   * chef -> one_life, one_tile_health
@@ -35,7 +37,7 @@ main :: proc() {
 
 		dt := clock.dt
 		if game.session.mod_speed_state == ModSpeedState.FAST do dt *= 1.5
-		else if game.session.mod_speed_State == ModSpeedState.SLOW do dt *= 0.33
+		else if game.session.mod_speed_state == ModSpeedState.SLOW do dt *= 0.33
 
 		update_game(game, input, platform, dt)
 		update_clock(&clock)

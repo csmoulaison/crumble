@@ -15,8 +15,6 @@ MAX_SCANCODE_INPUTS :: 128
 MAX_ONSCREEN_SPRITES :: 512
 // Maximum text displays allowed onscreen at once
 MAX_TEXTS :: 64
-// Maximum number of fonts used throughout game
-MAX_FONTS :: 4
 // Maximum number of textures used throghout game
 MAX_TEXTURES :: 16
 
@@ -39,16 +37,12 @@ Platform :: struct {
 	background_color: Color, // 
 	sprites: [MAX_ONSCREEN_SPRITES]Sprite,
 	sprites_len: int,
-	texts: [MAX_TEXTS]Text,
-	texts_len: int,
 	logical_offset: IVec2,
 	logical_offset_active: bool,
 	// Assets
 	sprite_atlas_handle: int,
 	textures: [MAX_TEXTURES]^SDL.Texture, //
 	textures_len: int,
-	fonts: [MAX_FONTS]Font,
-	fonts_len: int,
 	window_icon: ^SDL.Surface,
 	// Misc
 	time_passed: f32,
@@ -76,27 +70,6 @@ init_platform :: proc(platform: ^Platform) {
 
 update_platform :: proc(platform: ^Platform) {
 	using platform
-
-	// Buffer text sprites
-	for &text in texts[:texts_len] {
-		pos_x: int = text.position.x
-		for c, i in text.string {
-			font: ^Font = &fonts[text.font_index]
-
-			off_y: f32 = math.sin((text.wave_t - f32(i))) * text.wave_amplitude - text.wave_amplitude / 2
-
-			buffer_sprite(
-				platform,
-				IRect{{font.chars[c].pos, 3}, {font.chars[c].width, 20}},
-				IVec2{pos_x, text.position.y - int(off_y)},
-				IVec2{0,0},
-				false,
-				font.atlas_handle)
-
-			pos_x += font.chars[c].width + 1
-		}
-	}
-	texts_len = 0
 
 	//Prepare screen
 	SDL.SetRenderDrawColor(
@@ -255,16 +228,4 @@ new_texture_handle :: proc(platform: ^Platform, fname: cstring) -> int {
 	platform.textures[platform.textures_len] = SDL.CreateTextureFromSurface(platform.renderer, surface)
 	platform.textures_len += 1
 	return platform.textures_len - 1
-}
-
-new_font_handle :: proc(platform: ^Platform, fname: cstring) -> int {
-	font: Font
-
-	font.atlas_handle = new_texture_handle(platform, fname)
-	font.chars = get_charset()
-	font.height = 26
-
-	platform.fonts[platform.fonts_len] = font
-	platform.fonts_len += 1
-	return platform.fonts_len - 1
 }

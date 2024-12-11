@@ -15,7 +15,7 @@ init_level :: proc(session: ^Session, data: ^LevelData, config: ^Config) {
 	time_to_next_state = config.pre_active_length
 	level_points = 0
 
-	init_tilemap(&tilemap, config, &level_data)
+	init_tilemap(&tilemap, mod_crumbled, config, &level_data)
 	init_king(&king, &level_data, config)
 	init_food(&session.food, &level_data, config)
 	init_enemies(&enemy_list, &level_data)

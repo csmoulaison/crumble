@@ -3,17 +3,16 @@ import "core:fmt"
 
 // TODO
 // * Gravity mod not working
-// 
-// Full unlock list:
-// * king -> chef
-//   * chef -> one_life, one_tile_health
-//     * one_life -> slow, fast, low_grav
-//       * slow     -> color 1 (per character)
-//       * fast     -> color 2 (...)
-//       * low_grav -> color 3 (...)
-//     * one_tile_health -> food_hint
-//       * food_hint -> builder
-//         * builder -> king final
+// * Reorganize sprite atlas and update code
+// * Add alternate skins
+//   * slow, fast, low grav, and final crown king
+//   * 1 bit entire recolor
+// * Add character icons to character specific codes -
+//   AND make them work only when character selected -
+//   AND make them deactivate if character changed
+// * Genericize leaderboards to auto generate based on the game settings -
+//   * Easiest way to build this into the current system would be making it
+//     encoded in text file name
 
 main :: proc() {
 	platform: ^Platform = new(Platform)

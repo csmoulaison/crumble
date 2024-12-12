@@ -21,6 +21,7 @@ King :: struct {
 	up_step: bool,
 
 	character: Character,
+	skin: Skin,
 }
 
 // Current state of the king's jump and float capabilities.
@@ -35,6 +36,14 @@ Character :: enum {
 	KING,
 	CHEF,
 	BUILDER,
+}
+
+Skin :: enum {
+	DEFAULT,
+	ALT_ONE,
+	ALT_TWO,
+	ALT_THREE,
+	CROWN_KING,
 }
 
 // Initialize the starting values of king data.

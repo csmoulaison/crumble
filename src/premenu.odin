@@ -14,7 +14,7 @@ code_fast:     [secret_code_len]int: { 1, 0, 0, 1, 0, 1, 1, 0, }
 code_king1:    [secret_code_len]int: { 1, 1, 0, 0, 1, 1, 0, 1, }
 code_king2:    [secret_code_len]int: { 0, 1, 1, 0, 0, 0, 0, 1, }
 code_king3:    [secret_code_len]int: { 0, 0, 0, 1, 1, 1, 0, 0, }
-code_king4:    [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
+code_king_fin: [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
 code_chef1:    [secret_code_len]int: { 1, 0, 0, 1, 1, 1, 1, 0, }
 code_chef2:    [secret_code_len]int: { 1, 1, 1, 0, 0, 0, 1, 1, }
 code_chef3:    [secret_code_len]int: { 0, 0, 1, 1, 0, 0, 1, 0, }
@@ -23,6 +23,8 @@ code_builder2: [secret_code_len]int: { 1, 1, 1, 0, 1, 0, 1, 0, }
 code_builder3: [secret_code_len]int: { 0, 0, 1, 1, 0, 1, 1, 0, }
 // Food code sequence. Only the first 4 are real
 code_food:     [secret_code_len]int: { 2, 4, 1, 3, 0, 0, 0, 0, }
+// Final bonus
+code_1bit:     [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
 
 update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game

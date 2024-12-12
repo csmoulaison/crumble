@@ -36,6 +36,7 @@ Session :: struct {
 	mod_crumbled: bool,
 	mod_low_grav: bool,
 	mod_speed_state: ModSpeedState,
+	food_hint_accomplished: bool,
 }
 
 SessionState :: enum {

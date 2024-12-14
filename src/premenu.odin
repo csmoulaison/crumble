@@ -15,6 +15,7 @@ code_king1:    [secret_code_len]int: { 1, 1, 0, 0, 1, 1, 0, 1, }
 code_king2:    [secret_code_len]int: { 0, 1, 1, 0, 0, 0, 0, 1, }
 code_king3:    [secret_code_len]int: { 0, 0, 0, 1, 1, 1, 0, 0, }
 code_king_fin: [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
+code_king_sha:     [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
 code_chef1:    [secret_code_len]int: { 1, 0, 0, 1, 1, 1, 1, 0, }
 code_chef2:    [secret_code_len]int: { 1, 1, 1, 0, 0, 0, 1, 1, }
 code_chef3:    [secret_code_len]int: { 0, 0, 1, 1, 0, 0, 1, 0, }
@@ -23,8 +24,6 @@ code_builder2: [secret_code_len]int: { 1, 1, 1, 0, 1, 0, 1, 0, }
 code_builder3: [secret_code_len]int: { 0, 0, 1, 1, 0, 1, 1, 0, }
 // Food code sequence. Only the first 4 are real
 code_food:     [secret_code_len]int: { 1, 3, 0, 2, 0, 0, 0, 0, }
-// Final bonus
-code_1bit:     [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
 
 update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
@@ -41,6 +40,7 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 	}
 
 	code_success: bool = false
+	// Characters
 	if secret_code_inputs == code_chef {
 		session.king.character = Character.CHEF
 		start_sound(&sound_system, SoundType.FOOD_EAT)
@@ -49,6 +49,7 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		session.king.character = Character.BUILDER
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
+	// Big mods
 	} else if secret_code_inputs == code_one_life {
 		session.mod_one_life = true
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
@@ -57,6 +58,7 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		session.mod_crumbled = true
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
+	// Little mods
 	} else if secret_code_inputs == code_slow {
 		session.mod_speed_state = ModSpeedState.SLOW
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
@@ -65,8 +67,44 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		session.mod_speed_state = ModSpeedState.FAST
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
-	} else if secret_code_inputs == code_low_grav {
-		session.mod_low_grav = true
+	} else if secret_code_inputs == code_random {
+		session.mod_random = true
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	// Skins
+	// King
+	} else if secret_code_inputs == code_king1 && session.king.character = Character.KING {
+		session.king.skin = Skin.ALT_ONE
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_king2 && session.king.character = Character.KING {
+		session.king.skin = Skin.ALT_TWO
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_king_fin && session.king.character = Character.KING {
+		session.king.skin = Skin.CROWN_KING
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_king_sha && session.king.character = Character.KING {
+		session.king.skin = Skin.SHADOW_KING
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	// Chef
+	} else if secret_code_inputs == code_chef1 && session.king.character = Character.CHEF {
+		session.king.skin = Skin.ALT_ONE
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_chef2 && session.king.character = Character.CHEF {
+		session.king.skin = Skin.ALT_TWO
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	// Builder
+	} else if secret_code_inputs == code_builder1 && session.king.character = Character.BUILDER {
+		session.king.skin = Skin.ALT_ONE
+		start_sound(&sound_system, SoundType.FOOD_APPEAR)
+		code_success = true
+	} else if secret_code_inputs == code_builder2 && session.king.character = Character.BUILDER {
+		session.king.skin = Skin.ALT_TWO
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
 	}

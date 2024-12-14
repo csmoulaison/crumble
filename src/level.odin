@@ -94,7 +94,7 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 	draw_food(&food, platform)
 	draw_tilemap(&tilemap, &assets.sequences, session.current_level, platform)
 	if(king_visible) {
-		draw_king(&king, 0, &assets.sequences, platform, dt)
+		draw_king(&king, 0, &king_sequences, platform, dt)
 	}
 	draw_enemies(&enemy_list, &assets.sequences, platform, dt)
 

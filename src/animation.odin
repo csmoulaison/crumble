@@ -8,7 +8,7 @@ Sequence :: struct {
 }
 
 Animator :: struct {
-	sequence: ^Sequence,
+	sequence: Sequence,
 	frame: int,
 	time_to_next_frame: f32,
 	frame_length_mod: f32,

@@ -3,7 +3,7 @@ import "core:fmt"
 import "core:math"
 import "core:math/rand"
 
-draw_builder :: proc(builder: ^King, y_offset: int, sequences: ^Sequences, platform: ^Platform, dt: f32) {
+draw_builder :: proc(builder: ^King, y_offset: int, sequences: ^KingSequences, platform: ^Platform, dt: f32) {
 	using builder
 
 	animator.frame_length_mod = 1

@@ -42,8 +42,16 @@ Skin :: enum {
 	DEFAULT,
 	ALT_ONE,
 	ALT_TWO,
-	ALT_THREE,
 	CROWN_KING,
+	SHADOW_KING,
+}
+
+KingSequences :: struct {
+	idle: Sequence,
+	run: Sequence,
+	jump: Sequence,
+	float: Sequence,
+	post_float: Sequence,
 }
 
 // Initialize the starting values of king data.
@@ -61,7 +69,7 @@ init_king :: proc(king: ^King, data: ^LevelData, config: ^Config) {
 }
 
 // Draw a sprite to the platform representative of the king's current state.
-draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^Platform, dt: f32) {
+draw_king :: proc(king: ^King, y_offset: int, sequences: ^KingSequences, platform: ^Platform, dt: f32) {
 	using king
 
 	#partial switch(character) {
@@ -74,17 +82,17 @@ draw_king :: proc(king: ^King, y_offset: int, sequences: ^Sequences, platform: ^
 	}
 
 	animator.frame_length_mod = 1
-	animator.sequence = &sequences.king_idle
+	animator.sequence = sequences.idle
 	if running_input {
-		animator.sequence = &sequences.king_run
+		animator.sequence = sequences.run
 		animator.frame_length_mod = 0.8
 	}
 
 	#partial switch(jump_state) {
 	case JumpState.JUMP:
-		animator.sequence = &sequences.king_jump
+		animator.sequence = sequences.jump
 	case JumpState.FLOAT:
-		animator.sequence = &sequences.king_float
+		animator.sequence = sequences.float
 	}
 
 	animator.flipped = !facing_right

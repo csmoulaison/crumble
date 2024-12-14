@@ -34,10 +34,11 @@ Session :: struct {
 	// Modifier state
 	mod_one_life: bool,
 	mod_crumbled: bool,
-	mod_low_grav: bool,
+	mod_random: bool,
 	mod_speed_state: ModSpeedState,
 	mod_config: Config,
 	food_hint_accomplished: bool,
+	king_sequences: KingSequences,
 }
 
 SessionState :: enum {
@@ -57,7 +58,7 @@ init_session :: proc(session: ^Session, config: ^Config) {
 	using session
 
 	mod_config = config^
-	if mod_low_grav {
+	if mod_random {
 		mod_config.king_max_speed *= rand_mod()
 		mod_config.king_base_acceleration *= rand_mod()
 		mod_config.enemy_patrol_speed *= rand_mod()
@@ -81,6 +82,30 @@ init_session :: proc(session: ^Session, config: ^Config) {
 	//king.character = Character.CHEF
 	state = SessionState.PRE_LEVEL_SCREEN
 	time_to_next_state = config.level_interstitial_length
+
+	king_sequences.idle = sequences.king_idle
+	king_sequences.run = sequences.king_run
+	king_sequences.jump = sequences.king_jump
+	king_sequences.float = sequences.king_float
+	king_sequences.post_float = sequences.king_post_float
+
+	king_y_off: int = 0
+	#partial switch(skin) {
+	case Skin.ALT_ONE:
+		king_y_off = 21
+	case Skin.ALT_TWO:
+		king_y_off = 42
+	case Skin.CROWN_KING:
+		king_y_off = 63
+	case Skin.SHADOW_KING:
+		king_y_off = 84
+	}
+
+	king_sequences.idle.starting_frame.position.y += king_y_off
+	king_sequences.run.starting_frame.position.y += king_y_off
+	king_sequences.jump.starting_frame.position.y += king_y_off
+	king_sequences.float.starting_frame.position.y += king_y_off
+	king_sequences.post_float.starting_frame.position.y += king_y_off
 }
 
 handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) -> (ready_to_close: bool) {

@@ -3,7 +3,7 @@ import "core:fmt"
 import "core:math"
 import "core:math/rand"
 
-draw_chef :: proc(chef: ^King, y_offset: int, sequences: ^Sequences, platform: ^Platform, dt: f32) {
+draw_chef :: proc(chef: ^King, y_offset: int, sequences: ^KingSequences, platform: ^Platform, dt: f32) {
 	using chef
 
 	animator.frame_length_mod = 1

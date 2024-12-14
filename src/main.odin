@@ -2,11 +2,8 @@ package main
 import "core:fmt"
 
 // TODO
-// * Implement food code logic
-// * Reorganize sprite atlas and update code
-// * Add alternate skins
-//   * slow, fast, low grav, and final crown king
-//   * 1 bit entire recolor
+// * Recolor skins and do crown/shadow variants
+// * Fix final screen with different characters + food ending (different music?)
 // * Add character icons to character specific codes -
 //   AND make them work only when character selected -
 //   AND make them deactivate if character changed

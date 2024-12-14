@@ -5,15 +5,15 @@ handle_final_screen :: proc(session: ^Session, input: ^Input, dt: f32) {
 
 	time_to_next_state -= dt * 0.5
 	if time_to_next_state < 0 {
-        update_fireworks(&particle_system, dt)
-        if input.jump.just_pressed {
-            state = SessionState.END
-        }
+		update_fireworks(&particle_system, dt)
+		if input.jump.just_pressed {
+		    state = SessionState.END
+		}
 	} else {
-        if input.jump.just_pressed {
-            time_to_next_state = 0
-        }
-    }
+		if input.jump.just_pressed {
+		    time_to_next_state = 0
+		}
+	}
 }
 
 draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, sound_system: ^SoundSystem, platform: ^Platform, dt:f32) {
@@ -63,7 +63,7 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
 
 		platform.logical_offset_active = false
 
-		end_titles: IRect = {{77, 134}, {62, 16}}
+		end_titles: IRect = {{176, 190}, {62, 16}}
 		buffer_sprite(platform, end_titles, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 44}, IVec2{31, 8}, false)
 
 		draw_codes(session, platform)

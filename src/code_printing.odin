@@ -10,7 +10,7 @@ CodePrintContext :: struct {
 
 draw_codes :: proc(session: ^Session, platform: ^Platform) {
 	ctx: CodePrintContext
-	ctx.symbol = {{150, 149}, {8, 8}}
+	ctx.symbol = {{295, 194}, {8, 8}}
 	ctx.position = IVec2{LOGICAL_WIDTH / 2 - 9 * (secret_code_len / 2) + 1, LOGICAL_HEIGHT / 2 - 96}
 
 	// Food is only shown in one specific case, so only appears alone

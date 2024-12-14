@@ -40,12 +40,12 @@ pop_score :: proc(scorepop: ^Scorepop, new_position: Vec2, type: ScorepopType) {
 
 	switch type {
 	case ScorepopType.LITTLE:
-		src = {{307, 16}, {5, 8}}
+		src = {{128, 231}, {5, 8}}
 	case ScorepopType.BIG:
-		src = {{313, 16}, {7, 8}}
+		src = {{134, 231}, {7, 8}}
 	case ScorepopType.POT:
-		src = {{321, 16}, {7, 8}}
+		src = {{142, 231}, {7, 8}}
 	case ScorepopType.ONEUP:
-		src = {{329, 24}, {14, 7}}
+		src = {{149, 231}, {14, 7}}
 	}
 }

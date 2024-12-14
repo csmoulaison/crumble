@@ -42,9 +42,6 @@ init_tilemap :: proc(tilemap: ^Tilemap, mod_crumbled: bool, config: ^Config, dat
 }
 
 draw_tilemap :: proc(tilemap: ^Tilemap, sequences: ^Sequences, current_level: int, platform: ^Platform) {
-	level_tile_position: IVec2 = {480, 32}
-	level_tile_position.y += current_level * 16
-
 	for &tile, index in tilemap {
 		if tile.health == 0 do continue
 
@@ -75,7 +72,7 @@ draw_tilemap :: proc(tilemap: ^Tilemap, sequences: ^Sequences, current_level: in
 		else if tile.orientation == TileOrientation.RIGHT do src = sequences.tile_right_src
 
 		src.position.x += int(buffered_health) * TILE_PIXEL_SIZE
-		src.position += level_tile_position
+		src.position.y += current_level * TILE_PIXEL_SIZE
 
 		buffer_sprite(platform, src, position, IVec2{8,0}, false)
 	}

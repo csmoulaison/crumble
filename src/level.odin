@@ -38,7 +38,7 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 
 	// Draw score
 	pos_x: int = LOGICAL_WIDTH / 2 - 72
-	score_frame: IRect = {{0, 58}, {43, 20}}
+	score_frame: IRect = {{163, 226}, {43, 20}}
 
 	points: int = session.total_points + session.level_points
 	if session.visual_points < points {
@@ -58,8 +58,8 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 
 	// Draw remaining lives
 	pos_x = LOGICAL_WIDTH / 2 - 122
-	lives_frame: IRect = {{43, 58}, {47, 20}}
-	lives_icon: IRect = {{90, 73}, {9, 9}}
+	lives_frame: IRect = {{176, 206}, {37, 20}}
+	lives_icon: IRect = {{262, 238}, {9, 9}}
 
 	#partial switch session.king.character {
 	case Character.CHEF:
@@ -75,11 +75,11 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 
 	// Draw foods
 	pos_x = LOGICAL_WIDTH / 2 + 30
-	food_text: IRect = {{90, 58}, {19, 7}}
+	food_text: IRect = {{226, 117}, {19, 7}}
 
 	buffer_sprite(platform, food_text, IVec2{pos_x, top_margin}, IVec2{0, 0}, false)
 	for i: int = 0; i < int(session.king.foods_eaten); i += 1 {
-		buffer_sprite(platform, IRect{{592 + session.food.eaten_food_indices[i] * FOOD_SRC_OFFSET, 0},{16,16}}, IVec2{pos_x - 4 + i * 11, top_margin + 12}, IVec2{0,8}, false)
+		buffer_sprite(platform, IRect{{320 + session.food.eaten_food_indices[i] * FOOD_SRC_OFFSET, 112},{16,16}}, IVec2{pos_x - 4 + i * 11, top_margin + 14}, IVec2{0,8}, false)
 	}
 
 	// Draw non-UI level

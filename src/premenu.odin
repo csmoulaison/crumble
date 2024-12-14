@@ -104,7 +104,7 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 	if title {
 		pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
 		pos_y: int = LOGICAL_HEIGHT - 64
-		token_text: IRect = {{229, 37}, {56, 7}}
+		token_text: IRect = {{239, 194}, {56, 7}}
 		if int(intro_elapsed_time) % 2 != 0 {
 			token_text.position.y += 7
 
@@ -128,9 +128,9 @@ draw_pre_credits :: proc(title: bool, game: ^Game, input: ^Input, platform: ^Pla
 
 	total_time: f32 = 15
 
-	main_title: IRect = {{77, 100}, {63, 34}}
-	conner_credit: IRect = {{0, 115}, {77, 14}}
-	hannah_credit: IRect = {{0, 129}, {77, 14}}
+	main_title: IRect = {{176, 156}, {63, 34}}
+	conner_credit: IRect = {{176, 128}, {77, 14}}
+	hannah_credit: IRect = {{176, 142}, {77, 14}}
 
 	if title {
 		buffer_sprite(platform, main_title, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 64}, IVec2{31, 17}, false)

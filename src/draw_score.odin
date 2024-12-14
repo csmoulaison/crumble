@@ -1,7 +1,7 @@
 package main
 
 draw_score :: proc(score: int, position: IVec2, platform: ^Platform) {
-	first_num_text: IRect = {{50, 82}, {5, 9}}
+	first_num_text: IRect = {{176, 110}, {5, 9}}
 
 	leading_zeros: bool = true
 	for i: int = 5; i > -1; i -= 1 {

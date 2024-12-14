@@ -109,14 +109,6 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 	col2_x: int = 311
 	col3_x: int = 374
 
-	// Draw final score if game isn't eligible for a high score
-	if !is_session_eligible_for_high_score(game) {
-		final_score: IRect = {{114, 58}, {51, 7}}	
-		buffer_sprite(platform, final_score, IVec2{LOGICAL_WIDTH / 2, top_margin}, IVec2{25, 0}, false)
-		draw_score(game.session.total_points, IVec2{col3_x - 16, top_margin}, platform)
-	}
-
-	// Otherwise draw appropriate leaderboard
 	leaderboard := &game.leaderboard
 	#partial switch game.session.king.character {
 	case Character.CHEF:
@@ -136,9 +128,9 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 	}
 
 	// Draw headers
-	rank_text: IRect = {{0, 143}, {19, 7}}
-	score_text: IRect = {{6, 58}, {24, 7}}
-	name_text: IRect = {{0, 150}, {19, 7}}
+	rank_text: IRect = {{245, 117}, {19, 7}}
+	score_text: IRect = {{253, 110}, {24, 7}}
+	name_text: IRect = {{264, 117}, {19, 7}}
 
 	buffer_sprite(platform, rank_text, IVec2{col1_x, top_margin}, IVec2{0, 0}, false)
 	buffer_sprite(platform, name_text, IVec2{col2_x, top_margin}, IVec2{0, 0}, false)
@@ -146,7 +138,7 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 
 	// Draw score rows
 	row_y: int = top_margin + 20
-	place_text: IRect = {{140, 79}, {19, 7}}
+	place_text: IRect = {{253, 124}, {19, 7}}
 	#partial switch game.session.king.character {
 	case Character.CHEF:
 		place_text.position.x += 19
@@ -162,12 +154,12 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 		initial_pos_x: int = col2_x + 2
 		for c, j in score.initials {
 			letter_index: int = index_from_letter(c)
-			initial_src: IRect = {{20 + letter_index * 5, 150}, {4, 7}}
+			initial_src: IRect = {{176 + letter_index * 5, 96}, {4, 7}}
 
 			if current_score == i && current_initial == j {
 				initial_src.position.y += 7
 				if blink {
-					initial_src.position.x = 15
+					initial_src.position.x = 306
 				}
 			}
 			

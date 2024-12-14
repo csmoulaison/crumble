@@ -55,7 +55,9 @@ draw_final_screen :: proc(session: ^Session, assets: ^Assets, config: ^Config, s
 
         for i: int = 0; i < 4; i += 1 {
             flipped := false
-            if i > 1 do flipped = true
+            if i > 1 {
+	            flipped = true
+            }
             buffer_sprite(platform, IRect{{enemy_src_x, 16},{16, 21}}, IVec2{LOGICAL_WIDTH / 2 + i * 96 - 152, LOGICAL_HEIGHT - 32}, IVec2{8,21}, flipped)
         }
 

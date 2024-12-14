@@ -53,7 +53,7 @@ draw_fireworks :: proc(particle_system: ^ParticleSystem, platform: ^Platform) {
 			continue
 		}
 
-		src_pos: IVec2 = {331, 20}
+		src_pos: IVec2 = {301, 110}
 		src_pos.x += particle.color * 2
 		buffer_sprite(platform, IRect{src_pos, {2, 2}}, ivec2_from_vec2(particle.position), IVec2{0, 0}, false)
 	}

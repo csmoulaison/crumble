@@ -8,7 +8,7 @@ MAX_WINDOWS :: 8
 MAX_FOODS_EATEN :: 256
 MAX_CHOOSE_WINDOW_ITERATIONS :: 64
 SCOREPOP_OFFSET :: Vec2{20, -12}
-FOOD_SRC_OFFSET :: 128
+FOOD_SRC_OFFSET :: 16
 
 FoodPhase :: enum {
 	INACTIVE,
@@ -81,14 +81,14 @@ draw_food :: proc(food: ^Food, platform: ^Platform) {
 		else do draw_window(window.is_active, window.position, platform)
 
 		if index == current_window {
-			food_src_pos := IVec2{1068, 18}
-			cooked_src_pos := IVec2{592 + current_food_index * FOOD_SRC_OFFSET, 0}
+			food_src_pos := IVec2{352, 96}
+			cooked_src_pos := IVec2{320 + current_food_index * FOOD_SRC_OFFSET, 112}
 
 			cooked_food := false
 
 			#partial switch phase {
 			case FoodPhase.COOKING:
-				food_src_pos = {448, 0}
+				food_src_pos = {336, 96}
 			case FoodPhase.COOKED:
 				cooked_food = true
 			case FoodPhase.COOLING:
@@ -96,7 +96,7 @@ draw_food :: proc(food: ^Food, platform: ^Platform) {
 					cooked_food = true
 				}
 			case FoodPhase.POT:
-				food_src_pos = {288, 0}
+				food_src_pos = {320, 96}
 			}
 
 			food_draw_position := ivec2_from_vec2(window.position)
@@ -117,11 +117,14 @@ draw_food :: proc(food: ^Food, platform: ^Platform) {
 }
 
 draw_window :: proc(is_active: bool, position: Vec2, platform: ^Platform) {
-	src_x := 448
-	if !is_active do src_x = 464
+	src_y := 169
+	if !is_active {
+		src_y += 20
+	}
+
 	buffer_sprite(
 		platform,
-		IRect{{src_x, 16}, {16, 21}},
+		IRect{{160, src_y}, {16, 20}},
 		ivec2_from_vec2(position),
 		IVec2{8, 31},
 		false)

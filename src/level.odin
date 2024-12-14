@@ -79,7 +79,7 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 
 	buffer_sprite(platform, food_text, IVec2{pos_x, top_margin}, IVec2{0, 0}, false)
 	for i: int = 0; i < int(session.king.foods_eaten); i += 1 {
-		buffer_sprite(platform, IRect{{592 + session.food.eaten_food_offsets[i], 0},{16,16}}, IVec2{pos_x - 4 + i * 11, top_margin + 12}, IVec2{0,8}, false)
+		buffer_sprite(platform, IRect{{592 + session.food.eaten_food_indices[i] * FOOD_SRC_OFFSET, 0},{16,16}}, IVec2{pos_x - 4 + i * 11, top_margin + 12}, IVec2{0,8}, false)
 	}
 
 	// Draw non-UI level

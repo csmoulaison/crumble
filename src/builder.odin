@@ -13,14 +13,16 @@ draw_builder :: proc(builder: ^King, y_offset: int, sequences: ^Sequences, platf
 		animator.frame_length_mod = 0.8
 	}
 
+	animator.flipped = !facing_right
+
 	#partial switch(jump_state) {
 	case JumpState.JUMP:
 		animator.sequence = &sequences.builder_jump
+		animator.flipped = facing_right
 	case JumpState.FLOAT:
 		animator.sequence = &sequences.builder_float
 	}
 
-	animator.flipped = !facing_right
 
 	builder_position := ivec2_from_vec2(position)
 	builder_position.y += y_offset
@@ -73,7 +75,7 @@ update_builder_movement :: proc(builder: ^King, input: ^Input, config: ^Config, 
 	velocity.x = clamp(velocity.x, -config.king_max_speed, config.king_max_speed)
 }
 
-update_builder_jump_state:: proc(builder: ^King, mod_low_grav: bool, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
+update_builder_jump_state:: proc(builder: ^King, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) {
 	using builder
 
 	if jump_state == JumpState.GROUNDED || coyote_time > 0 {

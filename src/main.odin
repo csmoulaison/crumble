@@ -2,7 +2,7 @@ package main
 import "core:fmt"
 
 // TODO
-// * Gravity mod not working
+// * Implement food code logic
 // * Reorganize sprite atlas and update code
 // * Add alternate skins
 //   * slow, fast, low grav, and final crown king

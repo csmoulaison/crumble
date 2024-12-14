@@ -8,6 +8,7 @@ MAX_WINDOWS :: 8
 MAX_FOODS_EATEN :: 256
 MAX_CHOOSE_WINDOW_ITERATIONS :: 64
 SCOREPOP_OFFSET :: Vec2{20, -12}
+FOOD_SRC_OFFSET :: 128
 
 FoodPhase :: enum {
 	INACTIVE,
@@ -33,8 +34,8 @@ Food :: struct {
 	active_windows: [MAX_WINDOWS]int,
 	active_windows_len: int,
 	current_window: int,
-	current_food_offset: int,
-    eaten_food_offsets: [MAX_FOODS_EATEN]int,
+	current_food_index: int,
+    eaten_food_indices: [MAX_FOODS_EATEN]int,
     round: int,
 	// TODO this can be extrapolated from foods_eaten, yeah?
 	level_complete: bool,
@@ -81,7 +82,7 @@ draw_food :: proc(food: ^Food, platform: ^Platform) {
 
 		if index == current_window {
 			food_src_pos := IVec2{1068, 18}
-			cooked_src_pos := IVec2{592 + current_food_offset, 0}
+			cooked_src_pos := IVec2{592 + current_food_index * FOOD_SRC_OFFSET, 0}
 
 			cooked_food := false
 
@@ -147,7 +148,7 @@ update_food_state :: proc(food: ^Food, config: ^Config, sound_system: ^SoundSyst
 
 		if time_to_next_phase < 0 {
 			phase, time_to_next_phase = FoodPhase.COOKED, config.food_expiration_length
-			current_food_offset = 128 * rand.int_max(4)
+			current_food_index = rand.int_max(4)
 			start_sound(sound_system, SoundType.FOOD_APPEAR)
 		}
 	case FoodPhase.COOKED:
@@ -184,7 +185,7 @@ update_food_eating :: proc(food: ^Food, king: ^King, session: ^Session, sound_sy
 	}
 
 	if linalg.distance(food.windows[food.current_window].position, king.position) < config.food_distance_to_eat {
-        food.eaten_food_offsets[int(king.foods_eaten)] = food.current_food_offset
+        food.eaten_food_indices[int(king.foods_eaten)] = food.current_food_index
 
 		king.foods_eaten += 1
 		if food.phase == FoodPhase.COOKED {
@@ -228,6 +229,21 @@ update_pot_bounce :: proc(food: ^Food, king: ^King, session: ^Session, sound_sys
 	pot_col := Rect{{2, 0}, {12, 4}}
 	king_collider := Rect{{-5, -16}, {10, 16}}
 	if is_colliding(&king_collider, &king.position, &pot_col, &pot_pos) && king.position.y > pot_pos.y - 6 && king.velocity.y > 0 {
+		if session.current_level == 0 && king.foods_eaten == 4 {
+			correct_code: bool = true
+			code: [secret_code_len]int = code_food
+			for i in 0..<4 {
+				if code[i] != eaten_food_indices[i] {
+					correct_code = false
+					break
+				}
+			}
+
+			if correct_code {
+				session.food_hint_accomplished = true
+			}
+		}
+		
 		stop_music(sound_system)
 		start_sound(sound_system, SoundType.POT_BOUNCE)
 		pop_score(&session.scorepop, pot_pos + Vec2{26, -16}, ScorepopType.POT)
@@ -257,6 +273,9 @@ start_food_cycle :: proc(food: ^Food, config: ^Config) {
 choose_next_window :: proc(food: ^Food) {
 	using food 
 
-	if active_windows_len <= 0 do current_window = rand.int_max(windows_len)
-	else do current_window = active_windows[rand.int_max(active_windows_len)]
+	if active_windows_len <= 0 {
+		current_window = rand.int_max(windows_len)
+	} else {
+		current_window = active_windows[rand.int_max(active_windows_len)]
+	}
 }

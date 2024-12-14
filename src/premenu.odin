@@ -22,7 +22,7 @@ code_builder1: [secret_code_len]int: { 0, 1, 0, 1, 0, 1, 1, 1, }
 code_builder2: [secret_code_len]int: { 1, 1, 1, 0, 1, 0, 1, 0, }
 code_builder3: [secret_code_len]int: { 0, 0, 1, 1, 0, 1, 1, 0, }
 // Food code sequence. Only the first 4 are real
-code_food:     [secret_code_len]int: { 2, 4, 1, 3, 0, 0, 0, 0, }
+code_food:     [secret_code_len]int: { 1, 3, 0, 2, 0, 0, 0, 0, }
 // Final bonus
 code_1bit:     [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
 

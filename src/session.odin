@@ -36,6 +36,7 @@ Session :: struct {
 	mod_crumbled: bool,
 	mod_low_grav: bool,
 	mod_speed_state: ModSpeedState,
+	mod_config: Config,
 	food_hint_accomplished: bool,
 }
 
@@ -54,6 +55,14 @@ SessionState :: enum {
 
 init_session :: proc(session: ^Session, config: ^Config) {
 	using session
+
+	mod_config = config^
+	if mod_low_grav {
+		mod_config.king_max_speed *= rand_mod()
+		mod_config.king_base_acceleration *= rand_mod()
+		mod_config.enemy_patrol_speed *= rand_mod()
+		mod_config.enemy_chase_speed *= rand_mod()
+	}
 
 	deserialize_tower_sequence(&tower_sequence)
 
@@ -89,7 +98,7 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 
 	#partial switch state {
 	case SessionState.LEVEL_ACTIVE:
-		state = handle_level_active(session, input, &level_data, config, sound_system, dt)
+		state = handle_level_active(session, input, &level_data, &mod_config, sound_system, dt)
 	case SessionState.WAITING_TO_START:
 		handle_waiting_to_start(session, input, sound_system, dt)
 	case SessionState.HITCH:

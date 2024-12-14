@@ -5,9 +5,8 @@ import "core:os"
 import "core:strings"
 
 MAX_HIGH_SCORES :: 100
-LEADERBOARD_FNAME :: "data/leaderboard.score"
-LEADERBOARD_CHEF_FNAME :: "data/leaderboard_chef.score"
-LEADERBOARD_BUILDER_FNAME :: "data/leaderboard_builder.score"
+LEADERBOARD_PREFIX :: "data/"
+LEADERBOARD_SUFFIX :: ".ldb"
 SCORE_LETTER_COUNT :: 26
 
 Score :: struct {
@@ -22,7 +21,7 @@ LeaderboardData :: struct {
 
 Leaderboard :: struct {
 	data: LeaderboardData,
-	
+
 	// State of editing the score
 	current_score: int, // -1 if not editing any scores
 	current_initial: int, // only relevant if current_score != -1
@@ -32,18 +31,6 @@ Leaderboard :: struct {
 }
 
 update_high_scores :: proc(game: ^Game, input: ^Input) {
-	leaderboard := &game.leaderboard
-	leaderboard_fname := LEADERBOARD_FNAME
-
-	#partial switch game.session.king.character {
-	case Character.CHEF:
-		leaderboard = &game.leaderboard_chef
-		leaderboard_fname = LEADERBOARD_CHEF_FNAME
-	case Character.BUILDER:
-		leaderboard = &game.leaderboard_builder
-		leaderboard_fname = LEADERBOARD_CHEF_FNAME
-	}
-
 	using leaderboard
 
 	exiting: bool = false
@@ -177,8 +164,7 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 }
 
 add_high_score :: proc(game: ^Game, new_score: Score) {
-	leaderboard := &game.leaderboard
-	leaderboard_fname: string = LEADERBOARD_FNAME
+	leaderboard_fname: string = leaderboard_fname(&game.session)
 	#partial switch game.session.king.character {
 	case Character.CHEF:
 		leaderboard = &game.leaderboard_chef
@@ -276,7 +262,56 @@ get_letter_list :: proc() -> [SCORE_LETTER_COUNT]rune {
 		'Z',}
 }
 
-is_session_eligible_for_high_score :: proc(game: ^Game) -> bool {
-	using game.session
+is_session_eligible_for_high_score :: proc(session: ^Session) -> bool {
+	using session
 	return !(mod_one_life || mod_crumbled || mod_low_grav || mod_speed_state != ModSpeedState.NORMAL)
+}
+
+// data/ + character / one_life / crumbled / random / speed_state + .score
+// data/K000N.score for a regular high score
+// data/C101S.score for chef with one_life and random at slow speed
+leaderboard_fname :: proc(session: ^Session) -> char[16] {
+	fname: char[16]
+
+	mem_copy(&fname, LEADERBOARD_PREFIX, 5)
+
+	switch session.king.character {
+	case Character.KING:
+		fname[5] = 'K'
+	case Character.CHEF:
+		fname[5] = 'C'
+	case Character.BUILDER:
+		fname[5] = 'B'
+	}
+
+	if session.mod_one_life {
+		fname[6] = '1'
+	} else {
+		fname[6] = '0'
+	}
+
+	if session.mod_crumbled {
+		fname[7] = '1'
+	} else {
+		fname[7] = '0'
+	}
+
+	if session.mod_random {
+		fname[8] = '1'
+	} else {
+		fname[8] = '0'
+	}
+
+	switch session.mod_speed_state {
+	case ModSpeedState.NORMAL:
+		fname[9] = 'n'
+	case ModSpeedState.FAST:
+		fname[9] = 'f'
+	case ModSpeedState.SLOW:
+		fname[9] = 's'
+	}
+
+	mem_copy(&fname[10], LEADERBOARD_PREFIX, 6)
+
+	return fname
 }

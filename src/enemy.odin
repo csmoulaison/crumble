@@ -41,23 +41,23 @@ draw_enemies :: proc(enemy_list: ^EnemyList, sequences: ^Sequences, platform: ^P
 
 		switch state {
 		case EnemyState.PAUSE:
-			animator.sequence = &sequences.guard_idle
+			animator.sequence = sequences.guard_idle
 		case EnemyState.PATROL:
-			animator.sequence = &sequences.guard_run
+			animator.sequence = sequences.guard_run
 			animator.flipped = !facing_right
 		case EnemyState.CHASE:
-			animator.sequence = &sequences.guard_run
+			animator.sequence = sequences.guard_run
 			animator.frame_length_mod = 2
 			animator.flipped = !facing_right
 		case EnemyState.SEEN_JUMP:
-			animator.sequence = &sequences.guard_jump
+			animator.sequence = sequences.guard_jump
 		case EnemyState.DEAD:
-			animator.sequence = &sequences.guard_jump
+			animator.sequence = sequences.guard_jump
 		}
 
-		animator.sequence = &sequences.guard_idle
+		animator.sequence = sequences.guard_idle
 		if state != EnemyState.PAUSE {
-			animator.sequence = &sequences.guard_run
+			animator.sequence = sequences.guard_run
 
 			animator.frame_length_mod = 1
 			if state == EnemyState.CHASE {
@@ -65,7 +65,7 @@ draw_enemies :: proc(enemy_list: ^EnemyList, sequences: ^Sequences, platform: ^P
 			}
 		}
 		if state == EnemyState.SEEN_JUMP {
-			animator.sequence = &sequences.guard_jump
+			animator.sequence = sequences.guard_jump
 		}
 
 		cycle_and_draw_animator(&animator, ivec2_from_vec2(position), platform, dt)
@@ -183,7 +183,7 @@ check_king_caught :: proc(enemy_list: ^EnemyList, king: ^King, sound_system: ^So
 		}
 
 		king_collider := Rect{{-5, -16}, {10, 16}}
-		enemy_collider := Rect{{-5, -16}, {10, 16}}
+		enemy_collider := Rect{{-4, -12}, {8, 12}}
 		if is_colliding(&king_collider, &king.position, &enemy_collider, &enemy.position) {
 			if king.character == Character.BUILDER && king.jump_state == JumpState.GROUNDED {
 				enemy.state = EnemyState.DEAD

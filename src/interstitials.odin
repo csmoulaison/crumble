@@ -18,7 +18,7 @@ draw_level_interstitial :: proc(session: ^Session, time_to_end: f32, assets: ^As
 		}
 	}
 
-	tower_src = {{314, 252}, {53, 0}}
+	tower_src: IRect = {{310, 252}, {53, 0}}
 	x_off: int = 0
 	y_size: int = 0
 	switch level_tower_to_draw {
@@ -39,14 +39,14 @@ draw_level_interstitial :: proc(session: ^Session, time_to_end: f32, assets: ^As
 		y_size = 123
 	}
 	tower_src.position.x += x_off
-	tower_src.position.y -= y_off
-	tower_src.size.y += y_off
+	tower_src.position.y -= y_size
+	tower_src.size.y += y_size
 
 	// Draw tower graphic
 	buffer_sprite(
 		platform,
 		tower_src,
-		IVec2{LOGICAL_WIDTH / 2, center.y},
+		IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 + 32 - y_size},
 		IVec2{27, 0},
 		false)
 

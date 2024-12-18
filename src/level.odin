@@ -86,10 +86,23 @@ draw_level :: proc(session: ^Session, king_visible: bool, assets: ^Assets, confi
 	platform.logical_offset_active = true
 	// Stop making fun of me
 	platform.logical_offset.x = 64
-	platform.logical_offset.y = 32
-	if session.current_level == 1 || session.current_level == 5 {
+	switch session.current_level {
+	case 0: 
+		platform.logical_offset.y = 16
+	case 1:
+		platform.logical_offset.y = 16
+		platform.logical_offset.x = 80
+	case 2:
+		platform.logical_offset.y = 32
+	case 3:
+		platform.logical_offset.y = 48
+	case 4:
+		platform.logical_offset.y = 48
+	case 5: 
+		platform.logical_offset.y = 32
 		platform.logical_offset.x = 80
 	}
+	platform.logical_offset.y += 8
 
 	draw_food(&food, platform)
 	draw_tilemap(&tilemap, &assets.sequences, session.current_level, platform)

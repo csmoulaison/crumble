@@ -46,6 +46,8 @@ Platform :: struct {
 	window_icon: ^SDL.Surface,
 	// Misc
 	time_passed: f32,
+	mod_glitchy: bool,
+	glitch_chance: f32,
 }
 
 init_platform :: proc(platform: ^Platform) {

@@ -7,9 +7,9 @@ draw_builder :: proc(builder: ^King, y_offset: int, sequences: ^KingSequences, p
 	using builder
 
 	animator.frame_length_mod = 1
-	animator.sequence = &sequences.builder_idle
+	animator.sequence = sequences.idle
 	if running_input {
-		animator.sequence = &sequences.builder_run
+		animator.sequence = sequences.run
 		animator.frame_length_mod = 0.8
 	}
 
@@ -17,10 +17,10 @@ draw_builder :: proc(builder: ^King, y_offset: int, sequences: ^KingSequences, p
 
 	#partial switch(jump_state) {
 	case JumpState.JUMP:
-		animator.sequence = &sequences.builder_jump
+		animator.sequence = sequences.jump
 		animator.flipped = facing_right
 	case JumpState.FLOAT:
-		animator.sequence = &sequences.builder_float
+		animator.sequence = sequences.float
 	}
 
 

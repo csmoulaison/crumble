@@ -2,14 +2,13 @@ package main
 import "core:fmt"
 
 // TODO
-// * Recolor skins and do crown/shadow variants
 // * Fix final screen with different characters + food ending (different music?)
-// * Add character icons to character specific codes -
-//   AND make them work only when character selected -
-//   AND make them deactivate if character changed
-// * Genericize leaderboards to auto generate based on the game settings -
-//   * Easiest way to build this into the current system would be making it
-//     encoded in text file name
+// * Change Chef cycle:
+//   * food appears. chef touches it. turns into platter. disappears after time
+// * Make character specific codes deactivate if character changed
+// * Epilepsy warning for glitch ending
+// * Crown skin
+// * Co-op multiplayer
 
 main :: proc() {
 	platform: ^Platform = new(Platform)

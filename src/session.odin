@@ -1,5 +1,6 @@
 package main
 import "core:math"
+import "core:math/rand"
 import "core:fmt"
 
 Session :: struct {
@@ -54,8 +55,8 @@ SessionState :: enum {
 	FINAL_SCREEN,
 }
 
-init_session :: proc(session: ^Session, config: ^Config) {
-	using session
+init_session :: proc(game: ^Game, config: ^Config) {
+	using game.session
 
 	mod_config = config^
 	if mod_random {
@@ -75,22 +76,35 @@ init_session :: proc(session: ^Session, config: ^Config) {
 	lives = config.starting_lives
 
 	deserialize_level(&level_data, tower_sequence.towers[current_tower].levels[current_level])
-	init_level(session, &level_data, config)
+	init_level(&game.session, &level_data, config)
 	init_fireworks(&particle_system)
 
-	//state = SessionState.FINAL_SCREEN
-	//king.character = Character.CHEF
 	state = SessionState.PRE_LEVEL_SCREEN
 	time_to_next_state = config.level_interstitial_length
 
-	king_sequences.idle = sequences.king_idle
-	king_sequences.run = sequences.king_run
-	king_sequences.jump = sequences.king_jump
-	king_sequences.float = sequences.king_float
-	king_sequences.post_float = sequences.king_post_float
+	switch king.character {
+	case Character.KING:
+		king_sequences.idle = game.assets.sequences.king_idle
+		king_sequences.run = game.assets.sequences.king_run
+		king_sequences.jump = game.assets.sequences.king_jump
+		king_sequences.float = game.assets.sequences.king_float
+		king_sequences.post_float = game.assets.sequences.king_post_float
+	case Character.CHEF:
+		king_sequences.idle = game.assets.sequences.chef_idle
+		king_sequences.run = game.assets.sequences.chef_run
+		king_sequences.jump = game.assets.sequences.chef_jump
+		king_sequences.float = game.assets.sequences.chef_float
+		king_sequences.post_float = game.assets.sequences.chef_post_float
+	case Character.BUILDER:
+		king_sequences.idle = game.assets.sequences.builder_idle
+		king_sequences.run = game.assets.sequences.builder_run
+		king_sequences.jump = game.assets.sequences.builder_jump
+		king_sequences.float = game.assets.sequences.builder_float
+		king_sequences.post_float = game.assets.sequences.builder_post_float
+	}
 
 	king_y_off: int = 0
-	#partial switch(skin) {
+	#partial switch(king.skin) {
 	case Skin.ALT_ONE:
 		king_y_off = 21
 	case Skin.ALT_TWO:
@@ -106,6 +120,8 @@ init_session :: proc(session: ^Session, config: ^Config) {
 	king_sequences.jump.starting_frame.position.y += king_y_off
 	king_sequences.float.starting_frame.position.y += king_y_off
 	king_sequences.post_float.starting_frame.position.y += king_y_off
+
+	//debug_final_screen(game, config)
 }
 
 handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_system: ^SoundSystem, dt: f32) -> (ready_to_close: bool) {
@@ -127,6 +143,10 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 	case SessionState.WAITING_TO_START:
 		handle_waiting_to_start(session, input, sound_system, dt)
 	case SessionState.HITCH:
+		if input.jump.just_pressed {
+			king.jump_buffer = 0.25
+		}
+		
 		time_to_next_state -= dt
 		if time_to_next_state < 0 do state = SessionState.LEVEL_ACTIVE
 	case SessionState.FOOD_RESET:
@@ -169,6 +189,17 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 draw_session :: proc(session: ^Session, assets: ^Assets, config: ^Config, sound_system: ^SoundSystem, platform: ^Platform, dt: f32) {
 	using session
 
+	if platform.mod_glitchy {
+		platform.glitch_chance = lerp(platform.glitch_chance, 1, dt * 0.1)
+		if f32(rand.int_max(int(platform.glitch_chance * 1000))) / 1000 < dt * 500 {
+			sound_system.music_trackhead.position += f32(rand.int_max(3) - 1)
+			sound_system.music_tempo += (f32(rand.int_max(100)) / 1000) * dt - (50 / 1000)
+			for i in 0..<3 {
+				sound_system.channels[i].sound.frequency += (f32(rand.int_max(100)) / 100) * 1000
+			}
+		}
+	}
+
 	if state == SessionState.HITCH ||
 	state == SessionState.LEVEL_ACTIVE ||
 	state == SessionState.FOOD_RESET ||
@@ -184,7 +215,8 @@ draw_session :: proc(session: ^Session, assets: ^Assets, config: ^Config, sound_
         king_y_offset: f32 = 0
         move_king_float_start(time_to_next_state, &king, &king_y_offset, config)
         draw_level(session, false, assets, config, platform, dt)
-		draw_king(&king, int(king_y_offset), &assets.sequences, platform, dt)
+		draw_king(&king, int(king_y_offset), &king_sequences, platform, dt)
+		platform.glitch_chance = START_GLITCH
 	case SessionState.PRE_LEVEL_SCREEN:
 		draw_level_interstitial(session, time_to_next_state, assets, platform, dt)
 	}

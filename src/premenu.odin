@@ -1,27 +1,26 @@
 package main
 import "core:fmt"
 
+START_GLITCH :: 500
+
 // Character codes
 code_chef:     [secret_code_len]int: { 0, 0, 1, 1, 0, 1, 0, 1, }
 code_builder:  [secret_code_len]int: { 1, 0, 0, 1, 0, 0, 1, 1, }
 // Modifier codes
 code_one_life: [secret_code_len]int: { 0, 0, 1, 0, 1, 1, 0, 1, }
 code_crumbled: [secret_code_len]int: { 1, 1, 0, 1, 0, 0, 1, 0, }
-code_low_grav: [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 0, }
+code_random:   [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 0, }
 code_slow:     [secret_code_len]int: { 0, 0, 1, 0, 1, 0, 0, 1, }
 code_fast:     [secret_code_len]int: { 1, 0, 0, 1, 0, 1, 1, 0, }
 // Alternate skin codes
 code_king1:    [secret_code_len]int: { 1, 1, 0, 0, 1, 1, 0, 1, }
 code_king2:    [secret_code_len]int: { 0, 1, 1, 0, 0, 0, 0, 1, }
-code_king3:    [secret_code_len]int: { 0, 0, 0, 1, 1, 1, 0, 0, }
 code_king_fin: [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
-code_king_sha:     [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 1, }
+code_king_sha: [secret_code_len]int: { 0, 1, 1, 0, 0, 1, 0, 1, }
 code_chef1:    [secret_code_len]int: { 1, 0, 0, 1, 1, 1, 1, 0, }
 code_chef2:    [secret_code_len]int: { 1, 1, 1, 0, 0, 0, 1, 1, }
-code_chef3:    [secret_code_len]int: { 0, 0, 1, 1, 0, 0, 1, 0, }
 code_builder1: [secret_code_len]int: { 0, 1, 0, 1, 0, 1, 1, 1, }
 code_builder2: [secret_code_len]int: { 1, 1, 1, 0, 1, 0, 1, 0, }
-code_builder3: [secret_code_len]int: { 0, 0, 1, 1, 0, 1, 1, 0, }
 // Food code sequence. Only the first 4 are real
 code_food:     [secret_code_len]int: { 1, 3, 0, 2, 0, 0, 0, 0, }
 
@@ -73,50 +72,52 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		code_success = true
 	// Skins
 	// King
-	} else if secret_code_inputs == code_king1 && session.king.character = Character.KING {
+	} else if secret_code_inputs == code_king1 && session.king.character == Character.KING {
 		session.king.skin = Skin.ALT_ONE
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
-	} else if secret_code_inputs == code_king2 && session.king.character = Character.KING {
+	} else if secret_code_inputs == code_king2 && session.king.character == Character.KING {
 		session.king.skin = Skin.ALT_TWO
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
-	} else if secret_code_inputs == code_king_fin && session.king.character = Character.KING {
+	} else if secret_code_inputs == code_king_fin && session.king.character == Character.KING {
 		session.king.skin = Skin.CROWN_KING
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
-	} else if secret_code_inputs == code_king_sha && session.king.character = Character.KING {
-		session.king.skin = Skin.SHADOW_KING
+	} else if secret_code_inputs == code_king_sha && session.king.character == Character.KING {
+		platform.mod_glitchy = true
+		platform.glitch_chance = START_GLITCH
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
 	// Chef
-	} else if secret_code_inputs == code_chef1 && session.king.character = Character.CHEF {
+	} else if secret_code_inputs == code_chef1 && session.king.character == Character.CHEF {
 		session.king.skin = Skin.ALT_ONE
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
-	} else if secret_code_inputs == code_chef2 && session.king.character = Character.CHEF {
+	} else if secret_code_inputs == code_chef2 && session.king.character == Character.CHEF {
 		session.king.skin = Skin.ALT_TWO
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
 	// Builder
-	} else if secret_code_inputs == code_builder1 && session.king.character = Character.BUILDER {
+	} else if secret_code_inputs == code_builder1 && session.king.character == Character.BUILDER {
 		session.king.skin = Skin.ALT_ONE
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
-	} else if secret_code_inputs == code_builder2 && session.king.character = Character.BUILDER {
+	} else if secret_code_inputs == code_builder2 && session.king.character == Character.BUILDER {
 		session.king.skin = Skin.ALT_TWO
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
 	}
 
 	if code_success {
+		deserialize_leaderboard(leaderboard_fname(&game.session), &game.leaderboard.data)
 		for i in 0..<secret_code_len {
 			secret_code_inputs[i] = -1
 		}
 	}
 
 	if input.jump.just_pressed {
-		init_session(&game.session, &game.config)
+		init_session(game, &game.config)
 		state = GameState.SESSION
 		return
 	}
@@ -134,8 +135,6 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		draw_pre_credits(title, game, input, platform, dt)
 	case 1:
 		leaderboard.current_score = -1
-		leaderboard_chef.current_score = -1
-		leaderboard_builder.current_score = -1
 		draw_high_scores(game, &config, platform, dt)
 	}
 

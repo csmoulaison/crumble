@@ -184,7 +184,7 @@ update_king_jump_state :: proc(king: ^King, input: ^Input, config: ^Config, soun
 	} else if jump_state == JumpState.JUMP {
 		gravity_scale = config.king_jump_gravity_scale_down
 
-		if input.jump.just_pressed {
+		if input.jump.just_pressed || jump_buffer > 0 {
 			jump_state = JumpState.FLOAT
 			velocity.y = -config.king_float_velocity
 			gravity_scale = config.king_float_initial_gravity_scale

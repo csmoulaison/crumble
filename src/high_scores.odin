@@ -16,7 +16,6 @@ Score :: struct {
 
 LeaderboardData :: struct {
 	scores: [MAX_HIGH_SCORES]Score,
-	len: int,
 }
 
 Leaderboard :: struct {
@@ -31,26 +30,24 @@ Leaderboard :: struct {
 }
 
 update_high_scores :: proc(game: ^Game, input: ^Input) {
-	using leaderboard
+	using game.leaderboard
 
 	exiting: bool = false
 	defer if exiting {
-		serialize_leaderboard(leaderboard_fname, &data)
+		serialize_leaderboard(leaderboard_fname(&game.session), &data)
 
 		stop_music(&game.sound_system)
 		game.session.king.character = Character.KING
+		game.session.king.skin = Skin.DEFAULT
 		game.session.mod_one_life = false
 		game.session.mod_crumbled = false
-		game.session.mod_low_grav = false
+		game.session.mod_random = false
 		game.session.mod_speed_state = ModSpeedState.NORMAL
+
+		deserialize_leaderboard(leaderboard_fname(&game.session), &data)
 
 		game.state = GameState.PRE_MAIN_MENU
 		game.intro_elapsed_time = 1
-	}
-
-	if !is_session_eligible_for_high_score(game) && (input.select.just_pressed || input.quit.just_pressed) {
-		exiting = true
-		return
 	}
 
 	if current_score < 0 || current_score > 9 {
@@ -96,15 +93,7 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 	col2_x: int = 311
 	col3_x: int = 374
 
-	leaderboard := &game.leaderboard
-	#partial switch game.session.king.character {
-	case Character.CHEF:
-		leaderboard = &game.leaderboard_chef
-	case Character.BUILDER:
-		leaderboard = &game.leaderboard_builder
-	}
-
-	using leaderboard
+	using game.leaderboard
 
 	platform.logical_offset_active = false
 
@@ -164,24 +153,13 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 }
 
 add_high_score :: proc(game: ^Game, new_score: Score) {
+	using game.leaderboard
 	leaderboard_fname: string = leaderboard_fname(&game.session)
-	#partial switch game.session.king.character {
-	case Character.CHEF:
-		leaderboard = &game.leaderboard_chef
-		leaderboard_fname = LEADERBOARD_CHEF_FNAME
-	case Character.BUILDER:
-		leaderboard = &game.leaderboard_builder
-		leaderboard_fname = LEADERBOARD_BUILDER_FNAME
-	}
+	deserialize_leaderboard(leaderboard_fname, &data)
 
-	using leaderboard
-
-	if data.len > MAX_HIGH_SCORES {
-		data.len = MAX_HIGH_SCORES
-	}
-
-	leaderboard.current_score = -1
-	#reverse for score, i in data.scores[:data.len] {
+	current_score = -1
+	fmt.println("reversi")
+	#reverse for score, i in data.scores[:MAX_HIGH_SCORES] {
 		if score.points < new_score.points {
 			if i < MAX_HIGH_SCORES - 1 {
 				data.scores[i + 1] = score
@@ -193,14 +171,11 @@ add_high_score :: proc(game: ^Game, new_score: Score) {
 		}
 	}
 
-	if leaderboard.current_score != -1 {
+	if current_score != -1 {
 		current_initial = 0
-		if data.len < MAX_HIGH_SCORES {
-			data.len += 1
-		}
 	}
 
-	serialize_leaderboard(leaderboard_fname, &leaderboard.data)
+	serialize_leaderboard(leaderboard_fname, &data)
 }
 
 serialize_leaderboard :: proc (fname: string, data: ^LeaderboardData) -> (ok: bool) {
@@ -211,8 +186,9 @@ serialize_leaderboard :: proc (fname: string, data: ^LeaderboardData) -> (ok: bo
 deserialize_leaderboard :: proc(fname: string, result: ^LeaderboardData) -> (ok: bool) {
     data, read_ok := os.read_entire_file(fname)
     if !read_ok {
-		result.len = 10
-       return false
+	    cleared: LeaderboardData
+	    result^ = cleared
+    	return false
     }
 	result^ = (^LeaderboardData)(raw_data(data))^
     return true
@@ -262,56 +238,50 @@ get_letter_list :: proc() -> [SCORE_LETTER_COUNT]rune {
 		'Z',}
 }
 
-is_session_eligible_for_high_score :: proc(session: ^Session) -> bool {
-	using session
-	return !(mod_one_life || mod_crumbled || mod_low_grav || mod_speed_state != ModSpeedState.NORMAL)
-}
-
 // data/ + character / one_life / crumbled / random / speed_state + .score
 // data/K000N.score for a regular high score
 // data/C101S.score for chef with one_life and random at slow speed
-leaderboard_fname :: proc(session: ^Session) -> char[16] {
-	fname: char[16]
-
-	mem_copy(&fname, LEADERBOARD_PREFIX, 5)
+leaderboard_fname :: proc(session: ^Session) -> string {
+	builder := strings.builder_make()
+	strings.write_string(&builder, LEADERBOARD_PREFIX)
 
 	switch session.king.character {
 	case Character.KING:
-		fname[5] = 'K'
+		strings.write_rune(&builder, 'K')
 	case Character.CHEF:
-		fname[5] = 'C'
+		strings.write_rune(&builder, 'C')
 	case Character.BUILDER:
-		fname[5] = 'B'
+		strings.write_rune(&builder, 'B')
 	}
 
 	if session.mod_one_life {
-		fname[6] = '1'
+		strings.write_int(&builder, 1)
 	} else {
-		fname[6] = '0'
+		strings.write_int(&builder, 0)
 	}
 
 	if session.mod_crumbled {
-		fname[7] = '1'
+		strings.write_int(&builder, 1)
 	} else {
-		fname[7] = '0'
+		strings.write_int(&builder, 0)
 	}
 
 	if session.mod_random {
-		fname[8] = '1'
+		strings.write_int(&builder, 1)
 	} else {
-		fname[8] = '0'
+		strings.write_int(&builder, 0)
 	}
 
 	switch session.mod_speed_state {
 	case ModSpeedState.NORMAL:
-		fname[9] = 'n'
+		strings.write_rune(&builder, 'N')
 	case ModSpeedState.FAST:
-		fname[9] = 'f'
+		strings.write_rune(&builder, 'F')
 	case ModSpeedState.SLOW:
-		fname[9] = 's'
+		strings.write_rune(&builder, 'S')
 	}
 
-	mem_copy(&fname[10], LEADERBOARD_PREFIX, 6)
+	strings.write_string(&builder, LEADERBOARD_SUFFIX)
 
-	return fname
+	return strings.to_string(builder)
 }

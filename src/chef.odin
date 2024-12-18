@@ -7,17 +7,17 @@ draw_chef :: proc(chef: ^King, y_offset: int, sequences: ^KingSequences, platfor
 	using chef
 
 	animator.frame_length_mod = 1
-	animator.sequence = &sequences.chef_idle
+	animator.sequence = sequences.idle
 	if running_input {
-		animator.sequence = &sequences.chef_run
+		animator.sequence = sequences.run
 		animator.frame_length_mod = 0.8
 	}
 
 	#partial switch(jump_state) {
 	case JumpState.JUMP:
-		animator.sequence = &sequences.chef_jump
+		animator.sequence = sequences.jump
 	case JumpState.FLOAT:
-		animator.sequence = &sequences.chef_float
+		animator.sequence = sequences.float
 
 		velocity_frame_mod: f32 = math.abs(chef.velocity.y) + 50
 		animator.frame_length_mod = 50 / velocity_frame_mod
@@ -25,7 +25,7 @@ draw_chef :: proc(chef: ^King, y_offset: int, sequences: ^KingSequences, platfor
 			animator.frame_length_mod = 2
 		}
 	case JumpState.POST_FLOAT:
-		animator.sequence = &sequences.chef_float
+		animator.sequence = sequences.float
 		animator.frame_length_mod = lerp(animator.frame_length_mod, 1, dt * 2)
 	}
 

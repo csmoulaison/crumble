@@ -1,5 +1,6 @@
 package main
 import "core:fmt"
+import "core:math/rand"
 
 Sprite :: struct {
 	texture_src: IRect,
@@ -42,6 +43,35 @@ buffer_sprite_raw :: proc(platform: ^Platform, sprite: Sprite) {
 		spr.position.x += platform.logical_offset.x
 		spr.position.y += platform.logical_offset.y
 	}
+
+	if platform.mod_glitchy {
+		chance: int = int(platform.glitch_chance * 1000)
+		if chance < 1 {
+			chance = 1
+		}
+		if rand.int_max(chance) < 1000 {
+			spr.texture_src.position.x = rand.int_max(26) * 16
+			spr.texture_src.position.y = rand.int_max(16) * 16
+		}
+
+		x_off: int = 0
+		y_off: int = 0
+		if rand.int_max(chance) < 1000 {
+			x_off += rand.int_max(3) - 1
+			x_off += rand.int_max(3) - 1
+			if rand.int_max(chance) < 1000 {
+				x_off += rand.int_max(5) - 2
+				x_off += rand.int_max(5) - 2
+				if rand.int_max(chance) < 1000 {
+					x_off += rand.int_max(7) - 3
+					x_off += rand.int_max(6) - 3
+				}
+			}
+		}
+		spr.position.x += x_off
+		spr.position.y += y_off
+	}
+	
 	platform.sprites[platform.sprites_len] = spr
 	platform.sprites_len += 1
 }

@@ -1,5 +1,6 @@
 package main
 import "core:fmt"
+import "core:os"
 
 secret_code_len :: 8
 
@@ -25,8 +26,6 @@ Game :: struct {
 	// State specific data
 	session: Session,
 	leaderboard: Leaderboard,
-	leaderboard_chef: Leaderboard,
-	leaderboard_builder: Leaderboard,
 	sound_system: SoundSystem,
 	intro_elapsed_time: f32,
 	secret_code_inputs: [secret_code_len]int,
@@ -40,9 +39,7 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 	using game
 
 	load_assets(&assets, platform)
-	deserialize_leaderboard(LEADERBOARD_FNAME, &leaderboard.data)
-	deserialize_leaderboard(LEADERBOARD_CHEF_FNAME, &leaderboard_chef.data)
-	deserialize_leaderboard(LEADERBOARD_BUILDER_FNAME, &leaderboard_builder.data)
+	deserialize_leaderboard(leaderboard_fname(&game.session), &leaderboard.data)
 
 	init_config(&game.config)
 	init_sound_system(&game.sound_system)
@@ -69,10 +66,13 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 		draw_session(&session, &assets, &config, &sound_system, platform, dt)
 
 		if session.state == SessionState.END {
-			if is_session_eligible_for_high_score(game) {
-				add_high_score(game, Score{"AAA", session.total_points})
+			if platform.mod_glitchy {
+				os.exit(0)
 			}
+			
+			add_high_score(game, Score{"AAA", session.total_points})
 			state = GameState.HIGH_SCORES
+			platform.glitch_chance = 0
 		}
 	case GameState.HIGH_SCORES:
 		update_high_scores(game, input)

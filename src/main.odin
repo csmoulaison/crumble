@@ -3,11 +3,6 @@ import "core:fmt"
 
 // TODO
 // * Fix final screen with different characters + food ending (different music?)
-// * Change Chef cycle:
-//   * food appears. chef touches it. turns into platter. disappears after time
-// * Make character specific codes deactivate if character changed
-// * Epilepsy warning for glitch ending
-// * Crown skin
 // * Co-op multiplayer
 
 main :: proc() {

@@ -27,6 +27,49 @@ code_food:     [secret_code_len]int: { 1, 3, 0, 2, 0, 0, 0, 0, }
 update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 	using game
 
+	platform.logical_offset_active = false
+
+	title: bool = false
+	if intro_elapsed_time > 1 {
+		title = true
+	}
+
+	intro_elapsed_time += dt
+	switch int(intro_elapsed_time / 6) % 2 {
+	case 0:
+		draw_pre_credits(title, game, input, platform, dt)
+	case 1:
+		leaderboard.current_score = -1
+		draw_high_scores(game, &config, platform, dt)
+	}
+
+	if title {
+		pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
+		pos_y: int = LOGICAL_HEIGHT - 64
+		token_text: IRect = {{239, 194}, {56, 7}}
+		if int(intro_elapsed_time) % 2 != 0 {
+			token_text.position.y += 7
+
+			#partial switch session.king.character {
+			case Character.CHEF:
+				token_text.position.y += 7
+			case Character.BUILDER:
+				token_text.position.y += 14
+			}
+		}
+		if int(intro_elapsed_time * 2) % 2 == 0 {
+			buffer_sprite(platform, token_text, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 + 80}, IVec2{28, 3}, false)
+		}
+	}
+
+	if platform.mod_glitchy {
+		epilepsy_warning: IRect = {{310, 128}, {39, 16}}
+		if int(intro_elapsed_time * 8) % 2 == 0 {
+			epilepsy_warning.position.y += 16
+		}
+		buffer_sprite(platform, epilepsy_warning, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 - 112}, IVec2{19, 8}, false)
+	}
+
 	if input.left.just_pressed || input.right.just_pressed {
 		for i in 0..<secret_code_len - 1 {
 			secret_code_inputs[i] = secret_code_inputs[i + 1]
@@ -38,14 +81,20 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		}
 	}
 
+	if !input.jump.just_pressed {
+		return
+	}
+
 	code_success: bool = false
 	// Characters
 	if secret_code_inputs == code_chef {
 		session.king.character = Character.CHEF
+		session.king.skin = Skin.DEFAULT
 		start_sound(&sound_system, SoundType.FOOD_EAT)
 		code_success = true
 	} else if secret_code_inputs == code_builder {
 		session.king.character = Character.BUILDER
+		session.king.skin = Skin.DEFAULT
 		start_sound(&sound_system, SoundType.FOOD_APPEAR)
 		code_success = true
 	// Big mods
@@ -114,47 +163,13 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		for i in 0..<secret_code_len {
 			secret_code_inputs[i] = -1
 		}
+		return
 	}
 
 	if input.jump.just_pressed {
 		init_session(game, &game.config)
 		state = GameState.SESSION
 		return
-	}
-
-	platform.logical_offset_active = false
-
-	title: bool = false
-	if intro_elapsed_time > 1 {
-		title = true
-	}
-
-	intro_elapsed_time += dt
-	switch int(intro_elapsed_time / 6) % 2 {
-	case 0:
-		draw_pre_credits(title, game, input, platform, dt)
-	case 1:
-		leaderboard.current_score = -1
-		draw_high_scores(game, &config, platform, dt)
-	}
-
-	if title {
-		pos_x: int = LOGICAL_WIDTH / 2 - 7 * 6
-		pos_y: int = LOGICAL_HEIGHT - 64
-		token_text: IRect = {{239, 194}, {56, 7}}
-		if int(intro_elapsed_time) % 2 != 0 {
-			token_text.position.y += 7
-
-			#partial switch session.king.character {
-			case Character.CHEF:
-				token_text.position.y += 7
-			case Character.BUILDER:
-				token_text.position.y += 14
-			}
-		}
-		if int(intro_elapsed_time * 2) % 2 == 0 {
-			buffer_sprite(platform, token_text, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 + 80}, IVec2{28, 3}, false)
-		}
 	}
 }
 

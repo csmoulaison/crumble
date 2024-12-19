@@ -43,6 +43,7 @@ update_high_scores :: proc(game: ^Game, input: ^Input) {
 		game.session.mod_crumbled = false
 		game.session.mod_random = false
 		game.session.mod_speed_state = ModSpeedState.NORMAL
+		game.session.food_hint_accomplished = false
 
 		deserialize_leaderboard(leaderboard_fname(&game.session), &data)
 
@@ -158,7 +159,6 @@ add_high_score :: proc(game: ^Game, new_score: Score) {
 	deserialize_leaderboard(leaderboard_fname, &data)
 
 	current_score = -1
-	fmt.println("reversi")
 	#reverse for score, i in data.scores[:MAX_HIGH_SCORES] {
 		if score.points < new_score.points {
 			if i < MAX_HIGH_SCORES - 1 {

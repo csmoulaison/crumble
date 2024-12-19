@@ -109,7 +109,7 @@ draw_code_ex :: proc(ctx: ^CodePrintContext, code: [secret_code_len]int, charact
 
 	iter_len: int = secret_code_len
 	if food_hint {
-		iter_len -= 3
+		iter_len = 3
 	}
 	for i in 0..=iter_len {
 		if ctx.t > f32(-4 - i - ctx.codes_drawn) - delay {
@@ -120,7 +120,7 @@ draw_code_ex :: proc(ctx: ^CodePrintContext, code: [secret_code_len]int, charact
 		if i == secret_code_len {
 			spr.position.x += spr.size.x * 2
 		} else {
-			spr.position.x += i * spr.size.x
+			spr.position.x += code[i] * spr.size.x
 		}
 		buffer_sprite(platform, spr, IVec2{draw_pos.x + (spr.size.x + 1) * i, draw_pos.y}, IVec2{0, 0}, false)
 	}

@@ -7,8 +7,8 @@ START_GLITCH :: 500
 code_chef:     [secret_code_len]int: { 0, 0, 1, 1, 0, 1, 0, 1, }
 code_builder:  [secret_code_len]int: { 1, 0, 0, 1, 0, 0, 1, 1, }
 // Modifier codes
-code_one_life: [secret_code_len]int: { 0, 0, 1, 0, 1, 1, 0, 1, }
-code_crumbled: [secret_code_len]int: { 1, 1, 0, 1, 0, 0, 1, 0, }
+code_one_life: [secret_code_len]int: { 0, 1, 0, 0, 1, 0, 1, 1, }
+code_crumbled: [secret_code_len]int: { 1, 0, 1, 1, 0, 1, 0, 0, }
 code_random:   [secret_code_len]int: { 1, 1, 1, 0, 1, 1, 0, 0, }
 code_slow:     [secret_code_len]int: { 0, 0, 1, 0, 1, 0, 0, 1, }
 code_fast:     [secret_code_len]int: { 1, 0, 0, 1, 0, 1, 1, 0, }

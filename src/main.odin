@@ -2,7 +2,8 @@ package main
 import "core:fmt"
 
 // TODO
-// * Fix final screen with different characters + food ending (different music?)
+// * Indicators of game mode for high score/pre menu screen (+interstitials?)
+// * Press start button while waiting for king to start
 // * Co-op multiplayer
 
 main :: proc() {

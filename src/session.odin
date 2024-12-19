@@ -111,8 +111,6 @@ init_session :: proc(game: ^Game, config: ^Config) {
 		king_y_off = 42
 	case Skin.CROWN_KING:
 		king_y_off = 63
-	case Skin.SHADOW_KING:
-		king_y_off = 84
 	}
 
 	king_sequences.idle.starting_frame.position.y += king_y_off

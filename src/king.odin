@@ -43,7 +43,6 @@ Skin :: enum {
 	ALT_ONE,
 	ALT_TWO,
 	CROWN_KING,
-	SHADOW_KING,
 }
 
 KingSequences :: struct {

@@ -44,9 +44,6 @@ init_game :: proc(game: ^Game, platform: ^Platform) {
 	init_config(&game.config)
 	init_sound_system(&game.sound_system)
 
-	// DEBUG for making music
-	//start_music(1, &game.sound_system)
-
 	state = GameState.STARTUP
 }
 
@@ -72,7 +69,6 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 			
 			add_high_score(game, Score{"AAA", session.total_points})
 			state = GameState.HIGH_SCORES
-			platform.glitch_chance = 0
 		}
 	case GameState.HIGH_SCORES:
 		update_high_scores(game, input)

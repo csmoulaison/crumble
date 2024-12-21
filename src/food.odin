@@ -81,7 +81,7 @@ draw_food :: proc(food: ^Food, platform: ^Platform) {
 		else do draw_window(window.is_active, window.position, platform)
 
 		if index == current_window {
-			food_src_pos := IVec2{352, 96}
+			food_src_pos := IVec2{352, -96}
 			cooked_src_pos := IVec2{320 + current_food_index * FOOD_SRC_OFFSET, 112}
 
 			cooked_food := false

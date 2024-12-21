@@ -1,7 +1,7 @@
 package main
 import "core:math"
 
-move_king_float_start :: proc(time_to_next_state: f32, king: ^King, king_y_offset: ^f32, config: ^Config) {
+move_king_float_start :: proc(time_to_next_state: f32, king: ^King, king_y_offset: ^f32, config: ^Config) -> (just_grounded: bool) {
     t: f32 = (config.pre_active_length - time_to_next_state * time_to_next_state * 0.5) + 0.05
     amplitude: f32 = 300
     if t < 2.0217 {
@@ -11,6 +11,11 @@ move_king_float_start :: proc(time_to_next_state: f32, king: ^King, king_y_offse
             king.jump_state = JumpState.JUMP
         }
     } else {
-        king.jump_state = JumpState.GROUNDED
+	    if king.jump_state != JumpState.GROUNDED {
+	        king.jump_state = JumpState.GROUNDED
+	        return true
+	    }
     }
+
+    return false
 }

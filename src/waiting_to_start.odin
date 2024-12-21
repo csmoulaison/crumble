@@ -8,11 +8,8 @@ handle_waiting_to_start :: proc(session: ^Session, input: ^Input, sound_system: 
 		session.time_to_next_state = 0
 	}
 
-	if !input.jump.just_pressed {
-		return
+	if input.jump.just_pressed {
+		start_music(session.current_level, sound_system)
+		session.state = SessionState.LEVEL_ACTIVE
 	}
-
-	start_music(session.current_level, sound_system)
-
-	session.state = SessionState.LEVEL_ACTIVE
 }

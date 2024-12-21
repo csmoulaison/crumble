@@ -3,7 +3,6 @@ import "core:fmt"
 
 // TODO
 // * Indicators of game mode for high score/pre menu screen (+interstitials?)
-// * Press start button while waiting for king to start
 // * Co-op multiplayer
 
 main :: proc() {
@@ -32,7 +31,7 @@ main :: proc() {
 
 		update_game(game, input, platform, dt)
 		update_clock(&clock)
-		platform.time_passed += dt
+		platform.clock += dt
 	}
 
 	cleanup_platform(platform)

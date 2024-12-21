@@ -45,7 +45,7 @@ Platform :: struct {
 	textures_len: int,
 	window_icon: ^SDL.Surface,
 	// Misc
-	time_passed: f32,
+	clock: f32,
 	mod_glitchy: bool,
 	glitch_chance: f32,
 }

@@ -211,9 +211,23 @@ draw_session :: proc(session: ^Session, assets: ^Assets, config: ^Config, sound_
 	   	draw_final_screen(session, assets, config, sound_system, platform, dt)
 	case SessionState.WAITING_TO_START:
         king_y_offset: f32 = 0
-        move_king_float_start(time_to_next_state, &king, &king_y_offset, config)
+        just_grounded: bool = move_king_float_start(time_to_next_state, &king, &king_y_offset, config)
+	    if just_grounded {
+		    platform.clock = f32(int(platform.clock))
+	    }
+
         draw_level(session, false, assets, config, platform, dt)
 		draw_king(&king, int(king_y_offset), &king_sequences, platform, dt)
+		if king.jump_state == JumpState.GROUNDED {
+			platform.logical_offset_active = false
+			off_y: int = 0
+			if int(platform.clock) % 2 != 0 {
+				off_y = 7
+			}
+		    buffer_sprite(platform, IRect{{352, 96 + off_y}, {51, 7}}, IVec2{LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 + 32}, IVec2{25,3}, false)
+			platform.logical_offset_active = true
+		}
+
 		platform.glitch_chance = START_GLITCH
 	case SessionState.PRE_LEVEL_SCREEN:
 		draw_level_interstitial(session, time_to_next_state, assets, platform, dt)

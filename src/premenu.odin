@@ -62,6 +62,8 @@ update_pre_menu :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32
 		}
 	}
 
+	draw_mod_indicators(IVec2{LOGICAL_WIDTH - 33, LOGICAL_HEIGHT - 58}, &session, platform)
+
 	if platform.mod_glitchy {
 		epilepsy_warning: IRect = {{310, 128}, {39, 16}}
 		if int(intro_elapsed_time * 8) % 2 == 0 {

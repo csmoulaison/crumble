@@ -2,7 +2,6 @@ package main
 import "core:fmt"
 
 // TODO
-// * Indicators of game mode for high score/pre menu screen (+interstitials?)
 // * Co-op multiplayer
 
 main :: proc() {

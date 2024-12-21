@@ -3,7 +3,11 @@ import "core:fmt"
 
 // TODO
 // * Co-op multiplayer
-
+// * ^ Controller selection
+//   * Array of Input, bound to buttons
+//   * One Input for P1 variants, one for P2, with more for external controllers
+//   * In singeplayer, all inputs aggregated before being sent to king control
+//   * In multiplayer, input is selected before play, and sent per selection
 main :: proc() {
 	platform: ^Platform = new(Platform)
 	init_platform(platform)

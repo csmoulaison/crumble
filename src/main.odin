@@ -24,9 +24,9 @@ main :: proc() {
 	for !platform.ready_to_quit {
 		update_platform(platform)
 		update_input(input, platform)
-		if input.quit.just_pressed {
-			break
-		}
+		//if input.quit.just_pressed {
+			//break
+		//}
 
 		dt := clock.dt
 		if game.session.mod_speed_state == ModSpeedState.FAST do dt *= 1.5

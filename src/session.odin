@@ -126,10 +126,10 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 	using session
 
 	// DEBUG level advancer
-	if input.editor_incr_lvl.just_pressed {
-		try_advance_level(session, config)
-		return false
-	}
+	//if input.editor_incr_lvl.just_pressed {
+	//	try_advance_level(session, config)
+	//      return false
+	//}
 
 	if mod_one_life && lives > 0 {
 		lives = 0
@@ -175,6 +175,7 @@ handle_session :: proc(session: ^Session, input: ^Input, config: ^Config, sound_
 
 	// Check for force exit
 	if input.quit.just_pressed {
+		stop_music(sound_system)
 		state = SessionState.END
 	}
 

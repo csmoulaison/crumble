@@ -73,6 +73,8 @@ init_platform :: proc(platform: ^Platform) {
 update_platform :: proc(platform: ^Platform) {
 	using platform
 
+	SDL.ShowCursor(0)
+
 	//Prepare screen
 	SDL.SetRenderDrawColor(
 		renderer,
@@ -146,35 +148,41 @@ update_platform :: proc(platform: ^Platform) {
 	sprites_len = 0
 
 	// Scanlines
-	if true {
-		scanline_color_map: [8]i8 = {0, 0, 0, 0, 0, 0, 0, 0}
-		if pixel_scalar == 2 {
-			scanline_color_map[0] = 64
-			scanline_color_map[1] = 0
+	if false {
+		scanline_color_map: [8]i8 = {-128, -128, -128, -128, -128, -128, 0, 0}
+		if pixel_scalar == 1 {
+			scanline_color_map[0] = 0
+		} else if pixel_scalar == 2 {
+			scanline_color_map[0] = -64
+			scanline_color_map[1] = 1
 		} else if pixel_scalar == 3 {
 			scanline_color_map[0] = -64
 			scanline_color_map[1] = 2
 			scanline_color_map[2] = -96
 		} else if pixel_scalar == 4 {
-			scanline_color_map[0] = 127
-			scanline_color_map[1] = 0
-			scanline_color_map[2] = 127
-			scanline_color_map[3] = 127
+			scanline_color_map[0] = -128
+			scanline_color_map[1] = -64
+			scanline_color_map[2] = 2
+			scanline_color_map[3] = -64
+		} else if pixel_scalar > 4 {
+			scanline_color_map[0] = -128
+			scanline_color_map[1] = -64
+			scanline_color_map[2] = 2
+			scanline_color_map[3] = 1
+			scanline_color_map[4] = -64
 		}
 		for i: int = 0; i * pixel_scalar < int(screen_height); i += 1 {
-			if pixel_scalar == 3 {
-				for j: int = 0; j < pixel_scalar; j += 1 {
-					scanline_y: i32 = i32(pixel_scalar + i * pixel_scalar + j)
+			for j: int = 0; j < pixel_scalar; j += 1 {
+				scanline_y: i32 = i32(pixel_scalar + i * pixel_scalar + j)
 
-					if scanline_color_map[j] < 0 {
-						SDL.SetRenderDrawBlendMode(renderer, SDL.BlendMode.BLEND)
-						SDL.SetRenderDrawColor(renderer, 0, 0, 0, transmute(u8)math.abs(scanline_color_map[j]))
-					} else {
-						SDL.SetRenderDrawBlendMode(renderer, SDL.BlendMode.MUL)
-						SDL.SetRenderDrawColor(renderer, 255, 255, 255, transmute(u8)math.abs(scanline_color_map[j]))
-					}
-					SDL.RenderDrawLine(renderer, 0, scanline_y, screen_width, scanline_y)
+				if scanline_color_map[j] <= 0 {
+					SDL.SetRenderDrawBlendMode(renderer, SDL.BlendMode.BLEND)
+					SDL.SetRenderDrawColor(renderer, 0, 0, 0, transmute(u8)math.abs(scanline_color_map[j]))
+				} else {
+					SDL.SetRenderDrawBlendMode(renderer, SDL.BlendMode.MUL)
+					SDL.SetRenderDrawColor(renderer, 255, 255, 255, transmute(u8)math.abs(scanline_color_map[j]))
 				}
+				SDL.RenderDrawLine(renderer, 0, scanline_y, screen_width, scanline_y)
 			}
 		}
 	}

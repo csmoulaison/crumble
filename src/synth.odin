@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:mem"
 import "core:strings"
 import "core:math"
+import "core:math/rand"
 
 MAX_TRACK_STATES :: 512
 OSCILLATORS_LEN :: 3
@@ -88,9 +89,6 @@ audio_data_callback :: proc "c" (device: ^MA.device, output, input: rawptr, fram
             data.oscillators[i].t += t_add
             sin_index := data.oscillators[i].t
 
-            // for sin
-		    //mem.ptr_offset(output_f32, j * 2)^ += math.sin_f32(sin_index) * data.oscillators[i].amplitude
-
             // for square
             if (i == 0 && int(data.oscillators[i].t) % 2 == 0) || (i != 0 && int(data.oscillators[i].t * 2) % 4 == 0) {
                 mem.ptr_offset(output_f32, j )^ += data.oscillators[i].amplitude
@@ -102,11 +100,6 @@ audio_data_callback :: proc "c" (device: ^MA.device, output, input: rawptr, fram
             else if mem.ptr_offset(output_f32, j )^ > 0.999 do mem.ptr_offset(output_f32, j )^ = 0.999
 		}
 
-        // for sin
-        //if data.oscillators[i].t > math.PI * 128 {
-            //data.oscillators[i].t -= math.PI * 128
-        //}
-
         // for square
         if data.oscillators[i].t > 64 {
             data.oscillators[i].t -= 64
@@ -115,9 +108,13 @@ audio_data_callback :: proc "c" (device: ^MA.device, output, input: rawptr, fram
 }
 
 set_amplitude :: proc(oscillator: ^Oscillator, amp: f32) {
-    oscillator.target_amplitude = amp
+if amp > 0 {
+    oscillator.target_amplitude = amp + f32(rand.int_max(1000)) / 50000 - 500 / 50000
+} else {
+	oscillator.target_amplitude = 0
+}
 }
 
 set_frequency :: proc(oscillator: ^Oscillator, freq: f32) {
-    oscillator.frequency = i16(freq)
+    oscillator.frequency = i16(freq) + i16(rand.int_max(1000)) / 500 - 500 / 500
 }

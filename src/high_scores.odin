@@ -105,7 +105,7 @@ draw_high_scores :: proc(game: ^Game, config: ^Config, platform: ^Platform, dt: 
 	}
 
 	// Draw mod indicators if applicable
-	draw_mod_indicators(IVec2{LOGICAL_WIDTH - 33, top_margin - 16}, &session, platform)
+	draw_mod_indicators(IVec2{LOGICAL_WIDTH / 2 - 33, LOGICAL_HEIGHT / 2 - 98}, &game.session, platform)
 
 	// Draw headers
 	rank_text: IRect = {{245, 117}, {19, 7}}

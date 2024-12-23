@@ -75,6 +75,9 @@ update_game :: proc(game: ^Game, input: ^Input, platform: ^Platform, dt: f32) {
 		draw_high_scores(game, &config, platform, dt)
 	case GameState.PRE_MAIN_MENU:
 		update_pre_menu(game, input, platform, dt)
+		if input.quit.just_pressed {
+			state = GameState.QUIT
+		}
 	case GameState.QUIT:
 		platform.ready_to_quit = true
 	}

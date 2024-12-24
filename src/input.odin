@@ -9,8 +9,6 @@ Button :: struct {
 	held: bool,
 	just_pressed: bool,
 	just_released: bool,
-	// do we need the below?
-	// modified: bool,
 }
 
 ScancodeButtonMapping :: struct {

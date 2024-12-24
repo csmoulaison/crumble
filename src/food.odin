@@ -175,8 +175,20 @@ update_food_state :: proc(food: ^Food, config: ^Config, sound_system: ^SoundSyst
 			start_sound(sound_system, SoundType.FOOD_BLINK)
 		}
 	case FoodPhase.POT:
+		previous_active: bool = windows[current_window].is_active
+
+		windows[current_window].is_active = int(time_to_next_phase * 4) % 2 == 0
+		if time_to_next_phase < config.food_expiration_length / 2 {
+			windows[current_window].is_active = int(time_to_next_phase * 8) % 2 == 0
+
+			if windows[current_window].is_active != previous_active {
+				start_sound(sound_system, SoundType.FOOD_BLINK)
+			}
+		}
+
 		if time_to_next_phase < 0 {
 			phase, time_to_next_phase = FoodPhase.COOKED, config.food_expiration_length
+			start_sound(sound_system, SoundType.FOOD_APPEAR)
 			break
 		}
 	}

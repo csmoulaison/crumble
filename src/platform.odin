@@ -68,6 +68,12 @@ init_platform :: proc(platform: ^Platform) {
 	SDL.SetWindowIcon(window, window_icon)
 
 	init_audio(&audio)
+
+	for i: i32 = 0; i < SDL.NumJoysticks(); i += 1 {
+		if (SDL.IsGameController(i)) {
+			SDL.GameControllerOpen(i);
+		}
+	    }
 }
 
 update_platform :: proc(platform: ^Platform) {
@@ -91,29 +97,23 @@ update_platform :: proc(platform: ^Platform) {
 	//offset := IVec2{(int(screen_width) - LOGICAL_WIDTH * pixel_scalar) / 2 - 32, 64}
 
 	pixel_scalar: int = int(screen_height / LOGICAL_HEIGHT)
-	//SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
+	SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
 	//SDL.RenderDrawLine(renderer, 0, screen_height / 2, screen_width, screen_height / 2)
 
-	screen_scalar: f32 = f32(LOGICAL_HEIGHT) / f32(screen_height)
-	scaled_screen_width: f32 = f32(screen_width) * screen_scalar
-	pillarbox: int = (int(scaled_screen_width) - LOGICAL_WIDTH) / 2
+	screen_canvas_width: int = LOGICAL_WIDTH * pixel_scalar			
+	pillarbox: int = (int(screen_width) - screen_canvas_width) / 2
+	offset := IVec2{pillarbox, 0}
 
-	//SDL.SetRenderDrawColor(renderer, 0, 0, 255, 255)
+	SDL.SetRenderDrawColor(renderer, 255, 255, 255, 255)
 	//SDL.RenderDrawLine(renderer, i32(pillarbox), 0, i32(pillarbox), screen_height)
 
-	logical_pillarbox: int = pillarbox * pixel_scalar
-	offset := IVec2{logical_pillarbox, 0}
-
-	//SDL.SetRenderDrawColor(renderer, 255, 0, 0, 255)
-	//SDL.RenderDrawLine(renderer, i32(logical_pillarbox), 0, i32(logical_pillarbox), screen_height)
-
 	// Screen space center line
-	//SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
+	SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
 	//SDL.RenderDrawLine(renderer, screen_width / 2, 0, screen_width / 2, screen_height)
 
 	// Logical space center line
-	//SDL.SetRenderDrawColor(renderer, 0, 255, 0, 255)
-	//x: i32 = i32((LOGICAL_WIDTH / 2) + offset.x) * i32(pixel_scalar)
+	SDL.SetRenderDrawColor(renderer, 0, 255, 0, 255)
+	x: i32 = i32((LOGICAL_WIDTH / 2) + offset.x) * i32(pixel_scalar)
 	//SDL.RenderDrawLine(renderer, x, 0, x, screen_height)
 
 	for &sprite in sprites[:sprites_len] {
@@ -148,7 +148,7 @@ update_platform :: proc(platform: ^Platform) {
 	sprites_len = 0
 
 	// Scanlines
-	if false {
+	if true {
 		scanline_color_map: [8]i8 = {-128, -128, -128, -128, -128, -128, 0, 0}
 		if pixel_scalar == 1 {
 			scanline_color_map[0] = 0
@@ -204,6 +204,54 @@ update_platform :: proc(platform: ^Platform) {
 		case SDL.EventType.KEYUP:
 			keyups[keyups_len] = event.key.keysym.scancode
 			keyups_len += 1
+		case SDL.EventType.CONTROLLERBUTTONDOWN:
+			switch event.cbutton.button {
+			case u8(SDL.GameControllerButton.A):
+				keydowns[keydowns_len] = SDL.Scancode.SPACE
+				keydowns_len += 1
+			case u8(SDL.GameControllerButton.START):
+				keydowns[keydowns_len] = SDL.Scancode.SPACE
+				keydowns_len += 1
+			case u8(SDL.GameControllerButton.DPAD_LEFT):
+				keydowns[keydowns_len] = SDL.Scancode.LEFT
+				keydowns_len += 1
+			case u8(SDL.GameControllerButton.DPAD_RIGHT):
+				keydowns[keydowns_len] = SDL.Scancode.RIGHT
+				keydowns_len += 1
+			case u8(SDL.GameControllerButton.DPAD_UP):
+				keydowns[keydowns_len] = SDL.Scancode.UP
+				keydowns_len += 1
+			case u8(SDL.GameControllerButton.DPAD_DOWN):
+				keydowns[keydowns_len] = SDL.Scancode.DOWN
+				keydowns_len += 1
+			case u8(SDL.GameControllerButton.B):
+				keydowns[keydowns_len] = SDL.Scancode.ESCAPE
+				keydowns_len += 1
+			}
+		case SDL.EventType.CONTROLLERBUTTONUP:
+			switch event.cbutton.button {
+			case u8(SDL.GameControllerButton.A):
+				keyups[keyups_len] = SDL.Scancode.SPACE
+				keyups_len += 1
+			case u8(SDL.GameControllerButton.START):
+				keyups[keyups_len] = SDL.Scancode.SPACE
+				keyups_len += 1
+			case u8(SDL.GameControllerButton.DPAD_LEFT):
+				keyups[keyups_len] = SDL.Scancode.LEFT
+				keyups_len += 1
+			case u8(SDL.GameControllerButton.DPAD_RIGHT):
+				keyups[keyups_len] = SDL.Scancode.RIGHT
+				keyups_len += 1
+			case u8(SDL.GameControllerButton.DPAD_UP):
+				keyups[keyups_len] = SDL.Scancode.UP
+				keyups_len += 1
+			case u8(SDL.GameControllerButton.DPAD_DOWN):
+				keyups[keyups_len] = SDL.Scancode.DOWN
+				keyups_len += 1
+			case u8(SDL.GameControllerButton.B):
+				keyups[keyups_len] = SDL.Scancode.ESCAPE
+				keyups_len += 1
+			}
 		case SDL.EventType.WINDOWEVENT:
 			if event.window.event == SDL.WindowEventID.RESIZED {
 				screen_width = event.window.data1

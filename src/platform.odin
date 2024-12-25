@@ -48,19 +48,22 @@ Platform :: struct {
 	clock: f32,
 	mod_glitchy: bool,
 	glitch_chance: f32,
+	// Configs
+	crt: bool,
+	pixel_scalar_override: int,
 }
 
 init_platform :: proc(platform: ^Platform) {
 	using platform
 
 	SDL.Init(SDL.INIT_EVERYTHING)
+
 	display_mode: SDL.DisplayMode
 	SDL.GetDesktopDisplayMode(0, &display_mode)
 	screen_width = display_mode.w
 	screen_height = display_mode.h
 
 	window = SDL.CreateWindow("Crumble King", 0, 0, screen_width, screen_height, SDL.WINDOW_BORDERLESS)
-	//window = SDL.CreateWindow("Crumble King", 0, 0, 0, 0, SDL.WINDOW_RESIZABLE)
 	renderer = SDL.CreateRenderer(window, -1, SDL.RENDERER_ACCELERATED)
 
 	sprite_atlas_handle = new_texture_handle(platform, "textures/sprite_atlas.bmp")
@@ -96,7 +99,11 @@ update_platform :: proc(platform: ^Platform) {
 	//offset := IVec2{(int(screen_width) - LOGICAL_WIDTH * pixel_scalar) / 2, int((screen_height % LOGICAL_HEIGHT) / 2)}
 	//offset := IVec2{(int(screen_width) - LOGICAL_WIDTH * pixel_scalar) / 2 - 32, 64}
 
-	pixel_scalar: int = int(screen_height / LOGICAL_HEIGHT)
+	pixel_scalar: int = int(f32(screen_height) / f32(LOGICAL_HEIGHT))
+	if pixel_scalar_override != -1 {
+		pixel_scalar = pixel_scalar_override
+	}
+
 	SDL.SetRenderDrawColor(renderer, 255, 0, 255, 255)
 	//SDL.RenderDrawLine(renderer, 0, screen_height / 2, screen_width, screen_height / 2)
 
@@ -148,7 +155,7 @@ update_platform :: proc(platform: ^Platform) {
 	sprites_len = 0
 
 	// Scanlines
-	if true {
+	if crt {
 		scanline_color_map: [8]i8 = {-128, -128, -128, -128, -128, -128, 0, 0}
 		if pixel_scalar == 1 {
 			scanline_color_map[0] = 0

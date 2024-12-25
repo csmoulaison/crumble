@@ -1,5 +1,7 @@
 package main
 import "core:fmt"
+import "core:os"
+import "core:strconv"
 
 // TODO
 // * Co-op multiplayer
@@ -11,6 +13,25 @@ import "core:fmt"
 main :: proc() {
 	platform: ^Platform = new(Platform)
 	init_platform(platform)
+
+	platform.crt = false
+	platform.pixel_scalar_override = -1
+
+	check_scalar: bool = false
+	for arg in os.args[1:] {
+		if check_scalar {
+			platform.pixel_scalar_override = strconv.atoi(arg)
+			continue
+		}
+
+		if arg == "crt" {
+			platform.crt = true
+		}
+
+		if arg == "scalar" {
+			check_scalar = true
+		}
+	}
 
 	input: ^Input = new(Input)
 	init_input(input)
